@@ -91,6 +91,7 @@
         <module>Server-PskBruteforcer</module>
         <module>InvalidCurve</module>
         <module>Lucky13</module>
+        <module>Attacks</module>
     </modules>
     <build>
         <pluginManagement>
