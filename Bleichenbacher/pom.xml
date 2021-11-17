@@ -30,9 +30,8 @@
 		<!-- https://mvnrepository.com/artifact/de.rub.nds.tlsattacker/TLS-Attacker -->
 		<dependency>
 			<groupId>de.rub.nds.tlsattacker</groupId>
-			<artifactId>TLS-Attacker</artifactId>
-			<version>3.7.1</version>
-			<type>pom</type>
+			<artifactId>TLS-Core</artifactId>
+			<version>3.8.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/de.rub.nds/ModifiableVariable -->
