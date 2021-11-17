@@ -54,7 +54,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.main</mainClass>
+							<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
