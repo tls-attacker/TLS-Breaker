@@ -11,7 +11,9 @@ package de.rub.nds.tlsbreaker.invalidcurve.config;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import de.rub.nds.tlsbreaker.invalidcurve.config.delegate.AttackDelegate;
+
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.converters.BigIntegerConverter;

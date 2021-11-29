@@ -21,6 +21,7 @@ import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HeartbeatMode;
 import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 
 /**
  *

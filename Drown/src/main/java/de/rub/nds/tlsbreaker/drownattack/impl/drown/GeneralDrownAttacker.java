@@ -10,7 +10,7 @@
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import de.rub.nds.tlsbreaker.drownattack.config.GeneralDrownCommandConfig;
-import de.rub.nds.tlsbreaker.drownattack.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;

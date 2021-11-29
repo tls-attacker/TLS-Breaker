@@ -11,8 +11,9 @@ package de.rub.nds.tlsbreaker.bleichenbacher.config;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowType;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;

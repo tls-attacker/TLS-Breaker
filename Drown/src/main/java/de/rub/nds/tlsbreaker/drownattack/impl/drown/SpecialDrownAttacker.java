@@ -14,7 +14,7 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.Modifiable;
 import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
-import de.rub.nds.tlsbreaker.drownattack.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;

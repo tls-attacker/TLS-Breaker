@@ -9,9 +9,9 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.task;
 
-import de.rub.nds.tlsbreaker.invalidcurve.cca.CcaCertificateManager;
-import de.rub.nds.tlsbreaker.invalidcurve.cca.CcaWorkflowGenerator;
-import de.rub.nds.tlsbreaker.invalidcurve.cca.vector.CcaVector;
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaCertificateManager;
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaWorkflowGenerator;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.CcaVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.DefaultWorkflowExecutor;

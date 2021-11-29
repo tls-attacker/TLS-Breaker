@@ -11,9 +11,10 @@ package de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles;
 
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
-import de.rub.nds.tlsbreaker.drownattack.exception.AttackFailedException;
+import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
 import de.rub.nds.tlsbreaker.drownattack.impl.drown.ServerVerifyChecker;
-import de.rub.nds.tlsbreaker.drownattack.pkcs1.OracleException;
+import de.rub.nds.tlsbreaker.breakercommons.pkcs1.OracleException;
+import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
@@ -30,7 +31,6 @@ import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import java.util.Arrays;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

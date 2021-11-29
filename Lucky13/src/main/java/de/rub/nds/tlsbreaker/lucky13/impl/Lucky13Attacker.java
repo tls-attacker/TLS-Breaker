@@ -13,6 +13,7 @@ import de.rub.nds.modifiablevariable.VariableModification;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.lucky13.config.Lucky13CommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;

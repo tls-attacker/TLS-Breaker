@@ -9,8 +9,8 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.task;
 
-import de.rub.nds.tlsbreaker.invalidcurve.util.response.ResponseExtractor;
-import de.rub.nds.tlsbreaker.invalidcurve.util.response.ResponseFingerprint;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;

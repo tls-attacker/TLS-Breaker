@@ -18,38 +18,9 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
 import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.Cve20162107CommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.EarlyCCSCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.EarlyFinishedCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.GeneralDrownCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.HeartbleedCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.InvalidCurveAttackConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.Lucky13CommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.PaddingOracleCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.PoodleCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.PskBruteForcerAttackClientCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.PskBruteForcerAttackServerCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.SimpleMitmProxyCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.SpecialDrownCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.TLSPoodleCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.delegate.GeneralAttackDelegate;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.Cve20162107Attacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.EarlyCCSAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.EarlyFinishedAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.HeartbleedAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.InvalidCurveAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.Lucky13Attacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.PaddingOracleAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.PoodleAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.PskBruteForcerAttackClient;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.PskBruteForcerAttackServer;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.SimpleMitmProxy;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.TLSPoodleAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.drown.GeneralDrownAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.drown.SpecialDrownAttacker;
-
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,50 +42,6 @@ public class Main {
 
         BleichenbacherCommandConfig bleichenbacherTest = new BleichenbacherCommandConfig(generalDelegate);
         builder.addCommand(BleichenbacherCommandConfig.ATTACK_COMMAND, bleichenbacherTest);
-
-        PskBruteForcerAttackServerCommandConfig pskBruteForcerAttackServerTest =
-            new PskBruteForcerAttackServerCommandConfig(generalDelegate);
-        builder.addCommand(PskBruteForcerAttackServerCommandConfig.ATTACK_COMMAND, pskBruteForcerAttackServerTest);
-
-        PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientTest =
-            new PskBruteForcerAttackClientCommandConfig(generalDelegate);
-        builder.addCommand(PskBruteForcerAttackClientCommandConfig.ATTACK_COMMAND, pskBruteForcerAttackClientTest);
-
-        InvalidCurveAttackConfig ellipticTest = new InvalidCurveAttackConfig(generalDelegate);
-        builder.addCommand(InvalidCurveAttackConfig.ATTACK_COMMAND, ellipticTest);
-
-        HeartbleedCommandConfig heartbleed = new HeartbleedCommandConfig(generalDelegate);
-        builder.addCommand(HeartbleedCommandConfig.ATTACK_COMMAND, heartbleed);
-
-        Lucky13CommandConfig lucky13 = new Lucky13CommandConfig(generalDelegate);
-        builder.addCommand(Lucky13CommandConfig.ATTACK_COMMAND, lucky13);
-
-        PaddingOracleCommandConfig paddingOracle = new PaddingOracleCommandConfig(generalDelegate);
-        builder.addCommand(PaddingOracleCommandConfig.ATTACK_COMMAND, paddingOracle);
-
-        TLSPoodleCommandConfig tlsPoodle = new TLSPoodleCommandConfig(generalDelegate);
-        builder.addCommand(TLSPoodleCommandConfig.ATTACK_COMMAND, tlsPoodle);
-
-        Cve20162107CommandConfig cve20162107 = new Cve20162107CommandConfig(generalDelegate);
-        builder.addCommand(Cve20162107CommandConfig.ATTACK_COMMAND, cve20162107);
-
-        EarlyCCSCommandConfig earlyCCS = new EarlyCCSCommandConfig(generalDelegate);
-        builder.addCommand(EarlyCCSCommandConfig.ATTACK_COMMAND, earlyCCS);
-
-        EarlyFinishedCommandConfig earlyFin = new EarlyFinishedCommandConfig(generalDelegate);
-        builder.addCommand(EarlyFinishedCommandConfig.ATTACK_COMMAND, earlyFin);
-
-        PoodleCommandConfig poodle = new PoodleCommandConfig(generalDelegate);
-        builder.addCommand(PoodleCommandConfig.ATTACK_COMMAND, poodle);
-
-        SimpleMitmProxyCommandConfig simpleMITMProxy = new SimpleMitmProxyCommandConfig(generalDelegate);
-        builder.addCommand(SimpleMitmProxyCommandConfig.ATTACK_COMMAND, simpleMITMProxy);
-
-        GeneralDrownCommandConfig generalDrownConfig = new GeneralDrownCommandConfig(generalDelegate);
-        builder.addCommand(GeneralDrownCommandConfig.COMMAND, generalDrownConfig);
-
-        SpecialDrownCommandConfig specialDrownConfig = new SpecialDrownCommandConfig(generalDelegate);
-        builder.addCommand(SpecialDrownCommandConfig.COMMAND, specialDrownConfig);
 
         JCommander jc = builder.build();
 
@@ -145,50 +72,6 @@ public class Main {
         switch (jc.getParsedCommand()) {
             case BleichenbacherCommandConfig.ATTACK_COMMAND:
                 attacker = new BleichenbacherAttacker(bleichenbacherTest, bleichenbacherTest.createConfig());
-                break;
-            case InvalidCurveAttackConfig.ATTACK_COMMAND:
-                attacker = new InvalidCurveAttacker(ellipticTest, ellipticTest.createConfig());
-                break;
-            case HeartbleedCommandConfig.ATTACK_COMMAND:
-                attacker = new HeartbleedAttacker(heartbleed, heartbleed.createConfig());
-                break;
-            case Lucky13CommandConfig.ATTACK_COMMAND:
-                attacker = new Lucky13Attacker(lucky13, lucky13.createConfig());
-                break;
-            case TLSPoodleCommandConfig.ATTACK_COMMAND:
-                attacker = new TLSPoodleAttacker(tlsPoodle, tlsPoodle.createConfig());
-                break;
-            case PaddingOracleCommandConfig.ATTACK_COMMAND:
-                attacker = new PaddingOracleAttacker(paddingOracle, paddingOracle.createConfig());
-                break;
-            case Cve20162107CommandConfig.ATTACK_COMMAND:
-                attacker = new Cve20162107Attacker(cve20162107, cve20162107.createConfig());
-                break;
-            case EarlyCCSCommandConfig.ATTACK_COMMAND:
-                attacker = new EarlyCCSAttacker(earlyCCS, earlyCCS.createConfig());
-                break;
-            case EarlyFinishedCommandConfig.ATTACK_COMMAND:
-                attacker = new EarlyFinishedAttacker(earlyFin, earlyFin.createConfig());
-                break;
-            case PoodleCommandConfig.ATTACK_COMMAND:
-                attacker = new PoodleAttacker(poodle, poodle.createConfig());
-                break;
-            case SimpleMitmProxyCommandConfig.ATTACK_COMMAND:
-                attacker = new SimpleMitmProxy(simpleMITMProxy, simpleMITMProxy.createConfig());
-                break;
-            case PskBruteForcerAttackClientCommandConfig.ATTACK_COMMAND:
-                attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
-                    pskBruteForcerAttackClientTest.createConfig());
-                break;
-            case PskBruteForcerAttackServerCommandConfig.ATTACK_COMMAND:
-                attacker = new PskBruteForcerAttackServer(pskBruteForcerAttackServerTest,
-                    pskBruteForcerAttackServerTest.createConfig());
-                break;
-            case GeneralDrownCommandConfig.COMMAND:
-                attacker = new GeneralDrownAttacker(generalDrownConfig, generalDrownConfig.createConfig());
-                break;
-            case SpecialDrownCommandConfig.COMMAND:
-                attacker = new SpecialDrownAttacker(specialDrownConfig, specialDrownConfig.createConfig());
                 break;
             default:
                 break;

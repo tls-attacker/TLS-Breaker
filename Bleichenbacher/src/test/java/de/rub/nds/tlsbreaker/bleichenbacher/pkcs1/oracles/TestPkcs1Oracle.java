@@ -12,6 +12,8 @@ package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
+
 /**
  *
  *
