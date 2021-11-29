@@ -6,23 +6,23 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.config;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
-import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowType;
-import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
+import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowType;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +34,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     /**
      *
      */
-    public static final String ATTACK_COMMAND = "bleichenbacher";
-
     @ParametersDelegate
     private ClientDelegate clientDelegate;
 
@@ -69,13 +67,17 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     @Parameter(names = "-workflowType", description = "Which workflow traces should be tested with")
     private BleichenbacherWorkflowType workflowType = BleichenbacherWorkflowType.CKE_CCS_FIN;
 
+    @Parameter(names = "-pcap",
+        description = "Location of the pcap file that will be used for the Bleichenbacher attack."
+            + "The server to be attacked and the pre-master secret will be extracted automatically from the given pcap file.")
+    private String pcapFileLocation;
+
     /**
      * How many rescans should be done
      */
     private int numberOfIterations = 3;
 
     /**
-     *
      * @param delegate
      */
     public BleichenbacherCommandConfig(GeneralDelegate delegate) {
@@ -93,7 +95,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     public Type getType() {
@@ -101,7 +102,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @param type
      */
     public void setType(Type type) {
@@ -109,7 +109,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -141,7 +140,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -150,7 +148,6 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     public String getEncryptedPremasterSecret() {
@@ -158,26 +155,10 @@ public class BleichenbacherCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     public boolean isMsgPkcsConform() {
         return msgPkcsConform;
-    }
-
-    /**
-     *
-     */
-    public enum Type {
-
-        /**
-         *
-         */
-        FULL,
-        /**
-         *
-         */
-        FAST
     }
 
     public BleichenbacherWorkflowType getWorkflowType() {
@@ -202,5 +183,24 @@ public class BleichenbacherCommandConfig extends AttackConfig {
 
     public ProtocolVersionDelegate getProtocolVersionDelegate() {
         return protocolVersionDelegate;
+    }
+
+    public String getPcapFileLocation() {
+        return pcapFileLocation;
+    }
+
+    /**
+     *
+     */
+    public enum Type {
+
+        /**
+         *
+         */
+        FULL,
+        /**
+         *
+         */
+        FAST
     }
 }
