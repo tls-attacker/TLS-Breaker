@@ -10,3 +10,32 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+
+
+resources/*.pem
+test.sh
+
+# (build) artifacts
+apps/
+target/
+
+# Eclipse
+**/.classpath
+**/.project
+**/.settings/
+.project
+
+# Netbeans
+nbproject/
+nbactions.xml.project
+
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+pom.xml.*
+release.properties
+
+# VS Code
+.factorypath

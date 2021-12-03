@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss}{GMT+0} [%t] %-5level: %c{1} - %msg%n%throwable}"/>
+        </Console>
+        <Console name="Info" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss}{GMT+0} [%t] %-5level: %c{1}} - %msg%n%highlight{%throwable}"/>
+        </Console>
+        <Console name="Direct" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%msg}%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="DirectLogger" level="ALL" additivity="false">
+            <AppenderRef ref="Direct"/>
+        </Logger>
+		
+        <Logger name="de.rub.nds.tlsbreaker.core.protocol.handler" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.protocol.message" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.protocol.parser" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.protocol.preparator" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.protocol.serializer" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.cipher" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.compressor" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.crypto" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.layer" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.parser" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.preparator" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.record.serializer" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.workflow" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.workflow.action" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.config" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.state" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.core.constants" level="WARN"/>
+        <Logger name="de.rub.nds.modifiablevariable" level="WARN"/>
+        <Logger name="de.rub.nds.tlsbreaker.transport.tcp.ClientTcpTransportHandler" level="WARN"/>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
