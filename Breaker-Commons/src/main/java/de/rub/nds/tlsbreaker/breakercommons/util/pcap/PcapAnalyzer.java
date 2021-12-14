@@ -34,7 +34,7 @@ import de.rub.nds.tlsattacker.core.record.parser.RecordParser;
 
 public class PcapAnalyzer {
 
-    private static String pcapFileLocation;
+    private final String pcapFileLocation;
     private PcapHandle handle;
     private byte[] pms;
     PcapSession psession;
