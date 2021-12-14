@@ -251,9 +251,9 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
 //
 //        LOGGER.info("Fetched the following server public key: " + publicKey);
 //        byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
-		PcapAnalyzer someanalyzer = new PcapAnalyzer();
-		
-		byte[] pms = someanalyzer.getPreMasterSecret();
+        PcapAnalyzer someanalyzer = new PcapAnalyzer();
+
+        byte[] pms = someanalyzer.getPreMasterSecret();
         if ((pms.length * Bits.IN_A_BYTE) != publicKey.getModulus().bitLength()) {
             throw new ConfigurationException("The length of the encrypted premaster secret you have "
                 + "is not equal to the server public key length. Have you selected the correct value?");
