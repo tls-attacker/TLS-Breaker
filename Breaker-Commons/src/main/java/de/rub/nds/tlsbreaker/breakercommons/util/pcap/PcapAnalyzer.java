@@ -34,12 +34,13 @@ import de.rub.nds.tlsattacker.core.record.parser.RecordParser;
 
 public class PcapAnalyzer {
 
-    private static final String PCAP_FILE = "/home/bemore/Desktop/bb-session.pcapng";
+    private final String pcapFileLocation;
     private PcapHandle handle;
     private byte[] pms;
     PcapSession psession;
 
-    public PcapAnalyzer() {
+    public PcapAnalyzer(String pcapFileLocation) {
+        this.pcapFileLocation = pcapFileLocation;
         try {
             this.getSessionPackets();
         } catch (NotOpenException e) {
@@ -95,9 +96,10 @@ public class PcapAnalyzer {
     private void getSessionPackets() throws NotOpenException {
 
         try {
-            handle = Pcaps.openOffline(PCAP_FILE, TimestampPrecision.NANO);
+            handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
+            e.printStackTrace();
             // dumppac = Pcaps.openOffline(PCAP_FILE);
         }
 

@@ -36,9 +36,9 @@ public class Main {
      */
     public static void main(String[] args) {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
-        BleichenbacherCommandConfig bleichenbacherTest = new BleichenbacherCommandConfig(generalDelegate);
-        JCommander jc = JCommander.newBuilder().addObject(bleichenbacherTest).build();
+        BleichenbacherCommandConfig bleichenbacherCommandConfig = new BleichenbacherCommandConfig(generalDelegate);
 
+        JCommander jc = JCommander.newBuilder().addObject(bleichenbacherCommandConfig).build();
         try {
             jc.parse(args);
         } catch (ParameterException ex) {
@@ -52,9 +52,9 @@ public class Main {
         }
 
         Attacker<? extends TLSDelegateConfig> attacker =
-            new BleichenbacherAttacker(bleichenbacherTest, bleichenbacherTest.createConfig());
+            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         // TODO: Remove log
-        CONSOLE.info("Pcap file location = " + bleichenbacherTest.getPcapFileLocation());
+        CONSOLE.info("Pcap file location = " + bleichenbacherCommandConfig.getPcapFileLocation());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();
