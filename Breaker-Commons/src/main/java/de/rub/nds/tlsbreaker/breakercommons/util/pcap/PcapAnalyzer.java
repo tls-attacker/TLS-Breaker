@@ -1,3 +1,12 @@
+/**
+ * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
+ *
+ * Copyright 2021-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ *
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ */
+
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import java.io.EOFException;
@@ -24,89 +33,93 @@ import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.parser.RecordParser;
 
 public class PcapAnalyzer {
-	
 
-	private static final String PCAP_FILE = "/home/bemore/Desktop/bb-session.pcapng";
-	private PcapHandle handle;
-	private byte[] pms;
+    private static final String PCAP_FILE = "/home/bemore/Desktop/bb-session.pcapng";
+    private PcapHandle handle;
+    private byte[] pms;
+    PcapSession psession;
 
-//	public PcapAnalyzer(PcapHandle handle, String pcap_file) {
-//		this.handle = handle;
-//
-//	}
-	
-	public PcapAnalyzer() {
-		
-	}
-	
-	
-	public byte[] getPreMasterSecret() {
-		try {
-			findPremasterSecret();
-		} catch (PcapNativeException | NotOpenException e) {
+    public PcapAnalyzer() {
+    	try {
+			this.getSessionPackets();
+		} catch (NotOpenException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return pms;
+    }
+    
+	public static void main(String[] args) {
+		
+
+		
+		
 	}
-	
 
-	private void findPremasterSecret() throws PcapNativeException, NotOpenException {
+    public byte[] getPreMasterSecret() {
+        ProtocolVersion pversion = ProtocolVersion.TLS12;
 
-		try {
-			handle = Pcaps.openOffline(PCAP_FILE, TimestampPrecision.NANO);
-		} catch (PcapNativeException e) {
-			System.out.println("Can not find file");
-			// dumppac = Pcaps.openOffline(PCAP_FILE);
-		}
+//      System.out.println(new String(Hex.encodeHex(bytearray)));
 
-		while (true) {
-			try {
-				Packet packet = handle.getNextPacketEx();
+//		for(TcpPacket p:psession.getSessionFlights()) {
+        for (int i = 0; i < 5; i++) {
+            RecordParser parser =
+                new RecordParser(0, psession.getSessionFlights().get(i).getPayload().getRawData(), pversion);
 
-				TcpPacket tcpPacket = packet.get(TcpPacket.class);
+            Record parsedRecord = parser.parse();
+//	      System.out.println(Hex.encodeHex(tcpPacket.getPayload().getRawData()));
+//	      System.out.println(Hex.encodeHex(parsedRecord.getProtocolMessageBytes().getValue()));
 
-				ProtocolVersion pversion = ProtocolVersion.TLS12;
+            System.out.println(parsedRecord.getLength());
 
-//                System.out.println(new String(Hex.encodeHex(bytearray)));
+            System.out.println(parsedRecord.getContentMessageType());
 
-				RecordParser parser = new RecordParser(0, tcpPacket.getPayload().getRawData(), pversion);
+            Config config = Config.createConfig();
 
-				Record parsedRecord = parser.parse();
-//                System.out.println(Hex.encodeHex(tcpPacket.getPayload().getRawData()));
-//                System.out.println(Hex.encodeHex(parsedRecord.getProtocolMessageBytes().getValue()));
+            if (parsedRecord.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                try {
+                    RSAClientKeyExchangeParser rsaparser = new RSAClientKeyExchangeParser(0,
+                        parsedRecord.getProtocolMessageBytes().getValue(), pversion, config);
+                    RSAClientKeyExchangeMessage msg = (RSAClientKeyExchangeMessage) rsaparser.parse();
+                    pms = msg.getPublicKey().getValue();
+                } catch (Exception e) {
 
-				System.out.println(parsedRecord.getLength());
+                    System.out.println("Message not compatible");
+                    continue;
+                }
+            }
 
-				System.out.println(parsedRecord.getContentMessageType());
+            System.out.println("-------------------------------------------------");
 
-				Config config = Config.createConfig();
-				
-				if (parsedRecord.getContentMessageType() == ProtocolMessageType.APPLICATION_DATA) {
-					break;
-				}
+        }
 
-				if (parsedRecord.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
-					try {
-						RSAClientKeyExchangeParser rsaparser = new RSAClientKeyExchangeParser(0,
-								parsedRecord.getProtocolMessageBytes().getValue(), pversion, config);
-						RSAClientKeyExchangeMessage msg = (RSAClientKeyExchangeMessage) rsaparser.parse();
-						pms = msg.getPublicKey().getValue();
-					} catch (Exception e) {
-						
-						System.out.println("Message not compatible");
-						continue;
-					}
-				}
+        return pms;
+    }
 
-				System.out.println("-------------------------------------------------");
+    private void getSessionPackets() throws NotOpenException {
 
-			} catch (TimeoutException e) {
-			} catch (EOFException e) {
-				System.out.println("EOF");
-				break;
-			}
-		}
-	}
+        try {
+            handle = Pcaps.openOffline(PCAP_FILE, TimestampPrecision.NANO);
+        } catch (PcapNativeException e) {
+            System.out.println("Can not find file");
+            // dumppac = Pcaps.openOffline(PCAP_FILE);
+        }
+
+        psession = new PcapSession();
+
+        while (true) {
+
+            Packet packet = handle.getNextPacket();
+
+            if (packet == null) {
+                break;
+            }
+
+            TcpPacket tcpPacket = packet.get(TcpPacket.class);
+
+            System.out.println(tcpPacket);
+
+            psession.addPacket(tcpPacket);
+        }
+    }
 
 }

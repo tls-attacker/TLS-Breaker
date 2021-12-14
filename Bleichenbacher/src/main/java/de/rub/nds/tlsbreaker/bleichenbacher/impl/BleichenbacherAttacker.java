@@ -38,7 +38,6 @@ import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ExtractPmsData;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
@@ -249,14 +248,12 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
 //            throw new ConfigurationException(
 //                "You have to set the encrypted premaster secret you are " + "going to decrypt");
 //        }
-
-        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer();
-        LOGGER.info("Fetched the following server public key: " + publicKey);
+//
+//        LOGGER.info("Fetched the following server public key: " + publicKey);
 //        byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
-        byte[] pms = pcapAnalyzer.getPreMasterSecret();
-        System.out.println(pms);
-
-        
+		PcapAnalyzer someanalyzer = new PcapAnalyzer();
+		
+		byte[] pms = someanalyzer.getPreMasterSecret();
         if ((pms.length * Bits.IN_A_BYTE) != publicKey.getModulus().bitLength()) {
             throw new ConfigurationException("The length of the encrypted premaster secret you have "
                 + "is not equal to the server public key length. Have you selected the correct value?");
