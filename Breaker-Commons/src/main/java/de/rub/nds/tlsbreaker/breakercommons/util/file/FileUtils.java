@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.util;
+package de.rub.nds.tlsbreaker.breakercommons.util.file;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
