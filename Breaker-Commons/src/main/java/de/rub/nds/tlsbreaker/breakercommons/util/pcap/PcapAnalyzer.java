@@ -40,20 +40,17 @@ public class PcapAnalyzer {
     PcapSession psession;
 
     public PcapAnalyzer() {
-    	try {
-			this.getSessionPackets();
-		} catch (NotOpenException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            this.getSessionPackets();
+        } catch (NotOpenException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-    
-	public static void main(String[] args) {
-		
 
-		
-		
-	}
+    public static void main(String[] args) {
+
+    }
 
     public byte[] getPreMasterSecret() {
         ProtocolVersion pversion = ProtocolVersion.TLS12;
