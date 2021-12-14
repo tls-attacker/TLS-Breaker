@@ -33,11 +33,11 @@ import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.padding.VectorResponse;
 import de.rub.nds.tlsbreaker.breakercommons.padding.vector.FingerprintTaskVectorPair;
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ExtractPmsData;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
@@ -76,8 +76,6 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
 
     private boolean shakyScans = false;
     private boolean erroneousScans = false;
-
-    private byte[] pms;
 
     /**
      *
@@ -246,24 +244,16 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
             return;
         }
 
-        // Code block used to get pms from user input
 //        if (config.getEncryptedPremasterSecret() == null) {
 //            throw new ConfigurationException(
 //                "You have to set the encrypted premaster secret you are " + "going to decrypt");
 //        }
+//
+//        LOGGER.info("Fetched the following server public key: " + publicKey);
+//        byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
+        PcapAnalyzer someanalyzer = new PcapAnalyzer();
 
-        LOGGER.info("Fetched the following server public key: " + publicKey);
-
-        ExtractPmsData pms_extract = new ExtractPmsData();
-        try {
-            // byte[] pms = pms_extract.pmsDataExtracterFunction();
-            pms = ArrayConverter.hexStringToByteArray(pms_extract.pmsDataExtracterFunction());
-        } catch (Exception e) {
-
-            System.out.println("Something went wrong while fetching PMS Data.");
-        }
-
-        //// byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
+        byte[] pms = someanalyzer.getPreMasterSecret();
         if ((pms.length * Bits.IN_A_BYTE) != publicKey.getModulus().bitLength()) {
             throw new ConfigurationException("The length of the encrypted premaster secret you have "
                 + "is not equal to the server public key length. Have you selected the correct value?");
