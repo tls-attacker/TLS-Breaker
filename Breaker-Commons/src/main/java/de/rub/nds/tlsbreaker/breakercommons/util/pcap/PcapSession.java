@@ -17,15 +17,15 @@ import org.pcap4j.packet.TcpPacket;
 
 public class PcapSession {
 
-    private final List<TcpPacket> sessionFlights = Collections.synchronizedList(new ArrayList<>());
+    private final List<TcpPacket> tcppackets = Collections.synchronizedList(new ArrayList<>());
 
     public void addPacket(TcpPacket tcp) {
-        sessionFlights.add(tcp);
+        tcppackets.add(tcp);
 
     }
 
     public List<TcpPacket> getSessionFlights() {
-        return Collections.unmodifiableList(sessionFlights);
+        return Collections.unmodifiableList(tcppackets);
     }
 
 }

@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import java.io.EOFException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.codec.binary.Hex;
@@ -27,10 +28,14 @@ import org.pcap4j.packet.TcpPacket;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsattacker.core.exceptions.ParserException;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
+import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
+import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.record.parser.RecordParser;
+import de.rub.nds.tlsattacker.core.state.TlsContext;
 
 public class PcapAnalyzer {
 
@@ -50,43 +55,50 @@ public class PcapAnalyzer {
     }
 
     public static void main(String[] args) {
+        PcapAnalyzer analyzer = new PcapAnalyzer("/home/bemore/Desktop/bb-session.pcapng");
 
+        try {
+            System.out.println(analyzer.getPreMasterSecret());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public byte[] getPreMasterSecret() {
         ProtocolVersion pversion = ProtocolVersion.TLS12;
 
-//      System.out.println(new String(Hex.encodeHex(bytearray)));
+        for (TcpPacket p : psession.getSessionFlights()) {
 
-//		for(TcpPacket p:psession.getSessionFlights()) {
-        for (int i = 0; i < 5; i++) {
-            RecordParser parser =
-                new RecordParser(0, psession.getSessionFlights().get(i).getPayload().getRawData(), pversion);
+            try {
+                TlsContext context = new TlsContext();
 
-            Record parsedRecord = parser.parse();
-//	      System.out.println(Hex.encodeHex(tcpPacket.getPayload().getRawData()));
-//	      System.out.println(Hex.encodeHex(parsedRecord.getProtocolMessageBytes().getValue()));
+                TlsRecordLayer rec_layer = new TlsRecordLayer(context);
 
-            System.out.println(parsedRecord.getLength());
+                List<AbstractRecord> allrecords = rec_layer.parseRecords(p.getPayload().getRawData());
 
-            System.out.println(parsedRecord.getContentMessageType());
+                for (AbstractRecord ar : allrecords) {
 
-            Config config = Config.createConfig();
+                    Config config = Config.createConfig();
 
-            if (parsedRecord.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
-                try {
-                    RSAClientKeyExchangeParser rsaparser = new RSAClientKeyExchangeParser(0,
-                        parsedRecord.getProtocolMessageBytes().getValue(), pversion, config);
-                    RSAClientKeyExchangeMessage msg = (RSAClientKeyExchangeMessage) rsaparser.parse();
-                    pms = msg.getPublicKey().getValue();
-                } catch (Exception e) {
+                    if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                        try {
+                            RSAClientKeyExchangeParser rsaparser = new RSAClientKeyExchangeParser(0,
+                                ar.getProtocolMessageBytes().getValue(), pversion, config);
+                            RSAClientKeyExchangeMessage msg = (RSAClientKeyExchangeMessage) rsaparser.parse();
+                            pms = msg.getPublicKey().getValue();
+                        } catch (Exception e) {
 
-                    System.out.println("Message not compatible");
-                    continue;
+                            System.out.println("Message not compatible");
+                            continue;
+                        }
+                    }
+
+                    System.out.println("-------------------------------------------------");
                 }
+            } catch (ParserException pe) {
+                System.out.println("The package could not be parsed");
             }
-
-            System.out.println("-------------------------------------------------");
 
         }
 
