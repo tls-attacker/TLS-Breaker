@@ -6,25 +6,22 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.tlspoodle;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.JCommander.Builder;
 import com.beust.jcommander.ParameterException;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.tlspoodle.config.TLSPoodleCommandConfig;
 import de.rub.nds.tlsbreaker.tlspoodle.impl.TLSPoodleAttacker;
-
-import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Objects;
+
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  *
@@ -39,48 +36,22 @@ public class Main {
      */
     public static void main(String[] args) {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
-        Builder builder = JCommander.newBuilder().addObject(generalDelegate);
-
         TLSPoodleCommandConfig tlsPoodle = new TLSPoodleCommandConfig(generalDelegate);
-        builder.addCommand(TLSPoodleCommandConfig.ATTACK_COMMAND, tlsPoodle);
 
-        JCommander jc = builder.build();
-
+        JCommander jc = JCommander.newBuilder().addObject(tlsPoodle).build();
         try {
             jc.parse(args);
         } catch (ParameterException ex) {
-            String parsedCommand = ex.getJCommander().getParsedCommand();
-            if (parsedCommand != null) {
-                ex.getJCommander().getUsageFormatter().usage(parsedCommand);
-            } else {
-                ex.usage();
-            }
-            return;
-        }
-
-        if (jc.getParsedCommand() == null) {
-            jc.usage();
+            ex.usage();
             return;
         }
 
         if (generalDelegate.isHelp()) {
-            jc.getUsageFormatter().usage(jc.getParsedCommand());
+            jc.usage();
             return;
         }
 
-        Attacker<? extends TLSDelegateConfig> attacker = null;
-
-        switch (jc.getParsedCommand()) {
-            case TLSPoodleCommandConfig.ATTACK_COMMAND:
-                attacker = new TLSPoodleAttacker(tlsPoodle, tlsPoodle.createConfig());
-                break;
-            default:
-                break;
-        }
-
-        if (attacker == null) {
-            throw new ConfigurationException("Command not found");
-        }
+        Attacker<? extends TLSDelegateConfig> attacker = new TLSPoodleAttacker(tlsPoodle, tlsPoodle.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();
