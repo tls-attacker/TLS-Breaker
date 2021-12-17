@@ -26,10 +26,12 @@ import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
 
 import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
@@ -83,10 +85,26 @@ public class PcapAnalyzer {
 
                     if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
                         try {
-                            RSAClientKeyExchangeParser rsaparser = new RSAClientKeyExchangeParser(0,
-                                ar.getProtocolMessageBytes().getValue(), pversion, config);
-                            RSAClientKeyExchangeMessage msg = (RSAClientKeyExchangeMessage) rsaparser.parse();
+                            HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
+                                new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
+                                    config);
+
+                            System.out.println(ar.getContentMessageType());
+
+                            RSAClientKeyExchangeMessage msg = rsaparser.parse();
+
+                            if (msg.getType().getValue() != msg.getHandshakeMessageType().getValue()) {
+                                continue;
+                            }
+
+                            System.out.println(msg.getType());
+                            System.out.println(msg.getType().getValue());
+                            System.out.println(msg.getProtocolMessageType());
+                            System.out.println(msg.getHandshakeMessageType());
+                            System.out.println(msg.getHandshakeMessageType().getValue());
+
                             pms = msg.getPublicKey().getValue();
+
                         } catch (Exception e) {
 
                             System.out.println("Message not compatible");
