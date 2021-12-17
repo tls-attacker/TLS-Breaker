@@ -57,7 +57,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>de.rub.nds.tlsbreaker.attacks.Main</mainClass>
+							<mainClass>de.rub.nds.tlsbreaker.poodle.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
