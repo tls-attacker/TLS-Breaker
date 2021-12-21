@@ -10,7 +10,11 @@
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import java.io.EOFException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.codec.binary.Hex;
@@ -30,6 +34,7 @@ import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
@@ -43,67 +48,76 @@ public class PcapAnalyzer {
 
     private final String pcapFileLocation;
     private PcapHandle handle;
-    private byte[] pms;
+    private List<Entry<IpV4Packet, TcpPacket>> sessionPackets = Collections.synchronizedList(new ArrayList<>());
     PcapSession psession;
 
     public PcapAnalyzer(String pcapFileLocation) {
         this.pcapFileLocation = pcapFileLocation;
         try {
-            this.getSessionPackets();
+            this.getPacketsFromPcapFile();
         } catch (NotOpenException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        PcapAnalyzer analyzer = new PcapAnalyzer("/home/bemore/Desktop/bb-session.pcapng");
+    public byte[] getPreMasterSecret(ClientKeyExchangeMessage chosenCKEMessage) {
+        return chosenCKEMessage.getPublicKey().getValue();
 
-        try {
-            System.out.println(analyzer.getPreMasterSecret());
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
-    public byte[] getPreMasterSecret() {
-        ProtocolVersion pversion = ProtocolVersion.TLS12;
+    /**
+     * Get a list PcapSessions that are extracted from the PcapFie
+     * 
+     * @see PcapSesession.java for the definition of a session.
+     */
+    public List<PcapSession> getAllSessions() {
 
-        for (TcpPacket p : psession.getSessionFlights()) {
+        List<PcapSession> pcapSessions = new ArrayList<>();
+
+        for (Entry<IpV4Packet, TcpPacket> p : getSessionPackets()) {
 
             try {
                 TlsContext context = new TlsContext();
 
                 TlsRecordLayer rec_layer = new TlsRecordLayer(context);
 
-                List<AbstractRecord> allrecords = rec_layer.parseRecords(p.getPayload().getRawData());
+                List<AbstractRecord> allrecords;
+                if (p.getValue().getPayload() != null) {
+                    allrecords = rec_layer.parseRecords(p.getValue().getPayload().getRawData());
+                } else {
+                    continue;
+                }
 
                 for (AbstractRecord ar : allrecords) {
 
+                    Record thisRecord = (Record) ar;
+
+                    ProtocolVersion pversion =
+                        ProtocolVersion.getProtocolVersion(thisRecord.getProtocolVersion().getValue());
+
                     Config config = Config.createConfig();
 
+                    // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
+                    // messages are ignored.
                     if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+
                         try {
                             HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
                                 new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
                                     config);
 
-                            System.out.println(ar.getContentMessageType());
-
+                            // System.out.println(ar.getContentMessageType());
                             RSAClientKeyExchangeMessage msg = rsaparser.parse();
 
-                            if (msg.getType().getValue() != msg.getHandshakeMessageType().getValue()) {
-                                continue;
+                            if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
+
+                                pcapSessions.add(new PcapSession(p.getKey().getHeader().getSrcAddr().toString(),
+                                    p.getKey().getHeader().getDstAddr().toString(), msg));
+
+                                System.out.println("Source is: " + p.getKey().getHeader().getSrcAddr().toString());
+                                System.out.println("Destination is " + p.getKey().getHeader().getDstAddr().toString());
                             }
-
-                            System.out.println(msg.getType());
-                            System.out.println(msg.getType().getValue());
-                            System.out.println(msg.getProtocolMessageType());
-                            System.out.println(msg.getHandshakeMessageType());
-                            System.out.println(msg.getHandshakeMessageType().getValue());
-
-                            pms = msg.getPublicKey().getValue();
 
                         } catch (Exception e) {
 
@@ -116,24 +130,24 @@ public class PcapAnalyzer {
                 }
             } catch (ParserException pe) {
                 System.out.println("The package could not be parsed");
+
             }
 
         }
-
-        return pms;
+        return pcapSessions;
     }
 
-    private void getSessionPackets() throws NotOpenException {
+    public List<Entry<IpV4Packet, TcpPacket>> getSessionPackets() {
+        return sessionPackets;
+    }
+
+    private void getPacketsFromPcapFile() throws NotOpenException {
 
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
-            e.printStackTrace();
-            // dumppac = Pcaps.openOffline(PCAP_FILE);
         }
-
-        psession = new PcapSession();
 
         while (true) {
 
@@ -145,9 +159,14 @@ public class PcapAnalyzer {
 
             TcpPacket tcpPacket = packet.get(TcpPacket.class);
 
-            System.out.println(tcpPacket);
+            IpV4Packet ipPacket = packet.get(IpV4Packet.class);
 
-            psession.addPacket(tcpPacket);
+            if (tcpPacket == null) {
+                break;
+            }
+
+            Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket, tcpPacket);
+            sessionPackets.add(e);
         }
     }
 

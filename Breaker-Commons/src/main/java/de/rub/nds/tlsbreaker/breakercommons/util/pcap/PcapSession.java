@@ -9,23 +9,49 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.pcap4j.packet.TcpPacket;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 
 public class PcapSession {
+    /**
+     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
+     * change) and information from the TCP packet header like the source and destination of the package.
+     * 
+     */
 
-    private final List<TcpPacket> tcppackets = Collections.synchronizedList(new ArrayList<>());
+    private ClientKeyExchangeMessage clientKeyExchangeMessage;
 
-    public void addPacket(TcpPacket tcp) {
-        tcppackets.add(tcp);
+    private String packetSoruce;
 
+    private String packetDestination;
+
+    public PcapSession(String source, String destination, ClientKeyExchangeMessage ckeMessage) {
+        clientKeyExchangeMessage = ckeMessage;
+        packetSoruce = source;
+        packetDestination = destination;
     }
 
-    public List<TcpPacket> getSessionFlights() {
-        return Collections.unmodifiableList(tcppackets);
+    public String getPacketSoruce() {
+        return this.packetSoruce;
+    }
+
+    public void setPacketSoruce(String packetSoruce) {
+        this.packetSoruce = packetSoruce;
+    }
+
+    public String getPacketDestination() {
+        return this.packetDestination;
+    }
+
+    public void setPacketDestination(String packetDestination) {
+        this.packetDestination = packetDestination;
+    }
+
+    public ClientKeyExchangeMessage getClientKeyExchangeMessage() {
+        return this.clientKeyExchangeMessage;
+    }
+
+    public void setClientKeyExchangeMessage(ClientKeyExchangeMessage clientKeyExchangeMessage) {
+        this.clientKeyExchangeMessage = clientKeyExchangeMessage;
     }
 
 }
