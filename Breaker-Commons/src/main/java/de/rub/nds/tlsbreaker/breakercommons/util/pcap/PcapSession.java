@@ -26,25 +26,10 @@ public class PcapSession {
 
     private String packetPortSoruce;
 
-    public String getPacketPortSoruce() {
-        return this.packetPortSoruce;
-    }
-
-    public void setPacketPortSoruce(String packetPortSoruce) {
-        this.packetPortSoruce = packetPortSoruce;
-    }
-
-    public String getPacketPortDestination() {
-        return this.packetPortDestination;
-    }
-
-    public void setPacketPortDestination(String packetPortDestination) {
-        this.packetPortDestination = packetPortDestination;
-    }
-
     private String packetPortDestination;
 
-    public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst, ClientKeyExchangeMessage ckeMessage) {
+    public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst,
+        ClientKeyExchangeMessage ckeMessage) {
         clientKeyExchangeMessage = ckeMessage;
         packetSoruce = source;
         packetDestination = destination;
@@ -74,6 +59,22 @@ public class PcapSession {
 
     public void setClientKeyExchangeMessage(ClientKeyExchangeMessage clientKeyExchangeMessage) {
         this.clientKeyExchangeMessage = clientKeyExchangeMessage;
+    }
+
+    public String getPacketPortSoruce() {
+        return this.packetPortSoruce;
+    }
+
+    public void setPacketPortSoruce(String packetPortSoruce) {
+        this.packetPortSoruce = packetPortSoruce;
+    }
+
+    public String getPacketPortDestination() {
+        return this.packetPortDestination;
+    }
+
+    public void setPacketPortDestination(String packetPortDestination) {
+        this.packetPortDestination = packetPortDestination;
     }
 
 }

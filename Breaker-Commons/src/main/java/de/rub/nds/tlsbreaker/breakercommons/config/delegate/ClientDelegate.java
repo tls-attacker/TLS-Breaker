@@ -24,7 +24,7 @@ public class ClientDelegate extends Delegate {
     private static final int DEFAULT_HTTPS_PORT = 443;
 
     @Parameter(names = "-connect", description = "Who to connect to. Syntax: localhost:4433")
-    private String host = "cloud.nds.rub.de:40064";
+    private String host = null;
 
     @Parameter(names = "-server_name", description = "Server name for the SNI extension.")
     private String sniHostname = null;

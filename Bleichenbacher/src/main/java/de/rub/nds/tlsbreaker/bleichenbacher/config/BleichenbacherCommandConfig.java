@@ -190,6 +190,10 @@ public class BleichenbacherCommandConfig extends AttackConfig {
         return pcapFileLocation;
     }
 
+    public ClientDelegate getClientDelegate() {
+        return clientDelegate;
+    }
+
     /**
      *
      */
