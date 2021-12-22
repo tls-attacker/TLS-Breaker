@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>de.rub.nds.tlsbreaker</groupId>
@@ -20,6 +20,17 @@
 			<groupId>de.rub.nds.tlsbreaker</groupId>
 			<artifactId>Breaker-Commons</artifactId>
 			<version>1.0.0</version>
+		</dependency>
+				<!-- Pcap4j dependencies-->
+		<dependency>
+			<groupId>org.pcap4j</groupId>
+			<artifactId>pcap4j-core</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.pcap4j</groupId>
+			<artifactId>pcap4j-packetfactory-static</artifactId>
+			<version>1.8.2</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -47,37 +58,25 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
-			<!-- <plugin> Build an executable JAR <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId> <version>3.2.0</version> <configuration>
-				<archive> <manifest> <addClasspath>true</addClasspath> <classpathPrefix>lib/</classpathPrefix>
-				<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.Main</mainClass> </manifest>
-				</archive> </configuration> </plugin> -->
-			<!-- Build an executable jar that contains the dependencies -->
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId>
-				<executions> <execution> <goals> <goal>shade</goal> </goals> <configuration>
-				<shadedArtifactAttached>true</shadedArtifactAttached> <transformers> <transformer
-				implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-				<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.Main</mainClass> </transformer>
-				</transformers> <filters> <filter> <artifact>*:*</artifact> <excludes> <exclude>META-INF/*.SF</exclude>
-				<exclude>META-INF/*.DSA</exclude> <exclude>META-INF/*.RSA</exclude> </excludes>
-				</filter> </filters> </configuration> </execution> </executions> </plugin> -->
 			<plugin>
-				<groupId>de.ntcomputer</groupId>
-				<artifactId>executable-packer-maven-plugin</artifactId>
-				<version>1.0.1</version>
+				<!-- Build an executable JAR -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
 				<configuration>
-					<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.Main</mainClass>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>de.rub.nds.tlsbreaker.bleichenbacher.Main</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>pack-executable-jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId>
-				</plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 	<properties>

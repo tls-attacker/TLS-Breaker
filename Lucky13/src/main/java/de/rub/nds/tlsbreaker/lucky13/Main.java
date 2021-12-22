@@ -6,25 +6,22 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.lucky13;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.JCommander.Builder;
 import com.beust.jcommander.ParameterException;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
-import de.rub.nds.tlsbreaker.lucky13.config.Lucky13CommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.lucky13.config.Lucky13CommandConfig;
 import de.rub.nds.tlsbreaker.lucky13.impl.Lucky13Attacker;
-
-import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Objects;
+
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  *
@@ -39,48 +36,22 @@ public class Main {
      */
     public static void main(String[] args) {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
-        Builder builder = JCommander.newBuilder().addObject(generalDelegate);
-
         Lucky13CommandConfig lucky13 = new Lucky13CommandConfig(generalDelegate);
-        builder.addCommand(Lucky13CommandConfig.ATTACK_COMMAND, lucky13);
 
-        JCommander jc = builder.build();
-
+        JCommander jc = JCommander.newBuilder().addObject(lucky13).build();
         try {
             jc.parse(args);
         } catch (ParameterException ex) {
-            String parsedCommand = ex.getJCommander().getParsedCommand();
-            if (parsedCommand != null) {
-                ex.getJCommander().getUsageFormatter().usage(parsedCommand);
-            } else {
-                ex.usage();
-            }
-            return;
-        }
-
-        if (jc.getParsedCommand() == null) {
-            jc.usage();
+            ex.usage();
             return;
         }
 
         if (generalDelegate.isHelp()) {
-            jc.getUsageFormatter().usage(jc.getParsedCommand());
+            jc.usage();
             return;
         }
 
-        Attacker<? extends TLSDelegateConfig> attacker = null;
-
-        switch (jc.getParsedCommand()) {
-            case Lucky13CommandConfig.ATTACK_COMMAND:
-                attacker = new Lucky13Attacker(lucky13, lucky13.createConfig());
-                break;
-            default:
-                break;
-        }
-
-        if (attacker == null) {
-            throw new ConfigurationException("Command not found");
-        }
+        Attacker<? extends TLSDelegateConfig> attacker = new Lucky13Attacker(lucky13, lucky13.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();

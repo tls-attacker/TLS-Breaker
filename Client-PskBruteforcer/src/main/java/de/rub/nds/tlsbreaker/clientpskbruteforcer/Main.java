@@ -6,24 +6,22 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.clientpskbruteforcer;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.JCommander.Builder;
 import com.beust.jcommander.ParameterException;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerAttackClient;
-import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Objects;
+
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  *
@@ -33,55 +31,28 @@ public class Main {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     *
      * @param args
      */
     public static void main(String[] args) {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
-        Builder builder = JCommander.newBuilder().addObject(generalDelegate);
-
         PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientTest =
             new PskBruteForcerAttackClientCommandConfig(generalDelegate);
-        builder.addCommand(PskBruteForcerAttackClientCommandConfig.ATTACK_COMMAND, pskBruteForcerAttackClientTest);
 
-        JCommander jc = builder.build();
-
+        JCommander jc = JCommander.newBuilder().addObject(pskBruteForcerAttackClientTest).build();
         try {
             jc.parse(args);
         } catch (ParameterException ex) {
-            String parsedCommand = ex.getJCommander().getParsedCommand();
-            if (parsedCommand != null) {
-                ex.getJCommander().getUsageFormatter().usage(parsedCommand);
-            } else {
-                ex.usage();
-            }
-            return;
-        }
-
-        if (jc.getParsedCommand() == null) {
-            jc.usage();
+            ex.usage();
             return;
         }
 
         if (generalDelegate.isHelp()) {
-            jc.getUsageFormatter().usage(jc.getParsedCommand());
+            jc.usage();
             return;
         }
 
-        Attacker<? extends TLSDelegateConfig> attacker = null;
-
-        switch (jc.getParsedCommand()) {
-            case PskBruteForcerAttackClientCommandConfig.ATTACK_COMMAND:
-                attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
-                    pskBruteForcerAttackClientTest.createConfig());
-                break;
-            default:
-                break;
-        }
-
-        if (attacker == null) {
-            throw new ConfigurationException("Command not found");
-        }
+        Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
+            pskBruteForcerAttackClientTest.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();

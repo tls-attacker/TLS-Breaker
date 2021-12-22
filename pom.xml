@@ -420,4 +420,5 @@
         <jmockit.version>1.49</jmockit.version>
         <slowTests>de.rub.nds.tlsattacker.util.tests.SlowTests,de.rub.nds.tlsattacker.util.tests.IntegrationTests</slowTests>
     </properties>
+
 </project>
