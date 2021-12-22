@@ -113,10 +113,8 @@ public class PcapAnalyzer {
                             if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
 
                                 pcapSessions.add(new PcapSession(p.getKey().getHeader().getSrcAddr().toString(),
-                                    p.getKey().getHeader().getDstAddr().toString(), msg));
-
-                                System.out.println("Source is: " + p.getKey().getHeader().getSrcAddr().toString());
-                                System.out.println("Destination is " + p.getKey().getHeader().getDstAddr().toString());
+                                    p.getKey().getHeader().getDstAddr().toString(),
+                                    p.getValue().getHeader().getSrcPort().toString(),p.getValue().getHeader().getDstPort().toString(), msg));
                             }
 
                         } catch (Exception e) {
