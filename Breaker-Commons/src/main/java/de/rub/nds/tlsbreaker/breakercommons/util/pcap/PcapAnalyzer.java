@@ -9,28 +9,7 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
-import java.io.EOFException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
-
-import org.apache.commons.codec.binary.Hex;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapHandle.TimestampPrecision;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.Pcaps;
-import org.pcap4j.packet.IpV4Packet;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.TcpPacket;
-
 import de.rub.nds.tlsattacker.core.config.Config;
-import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
@@ -41,8 +20,21 @@ import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
-import de.rub.nds.tlsattacker.core.record.parser.RecordParser;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
+import org.pcap4j.core.NotOpenException;
+import org.pcap4j.core.PcapHandle;
+import org.pcap4j.core.PcapHandle.TimestampPrecision;
+import org.pcap4j.core.PcapNativeException;
+import org.pcap4j.core.Pcaps;
+import org.pcap4j.packet.IpV4Packet;
+import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.TcpPacket;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class PcapAnalyzer {
 
@@ -112,9 +104,11 @@ public class PcapAnalyzer {
 
                             if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
 
-                                pcapSessions.add(new PcapSession(p.getKey().getHeader().getSrcAddr().toString(),
-                                    p.getKey().getHeader().getDstAddr().toString(),
-                                    p.getValue().getHeader().getSrcPort().toString(),p.getValue().getHeader().getDstPort().toString(), msg));
+                                pcapSessions.add(new PcapSession(
+                                    p.getKey().getHeader().getSrcAddr().toString().replaceFirst("/", ""),
+                                    p.getKey().getHeader().getDstAddr().toString().replaceFirst("/", ""),
+                                    p.getValue().getHeader().getSrcPort().toString().replace(" (unknown)", ""),
+                                    p.getValue().getHeader().getDstPort().toString().replace(" (unknown)", ""), msg));
                             }
 
                         } catch (Exception e) {
