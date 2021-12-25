@@ -15,6 +15,7 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherAttacker;
+import de.rub.nds.tlsbreaker.bleichenbacher.impl.ServerSelection;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +49,16 @@ public class Main {
 
         if (generalDelegate.isHelp()) {
             jc.usage();
+            return;
+        }
+
+        // TODO: For testing
+        try {
+            ServerSelection serverSelection = new ServerSelection();
+            String serverToAttack = serverSelection.getUserSelectedServer(bleichenbacherCommandConfig);
+            bleichenbacherCommandConfig.getClientDelegate().setHost(serverToAttack);
+        } catch (UnsupportedOperationException e) {
+            CONSOLE.error("Invalid server selected");
             return;
         }
 
