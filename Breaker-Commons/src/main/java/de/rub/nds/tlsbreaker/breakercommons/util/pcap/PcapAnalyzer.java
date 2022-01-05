@@ -1,7 +1,7 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -21,11 +21,14 @@ import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
+
+import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
+import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
@@ -67,7 +70,9 @@ public class PcapAnalyzer {
 
         List<PcapSession> pcapSessions = new ArrayList<>();
 
-        for (Entry<IpV4Packet, TcpPacket> p : getSessionPackets()) {
+        List<Entry<IpV4Packet, TcpPacket>> collectedPackages = getSessionPackets();
+
+        for (Entry<IpV4Packet, TcpPacket> p : collectedPackages) {
 
             try {
                 TlsContext context = new TlsContext();
@@ -113,16 +118,38 @@ public class PcapAnalyzer {
 
                         } catch (Exception e) {
 
-                            System.out.println("Message not compatible");
+                            // System.out.println("Message not compatible");
+                            continue;
+                        }
+                        try {
+                            HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
+                                new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
+                                    config);
+
+                            // System.out.println(ar.getContentMessageType());
+                            RSAClientKeyExchangeMessage msg = rsaparser.parse();
+
+                            if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
+
+                                pcapSessions.add(new PcapSession(
+                                    p.getKey().getHeader().getSrcAddr().toString().replaceFirst("/", ""),
+                                    p.getKey().getHeader().getDstAddr().toString().replaceFirst("/", ""),
+                                    p.getValue().getHeader().getSrcPort().toString().replace(" (unknown)", ""),
+                                    p.getValue().getHeader().getDstPort().toString().replace(" (unknown)", ""), msg));
+                            }
+
+                        } catch (Exception e) {
+
+                            // System.out.println("Message not compatible");
                             continue;
                         }
                     }
 
-                    System.out.println("-------------------------------------------------");
+                    // System.out.println("-------------------------------------------------");
                 }
             } catch (ParserException pe) {
-                System.out.println("The package could not be parsed");
-
+                // System.out.println("The package could not be parsed");
+                continue;
             }
 
         }
@@ -137,6 +164,12 @@ public class PcapAnalyzer {
 
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
+
+            // Apply filtering
+            String filter = "tcp";
+            BpfProgram bpfFilter =
+                handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE, PcapHandle.PCAP_NETMASK_UNKNOWN);
+            handle.setFilter(bpfFilter);
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
         }
