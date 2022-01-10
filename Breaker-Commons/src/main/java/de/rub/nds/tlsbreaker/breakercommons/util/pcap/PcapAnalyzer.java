@@ -28,7 +28,6 @@ import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
-import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
@@ -99,28 +98,6 @@ public class PcapAnalyzer {
                     // messages are ignored.
                     if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
 
-                        try {
-                            HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
-                                new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
-                                    config);
-
-                            // System.out.println(ar.getContentMessageType());
-                            RSAClientKeyExchangeMessage msg = rsaparser.parse();
-
-                            if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
-
-                                pcapSessions.add(new PcapSession(
-                                    p.getKey().getHeader().getSrcAddr().toString().replaceFirst("/", ""),
-                                    p.getKey().getHeader().getDstAddr().toString().replaceFirst("/", ""),
-                                    p.getValue().getHeader().getSrcPort().toString().replace(" (unknown)", ""),
-                                    p.getValue().getHeader().getDstPort().toString().replace(" (unknown)", ""), msg));
-                            }
-
-                        } catch (Exception e) {
-
-                            // System.out.println("Message not compatible");
-                            continue;
-                        }
                         try {
                             HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
                                 new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
