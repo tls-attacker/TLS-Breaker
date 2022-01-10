@@ -77,4 +77,8 @@ public class PcapSession {
         this.packetPortDestination = packetPortDestination;
     }
 
+    public String getDestinationHost() {
+        return this.packetDestination + ":" + this.packetPortDestination;
+    }
+
 }
