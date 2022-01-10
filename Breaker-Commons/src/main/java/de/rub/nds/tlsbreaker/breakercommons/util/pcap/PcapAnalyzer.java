@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
@@ -22,6 +23,7 @@ import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
@@ -87,20 +89,22 @@ public class PcapAnalyzer {
 
                 for (AbstractRecord ar : allrecords) {
 
-                    Record thisRecord = (Record) ar;
+                    Record record = (Record) ar;
 
                     ProtocolVersion pversion =
-                        ProtocolVersion.getProtocolVersion(thisRecord.getProtocolVersion().getValue());
+                        ProtocolVersion.getProtocolVersion(record.getProtocolVersion().getValue());
 
                     Config config = Config.createConfig();
 
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
-                    if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+
+                    if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                        System.out.println(getRecordHandshakeMessageType(record));
 
                         try {
                             HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
-                                new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
+                                new RSAClientKeyExchangeParser(0, record.getProtocolMessageBytes().getValue(), pversion,
                                     config);
 
                             // System.out.println(ar.getContentMessageType());
@@ -170,6 +174,23 @@ public class PcapAnalyzer {
             Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket, tcpPacket);
             sessionPackets.add(e);
         }
+    }
+
+    /**
+     * Given that the record is of type Handshake, one can check which message type it contains
+     * 
+     * @param  record
+     *                The record which contains the handshake message.
+     * 
+     * @return        The type of handshake message.
+     */
+    private HandshakeMessageType getRecordHandshakeMessageType(Record record) {
+        if (record.getProtocolMessageBytes().getValue().length != 0) {
+            byte typeBytes = record.getProtocolMessageBytes().getValue()[0];
+            return HandshakeMessageType.getMessageType(typeBytes);
+        }
+        return HandshakeMessageType.UNKNOWN;
+
     }
 
 }
