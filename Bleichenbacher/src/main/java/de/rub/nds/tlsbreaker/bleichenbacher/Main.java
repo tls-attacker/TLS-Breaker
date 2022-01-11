@@ -18,10 +18,16 @@ import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherAttacker;
 import de.rub.nds.tlsbreaker.bleichenbacher.impl.ServerSelection;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
@@ -53,13 +59,18 @@ public class Main {
         }
 
         // TODO: For testing
-        try {
-            ServerSelection serverSelection = new ServerSelection();
-            String serverToAttack = serverSelection.getUserSelectedServer(bleichenbacherCommandConfig);
-            bleichenbacherCommandConfig.getClientDelegate().setHost(serverToAttack);
-        } catch (UnsupportedOperationException e) {
-            CONSOLE.error("Invalid server selected");
-            return;
+        if (bleichenbacherCommandConfig.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(bleichenbacherCommandConfig.getPcapFileLocation())) {
+                try {
+                    handlePcapFile(bleichenbacherCommandConfig);
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error("Invalid server selected");
+                    return;
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+                return;
+            }
         }
 
         Attacker<? extends TLSDelegateConfig> attacker =
@@ -83,5 +94,36 @@ public class Main {
                 LOGGER.info("The selected attacker is currently not implemented");
             }
         }
+
+    }
+
+    private static void handlePcapFile(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer(bleichenbacherCommandConfig.getPcapFileLocation());
+        List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
+
+        if (sessions != null || !sessions.isEmpty()) {
+            ServerSelection serverSelection = new ServerSelection();
+            String serverToAttack = serverSelection.getUserSelectedServer(sessions);
+
+            bleichenbacherCommandConfig.getClientDelegate().setHost(serverToAttack);
+            bleichenbacherCommandConfig
+                .setEncryptedPremasterSecret(getPremasterSecret(pcapAnalyzer, sessions, serverToAttack));
+        } else {
+            // TODO: throw exception
+        }
+    }
+
+    private static String getPremasterSecret(PcapAnalyzer pcapAnalyzer, List<PcapSession> sessions,
+        String serverToAttack) {
+        String preMasterSecret = null;
+        Optional<PcapSession> filteredPcapSession = sessions.stream()
+            .filter(pcapSession -> serverToAttack.equals(pcapSession.getDestinationHost())).findFirst();
+
+        if (filteredPcapSession.isPresent()) {
+            byte[] pms = pcapAnalyzer.getPreMasterSecret(filteredPcapSession.get().getClientKeyExchangeMessage());
+            preMasterSecret = new String(Hex.encodeHex(pms));
+        }
+
+        return preMasterSecret;
     }
 }
