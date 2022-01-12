@@ -33,8 +33,6 @@ import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.padding.VectorResponse;
 import de.rub.nds.tlsbreaker.breakercommons.padding.vector.FingerprintTaskVectorPair;
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
@@ -44,13 +42,10 @@ import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.pcap4j.packet.IpV4Packet;
-import org.pcap4j.packet.TcpPacket;
 
 /**
  * Sends differently formatted PKCS#1 messages to the TLS server and observes the server responses. In case there are
@@ -248,18 +243,13 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
             return;
         }
 
-//        if (config.getEncryptedPremasterSecret() == null) {
-//            throw new ConfigurationException(
-//                "You have to set the encrypted premaster secret you are " + "going to decrypt");
-//        }
-//
-//        LOGGER.info("Fetched the following server public key: " + publicKey);
-//        byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
+        if (config.getEncryptedPremasterSecret() == null) {
+            throw new ConfigurationException(
+                "You have to set the encrypted premaster secret you are " + "going to decrypt");
+        }
 
-        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer(config.getPcapFileLocation());
-        List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
-        byte[] pms = pcapAnalyzer.getPreMasterSecret(sessions.get(0).getClientKeyExchangeMessage());
-
+        LOGGER.info("Fetched the following server public key: " + publicKey);
+        byte[] pms = ArrayConverter.hexStringToByteArray(config.getEncryptedPremasterSecret());
         if ((pms.length * Bits.IN_A_BYTE) != publicKey.getModulus().bitLength()) {
             throw new ConfigurationException("The length of the encrypted premaster secret you have "
                 + "is not equal to the server public key length. Have you selected the correct value?");
