@@ -149,12 +149,7 @@ public class PcapAnalyzer {
              * Apply filtering to get only TLS packets (At the moment a bit tricky since TLS filter and packet support in pcap4j is yet to come)
              * The filet used is taken from the link above (Last time worked Jan 11 2021).
              * https://www.netmeister.org/blog/tcpdump-ssl-and-tls.html*/ 
-            String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) ||"
-            +" (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03 &&"
-            +" (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))   ||   (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) &&"
-            +" (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) &&"
-            +" (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03)    ||    (((tcp[((tcp[12] & 0xf0) >> 2)] < 0x14) ||"
-            +" (tcp[((tcp[12] & 0xf0) >> 2)] > 0x18)) && (tcp[((tcp[12] & 0xf0) >> 2)+3] = 0x00) && (tcp[((tcp[12] & 0xf0) >> 2)+4] = 0x02))";
+            String filter = "";
             BpfProgram bpfFilter =
                 handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE, PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
@@ -175,7 +170,7 @@ public class PcapAnalyzer {
             IpV4Packet ipPacket = packet.get(IpV4Packet.class);
 
             if (tcpPacket == null) {
-                break;
+                continue;
             }
 
             Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket, tcpPacket);
