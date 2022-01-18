@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
@@ -21,6 +22,9 @@ import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
+
+import org.bouncycastle.util.encoders.Hex;
+import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
@@ -67,7 +71,9 @@ public class PcapAnalyzer {
 
         List<PcapSession> pcapSessions = new ArrayList<>();
 
-        for (Entry<IpV4Packet, TcpPacket> p : getSessionPackets()) {
+        List<Entry<IpV4Packet, TcpPacket>> collectedPackages = getSessionPackets();
+
+        for (Entry<IpV4Packet, TcpPacket> p : collectedPackages) {
 
             try {
                 TlsContext context = new TlsContext();
@@ -83,20 +89,22 @@ public class PcapAnalyzer {
 
                 for (AbstractRecord ar : allrecords) {
 
-                    Record thisRecord = (Record) ar;
+                    Record record = (Record) ar;
 
                     ProtocolVersion pversion =
-                        ProtocolVersion.getProtocolVersion(thisRecord.getProtocolVersion().getValue());
+                        ProtocolVersion.getProtocolVersion(record.getProtocolVersion().getValue());
 
                     Config config = Config.createConfig();
 
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
-                    if (ar.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+
+                    if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                        System.out.println(getRecordHandshakeMessageType(record));
 
                         try {
                             HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
-                                new RSAClientKeyExchangeParser(0, ar.getProtocolMessageBytes().getValue(), pversion,
+                                new RSAClientKeyExchangeParser(0, record.getProtocolMessageBytes().getValue(), pversion,
                                     config);
 
                             // System.out.println(ar.getContentMessageType());
@@ -112,16 +120,16 @@ public class PcapAnalyzer {
 
                         } catch (Exception e) {
 
-                            System.out.println("Message not compatible");
+                            // System.out.println("Message not compatible");
                             continue;
                         }
                     }
 
-                    System.out.println("-------------------------------------------------");
+                    // System.out.println("-------------------------------------------------");
                 }
             } catch (ParserException pe) {
-                System.out.println("The package could not be parsed");
-
+                // System.out.println("The package could not be parsed");
+                continue;
             }
 
         }
@@ -136,6 +144,15 @@ public class PcapAnalyzer {
 
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
+
+            /** 
+             * Apply filtering to get only TLS packets (At the moment a bit tricky since TLS filter and packet support in pcap4j is yet to come)
+             * The filet used is taken from the link above (Last time worked Jan 11 2021).
+             * https://www.netmeister.org/blog/tcpdump-ssl-and-tls.html*/ 
+            String filter = "";
+            BpfProgram bpfFilter =
+                handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE, PcapHandle.PCAP_NETMASK_UNKNOWN);
+            handle.setFilter(bpfFilter);
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
         }
@@ -153,12 +170,29 @@ public class PcapAnalyzer {
             IpV4Packet ipPacket = packet.get(IpV4Packet.class);
 
             if (tcpPacket == null) {
-                break;
+                continue;
             }
 
             Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket, tcpPacket);
             sessionPackets.add(e);
         }
+    }
+
+    /**
+     * Given that the record is of type Handshake, one can check which message type it contains
+     * 
+     * @param  record
+     *                The record which contains the handshake message.
+     * 
+     * @return        The type of handshake message.
+     */
+    private HandshakeMessageType getRecordHandshakeMessageType(Record record) {
+        if (record.getProtocolMessageBytes().getValue().length != 0) {
+            byte typeBytes = record.getProtocolMessageBytes().getValue()[0];
+            return HandshakeMessageType.getMessageType(typeBytes);
+        }
+        return HandshakeMessageType.UNKNOWN;
+
     }
 
 }
