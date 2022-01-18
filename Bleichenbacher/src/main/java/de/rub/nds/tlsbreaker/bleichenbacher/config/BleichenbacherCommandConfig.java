@@ -155,6 +155,10 @@ public class BleichenbacherCommandConfig extends AttackConfig {
         return encryptedPremasterSecret;
     }
 
+    public void setEncryptedPremasterSecret(String encryptedPremasterSecret) {
+        this.encryptedPremasterSecret = encryptedPremasterSecret;
+    }
+
     /**
      * @return
      */
