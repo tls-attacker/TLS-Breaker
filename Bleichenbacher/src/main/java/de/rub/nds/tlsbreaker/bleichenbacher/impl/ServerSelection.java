@@ -27,6 +27,7 @@ public class ServerSelection {
         return getServerFromUser(serverList);
     }
 
+    // TODO: used at 2 places
     public List<String> getUniqueServers(List<PcapSession> sessions) {
         Set<String> serverSet = new HashSet<>();
         sessions.forEach(pcapSession -> serverSet.add(pcapSession.getDestinationHost()));
@@ -37,12 +38,21 @@ public class ServerSelection {
         String selectedServer = null;
         Scanner sc = new Scanner(System.in);
         try {
-            int serverNumber = sc.nextInt();
-            if (serverNumber > 0 & serverNumber <= serverList.size()) {
-                selectedServer = serverList.get(serverNumber - 1);
-                LOGGER.info("Selected server: " + selectedServer);
+            if (sc.hasNextInt()) {
+                int serverNumber = sc.nextInt();
+                if (serverNumber > 0 & serverNumber <= serverList.size()) {
+                    selectedServer = serverList.get(serverNumber - 1);
+                    LOGGER.info("Selected server: " + selectedServer);
+                } else {
+                    throw new UnsupportedOperationException();
+                }
             } else {
-                throw new UnsupportedOperationException();
+                String option = sc.nextLine();
+                if ("a".equals(option)) {
+                    return option;
+                } else {
+                    throw new UnsupportedOperationException();
+                }
             }
         } catch (Exception e) {
             throw new UnsupportedOperationException();
@@ -56,7 +66,9 @@ public class ServerSelection {
         for (int i = 0; i < serverList.size(); i++) {
             CONSOLE.info(i + 1 + ") " + serverList.get(i));
         }
-        CONSOLE.info("Please select a server to check for vulnerability and launch an attack.");
-        CONSOLE.info("Server number: ");
+        CONSOLE.info("a) Check if all the above servers are vulnerable.");
+        CONSOLE.info("Please select a server number to check for vulnerability "
+            + "or press 'a' to check for vulnerability of all the servers.");
+        CONSOLE.info("Select Option: ");
     }
 }
