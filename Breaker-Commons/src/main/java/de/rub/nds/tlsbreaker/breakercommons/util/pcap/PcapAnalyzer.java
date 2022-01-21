@@ -24,7 +24,6 @@ import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
@@ -38,13 +37,10 @@ import org.pcap4j.packet.TcpPacket;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 public class PcapAnalyzer {
@@ -102,6 +98,8 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
+                    System.out.println(getRecordHandshakeMessageType(record));
+
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
 
@@ -157,16 +155,6 @@ public class PcapAnalyzer {
         return msg;
     }
 
-    // public Map<Long, List<Packet>> getSessionPackets() {
-    // try {
-    // this.getPacketsFromPcapFile();
-    // } catch (NotOpenException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-    // return packets;
-    // }
-
     private void getPacketsFromPcapFile() throws NotOpenException {
 
         try {
@@ -179,27 +167,6 @@ public class PcapAnalyzer {
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
         }
-
-        // while (true) {
-
-        // Packet packet = handle.getNextPacket();
-
-        // if (packet == null) {
-        // break;
-        // }
-
-        // TcpPacket tcpPacket = packet.get(TcpPacket.class);
-
-        // IpV4Packet ipPacket = packet.get(IpV4Packet.class);
-
-        // if (tcpPacket == null) {
-        // continue;
-        // }
-
-        // Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket,
-        // tcpPacket);
-        // sessionPackets.add(e);
-        // }
 
         while (true) {
             try {
@@ -252,8 +219,6 @@ public class PcapAnalyzer {
                 e.printStackTrace();
             }
         }
-
-        // System.out.println(Hex.encodeHexString(finalPacket.getPayload().getRawData()).length());
 
         return output.toByteArray();
     }

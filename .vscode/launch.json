@@ -48,7 +48,25 @@
             "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
             "projectName": "Bleichenbacher",
             "args": "-pcap ~/Desktop/a_correct_example.pcapng"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher Sample 1",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/Sample1.pcapng"
         }
+        ,
+        {
+            "type": "java",
+            "name": "Random Sample",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/randomsample.pcapng"
+        }
+
 
 
 
