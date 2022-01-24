@@ -14,9 +14,11 @@ import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
@@ -88,7 +90,7 @@ public class PcapAnalyzer {
                 TlsRecordLayer rec_layer = new TlsRecordLayer(context);
 
                 List<AbstractRecord> allrecords;
-                if (defragmentedBytes != null) {
+                if (defragmentedBytes != null && defragmentedBytes.length != 0) {
                     allrecords = rec_layer.parseRecords(defragmentedBytes);
                 } else {
                     continue;
@@ -98,25 +100,30 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
-                    System.out.println(getRecordHandshakeMessageType(record));
+                    System.out.println(record.getContentMessageType());
 
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
 
-                    if (getRecordHandshakeMessageType(record) == HandshakeMessageType.CLIENT_KEY_EXCHANGE
-                            && record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                    if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
 
-                        HandshakeMessage msg = parseToTLSMessage(record, HandshakeMessageType.CLIENT_KEY_EXCHANGE);
+                        HandshakeMessage ckemsg = parseToTLSMessage(record, HandshakeMessageType.CLIENT_KEY_EXCHANGE);
+
+                        HandshakeMessage clHello = parseToTLSMessage(record, HandshakeMessageType.CLIENT_HELLO);
 
                         IpV4Packet ipPacket = list.get(0).get(IpV4Packet.class);
 
                         TcpPacket tcpPacket = list.get(0).get(TcpPacket.class);
 
-                        pcapSessions.add(new PcapSession(ipPacket.getHeader().getSrcAddr().getHostAddress(),
+                        PcapSession foundSession = new PcapSession(ipPacket.getHeader().getSrcAddr().getHostAddress(),
                                 ipPacket.getHeader().getDstAddr().getHostAddress(),
                                 tcpPacket.getHeader().getSrcPort().valueAsString(),
-                                tcpPacket.getHeader().getDstPort().valueAsString(),
-                                (ClientKeyExchangeMessage) msg));
+                                tcpPacket.getHeader().getDstPort().valueAsString());
+
+                        foundSession.setClientKeyExchangeMessage((ClientKeyExchangeMessage) ckemsg);
+                        foundSession.setClientHelloMessage((ClientHelloMessage)clHello);
+
+                        pcapSessions.add(foundSession);
 
                     }
 
@@ -128,7 +135,40 @@ public class PcapAnalyzer {
             }
 
         }
+        // groupIntoStreams(pcapSessions);
+
         return pcapSessions;
+    }
+
+    private HashMap<String, PcapSession> groupIntoStreams(List<PcapSession> sessions) {
+
+        HashMap<String, PcapSession> handshakeStreams = new HashMap<>();
+
+        for (PcapSession s : sessions) {
+
+            String direction_one = s.getPacketSource() + s.getPacketPortSource() +
+                    s.getPacketDestination() + s.getPacketPortDestination();
+
+            String direction_two = s.getPacketDestination() + s.getPacketPortDestination() +
+                    s.getPacketSource() + s.getPacketPortSource();
+
+            if (handshakeStreams.containsKey(direction_one) || handshakeStreams.containsKey(direction_two)) {
+
+                PcapSession hs = handshakeStreams.get(direction_one);
+
+                handshakeStreams.put(s.getPacketSource() + s.getPacketPortSource() +
+                        s.getPacketDestination() + s.getPacketPortDestination(), hs);
+            } else {
+                handshakeStreams.put(s.getPacketSource() + s.getPacketPortSource() +
+                        s.getPacketDestination() + s.getPacketPortDestination(), s);
+            }
+        }
+
+        for (String st : handshakeStreams.keySet()) {
+            System.out.println(st);
+        }
+
+        return handshakeStreams;
     }
 
     private HandshakeMessage parseToTLSMessage(Record record, HandshakeMessageType messageType) {
@@ -138,16 +178,24 @@ public class PcapAnalyzer {
 
         Config config = Config.createConfig();
 
-        RSAClientKeyExchangeMessage msg = null;
+        HandshakeMessage msg = null;
 
         if (getRecordHandshakeMessageType(record) == messageType) {
             try {
-                HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser = new RSAClientKeyExchangeParser(0,
-                        record.getProtocolMessageBytes().getValue(), pversion,
-                        config);
+                if (messageType == HandshakeMessageType.CLIENT_KEY_EXCHANGE) {
+                    HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaParser = new RSAClientKeyExchangeParser(0,
+                            record.getProtocolMessageBytes().getValue(), pversion,
+                            config);
 
-                // System.out.println(ar.getContentMessageType());
-                msg = rsaparser.parse();
+                    // System.out.println(ar.getContentMessageType());
+                    msg = rsaParser.parse();
+                }
+                else if(messageType == HandshakeMessageType.CLIENT_HELLO){
+                    ClientHelloParser clientHelloParser = new ClientHelloParser(0, record.getProtocolMessageBytes().getValue(),
+                     pversion, config);
+
+                     msg = clientHelloParser.parse();
+                }
 
             } catch (Exception e) {
             }
@@ -208,8 +256,8 @@ public class PcapAnalyzer {
                 if (pack.get(TcpPacket.class) != null) {
                     TcpPacket tcpPacket = pack.get(TcpPacket.class);
 
-                    System.out.println(tcpPacket.getHeader().getSequenceNumberAsLong() + " --- "
-                            + tcpPacket.getHeader().getAcknowledgmentNumberAsLong());
+                    // System.out.println(tcpPacket.getHeader().getSequenceNumberAsLong() + " --- "
+                    // + tcpPacket.getHeader().getAcknowledgmentNumberAsLong());
                     if (tcpPacket.getPayload() != null) {
                         output.write(tcpPacket.getPayload().getRawData());
                     }
@@ -233,7 +281,8 @@ public class PcapAnalyzer {
      * @return The type of handshake message.
      */
     private HandshakeMessageType getRecordHandshakeMessageType(Record record) {
-        if (record.getProtocolMessageBytes().getValue().length != 0) {
+        if (record.getProtocolMessageBytes().getValue().length != 0
+                && record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
             byte typeBytes = record.getProtocolMessageBytes().getValue()[0];
             return HandshakeMessageType.getMessageType(typeBytes);
         }

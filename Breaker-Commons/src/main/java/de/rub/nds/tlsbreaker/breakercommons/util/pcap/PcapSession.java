@@ -9,7 +9,11 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.HelloMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 
 public class PcapSession {
     /**
@@ -20,6 +24,26 @@ public class PcapSession {
 
     private ClientKeyExchangeMessage clientKeyExchangeMessage;
 
+    private ClientHelloMessage clientHelloMessage;
+
+    public ClientHelloMessage getClientHelloMessage() {
+        return this.clientHelloMessage;
+    }
+
+    public void setClientHelloMessage(ClientHelloMessage clientHelloMessage) {
+        this.clientHelloMessage = clientHelloMessage;
+    }
+
+    public ServerHelloMessage getServerHellomessage() {
+        return this.serverHellomessage;
+    }
+
+    public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
+        this.serverHellomessage = serverHellomessage;
+    }
+
+    private ServerHelloMessage serverHellomessage;
+
     private String packetSource;
 
     private String packetDestination;
@@ -28,13 +52,11 @@ public class PcapSession {
 
     private String packetPortDestination;
 
-    public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst,
-        ClientKeyExchangeMessage ckeMessage) {
+    public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
         packetDestination = destination;
         packetPortSource = packetPortSrc;
         packetPortDestination = PackerPortDst;
-        clientKeyExchangeMessage = ckeMessage;
     }
 
     public String getPacketSource() {
@@ -80,5 +102,6 @@ public class PcapSession {
     public String getDestinationHost() {
         return this.packetDestination + ":" + this.packetPortDestination;
     }
+
 
 }
