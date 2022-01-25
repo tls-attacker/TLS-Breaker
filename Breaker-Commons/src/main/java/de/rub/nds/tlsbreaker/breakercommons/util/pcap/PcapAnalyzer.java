@@ -14,8 +14,11 @@ import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
@@ -23,7 +26,6 @@ import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
@@ -34,21 +36,30 @@ import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
 
-import java.util.AbstractMap;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 public class PcapAnalyzer {
 
     private final String pcapFileLocation;
     private PcapHandle handle;
-    private List<Entry<IpV4Packet, TcpPacket>> sessionPackets = Collections.synchronizedList(new ArrayList<>());
+    // private List<Entry<IpV4Packet, TcpPacket>> sessionPackets =
+    // Collections.synchronizedList(new ArrayList<>());
     PcapSession psession;
+    Map<Long, List<Packet>> packets = new HashMap<Long, List<Packet>>();
+
+    Map<Integer, PcapSession> sessionsWithId = new HashMap<>();
 
     public PcapAnalyzer(String pcapFileLocation) {
         this.pcapFileLocation = pcapFileLocation;
+
         try {
             this.getPacketsFromPcapFile();
         } catch (NotOpenException e) {
@@ -59,7 +70,6 @@ public class PcapAnalyzer {
 
     public byte[] getPreMasterSecret(ClientKeyExchangeMessage chosenCKEMessage) {
         return chosenCKEMessage.getPublicKey().getValue();
-
     }
 
     /**
@@ -71,9 +81,11 @@ public class PcapAnalyzer {
 
         List<PcapSession> pcapSessions = new ArrayList<>();
 
-        List<Entry<IpV4Packet, TcpPacket>> collectedPackages = getSessionPackets();
+        for (Long id : packets.keySet()) {
 
-        for (Entry<IpV4Packet, TcpPacket> p : collectedPackages) {
+            List<Packet> list = packets.get(id);
+
+            byte[] defragmentedBytes = defragment(list);
 
             try {
                 TlsContext context = new TlsContext();
@@ -81,8 +93,8 @@ public class PcapAnalyzer {
                 TlsRecordLayer rec_layer = new TlsRecordLayer(context);
 
                 List<AbstractRecord> allrecords;
-                if (p.getValue().getPayload() != null) {
-                    allrecords = rec_layer.parseRecords(p.getValue().getPayload().getRawData());
+                if (defragmentedBytes != null && defragmentedBytes.length != 0) {
+                    allrecords = rec_layer.parseRecords(defragmentedBytes);
                 } else {
                     continue;
                 }
@@ -91,38 +103,44 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
-                    ProtocolVersion pversion =
-                        ProtocolVersion.getProtocolVersion(record.getProtocolVersion().getValue());
-
-                    Config config = Config.createConfig();
+                    System.out.println(record.getContentMessageType());
 
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
 
                     if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
-                        System.out.println(getRecordHandshakeMessageType(record));
 
-                        try {
-                            HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaparser =
-                                new RSAClientKeyExchangeParser(0, record.getProtocolMessageBytes().getValue(), pversion,
-                                    config);
+                        HandshakeMessage ckemsg = parseToTLSMessage(record, HandshakeMessageType.CLIENT_KEY_EXCHANGE);
 
-                            // System.out.println(ar.getContentMessageType());
-                            RSAClientKeyExchangeMessage msg = rsaparser.parse();
+                        HandshakeMessage clHello = parseToTLSMessage(record, HandshakeMessageType.CLIENT_HELLO);
 
-                            if (msg.getType().getValue() == msg.getHandshakeMessageType().getValue()) {
+                        IpV4Packet ipPacket = list.get(0).get(IpV4Packet.class);
 
-                                pcapSessions.add(new PcapSession(p.getKey().getHeader().getSrcAddr().getHostAddress(),
-                                    p.getKey().getHeader().getDstAddr().getHostAddress(),
-                                    p.getValue().getHeader().getSrcPort().valueAsString(),
-                                    p.getValue().getHeader().getDstPort().valueAsString(), msg));
-                            }
+                        TcpPacket tcpPacket = list.get(0).get(TcpPacket.class);
 
-                        } catch (Exception e) {
+                        PcapSession foundSession = new PcapSession(ipPacket.getHeader().getSrcAddr().getHostAddress(),
+                                ipPacket.getHeader().getDstAddr().getHostAddress(),
+                                tcpPacket.getHeader().getSrcPort().valueAsString(),
+                                tcpPacket.getHeader().getDstPort().valueAsString());
 
-                            // System.out.println("Message not compatible");
-                            continue;
+                        foundSession.getPcapIdentifier().add(ipPacket.getHeader().getSrcAddr().getHostAddress());
+                        foundSession.getPcapIdentifier().add(ipPacket.getHeader().getDstAddr().getHostAddress());
+                        foundSession.getPcapIdentifier().add(tcpPacket.getHeader().getSrcPort().valueAsString());
+                        foundSession.getPcapIdentifier().add(tcpPacket.getHeader().getDstPort().valueAsString());
+
+                        System.out.println(foundSession.getPcapIdentifier().hashCode());
+
+                        if (sessionsWithId.containsKey(foundSession.getPcapIdentifier().hashCode())) {
+                            foundSession = sessionsWithId.get(foundSession.getPcapIdentifier().hashCode());
                         }
+                        else{
+                            sessionsWithId.put(foundSession.getPcapIdentifier().hashCode(), foundSession);
+
+                        }
+                        foundSession.setClientKeyExchangeMessage((ClientKeyExchangeMessage) ckemsg);
+                        foundSession.setClientHelloMessage((ClientHelloMessage) clHello);
+
+                        
                     }
 
                     // System.out.println("-------------------------------------------------");
@@ -133,11 +151,44 @@ public class PcapAnalyzer {
             }
 
         }
+
+        for(int key:sessionsWithId.keySet()){
+            pcapSessions.add(sessionsWithId.get(key));
+        }
+
         return pcapSessions;
     }
 
-    public List<Entry<IpV4Packet, TcpPacket>> getSessionPackets() {
-        return sessionPackets;
+    private HandshakeMessage parseToTLSMessage(Record record, HandshakeMessageType messageType) {
+
+        ProtocolVersion pversion = ProtocolVersion
+                .getProtocolVersion(record.getProtocolVersion().getValue());
+
+        Config config = Config.createConfig();
+
+        HandshakeMessage msg = null;
+
+        if (getRecordHandshakeMessageType(record) == messageType) {
+            try {
+                if (messageType == HandshakeMessageType.CLIENT_KEY_EXCHANGE) {
+                    HandshakeMessageParser<RSAClientKeyExchangeMessage> rsaParser = new RSAClientKeyExchangeParser(0,
+                            record.getProtocolMessageBytes().getValue(), pversion,
+                            config);
+
+                    // System.out.println(ar.getContentMessageType());
+                    msg = rsaParser.parse();
+                } else if (messageType == HandshakeMessageType.CLIENT_HELLO) {
+                    ClientHelloParser clientHelloParser = new ClientHelloParser(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config);
+
+                    msg = clientHelloParser.parse();
+                }
+
+            } catch (Exception e) {
+            }
+        }
+        return msg;
     }
 
     private void getPacketsFromPcapFile() throws NotOpenException {
@@ -145,54 +196,85 @@ public class PcapAnalyzer {
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
 
-            /** 
-             * Apply filtering to get only TLS packets (At the moment a bit tricky since TLS filter and packet support in pcap4j is yet to come)
-             * The filet used is taken from the link above (Last time worked Jan 11 2021).
-             * https://www.netmeister.org/blog/tcpdump-ssl-and-tls.html*/ 
-            String filter = "";
-            BpfProgram bpfFilter =
-                handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE, PcapHandle.PCAP_NETMASK_UNKNOWN);
+            String filter = "tcp";
+            BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
+                    PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
         }
 
         while (true) {
+            try {
+                Packet packet = handle.getNextPacketEx();
 
-            Packet packet = handle.getNextPacket();
+                if (packet.get(TcpPacket.class) != null) {
+                    long id = packet.get(TcpPacket.class).getHeader().getAcknowledgmentNumberAsLong();
 
-            if (packet == null) {
+                    // System.out.println(id);
+                    if (packets.containsKey(id)) {
+                        packets.get(id).add(packet);
+                    } else {
+                        List<Packet> list = new ArrayList<Packet>();
+                        list.add(packet);
+                        packets.put(id, list);
+                    }
+                } else {
+                    continue;
+                }
+
+            } catch (TimeoutException e) {
+                continue;
+            } catch (EOFException e) {
+                break;
+            } catch (PcapNativeException e) {
                 break;
             }
-
-            TcpPacket tcpPacket = packet.get(TcpPacket.class);
-
-            IpV4Packet ipPacket = packet.get(IpV4Packet.class);
-
-            if (tcpPacket == null) {
-                continue;
-            }
-
-            Entry<IpV4Packet, TcpPacket> e = new AbstractMap.SimpleEntry<>(ipPacket, tcpPacket);
-            sessionPackets.add(e);
         }
+
+    }
+
+    private byte[] defragment(List<Packet> list) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        for (Packet pack : list) {
+            try {
+                // System.out.println(tcpPacket.getHeader().getSequenceNumberAsLong());
+
+                if (pack.get(TcpPacket.class) != null) {
+                    TcpPacket tcpPacket = pack.get(TcpPacket.class);
+
+                    // System.out.println(tcpPacket.getHeader().getSequenceNumberAsLong() + " --- "
+                    // + tcpPacket.getHeader().getAcknowledgmentNumberAsLong());
+                    if (tcpPacket.getPayload() != null) {
+                        output.write(tcpPacket.getPayload().getRawData());
+                    }
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        return output.toByteArray();
     }
 
     /**
-     * Given that the record is of type Handshake, one can check which message type it contains
+     * Given that the record is of type Handshake, one can check which message type
+     * it contains
      * 
-     * @param  record
-     *                The record which contains the handshake message.
+     * @param record
+     *               The record which contains the handshake message.
      * 
-     * @return        The type of handshake message.
+     * @return The type of handshake message.
      */
     private HandshakeMessageType getRecordHandshakeMessageType(Record record) {
-        if (record.getProtocolMessageBytes().getValue().length != 0) {
+        if (record.getProtocolMessageBytes().getValue().length != 0
+                && record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
             byte typeBytes = record.getProtocolMessageBytes().getValue()[0];
             return HandshakeMessageType.getMessageType(typeBytes);
         }
         return HandshakeMessageType.UNKNOWN;
-
     }
 
 }
