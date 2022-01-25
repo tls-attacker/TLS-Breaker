@@ -1,16 +1,14 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- * <p>
- * Copyright 2021-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- * <p>
+ *
+ * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
-import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,17 +21,16 @@ public class ServerSelection {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static String getUserSelectedServer(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
-        Set<String> serverSet = new HashSet<>();
-        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer(bleichenbacherCommandConfig.getPcapFileLocation());
-        List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
-
-        sessions.forEach(pcapSession -> serverSet
-                .add(pcapSession.getPacketDestination() + ":" + pcapSession.getPacketPortDestination()));
-        List<String> serverList = new ArrayList<>(serverSet);
-
+    public String getUserSelectedServer(List<PcapSession> sessions) {
+        List<String> serverList = getUniqueServers(sessions);
         displayListOfServers(serverList);
         return getServerFromUser(serverList);
+    }
+
+    public List<String> getUniqueServers(List<PcapSession> sessions) {
+        Set<String> serverSet = new HashSet<>();
+        sessions.forEach(pcapSession -> serverSet.add(pcapSession.getDestinationHost()));
+        return new ArrayList<>(serverSet);
     }
 
     private static String getServerFromUser(List<String> serverList) {

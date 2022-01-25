@@ -1,0 +1,83 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.attacks.Main",
+            "projectName": "Attacks"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher with Sample4",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/Sample4.pcap"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher with Sample3",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/Sample3.pcap"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher with Sample2",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/Sample2.pcapng"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher with bb-session",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/bb-session.pcapng"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher vulnerable",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/a_correct_example.pcapng"
+        },
+        {
+            "type": "java",
+            "name": "Bleichenbacher Sample 1",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/Sample1.pcapng"
+        }
+        ,
+        {
+            "type": "java",
+            "name": "Random Sample",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/randomsample.pcapng"
+        }
+
+
+
+
+
+    ]
+}
