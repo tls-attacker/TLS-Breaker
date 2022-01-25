@@ -9,18 +9,34 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import java.util.HashSet;
+
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.HelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
+import de.rub.nds.tlsattacker.transport.tcp.fragmentation.ClientTcpFragmentationTransportHandler;
 
 public class PcapSession {
     /**
-     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
-     * change) and information from the TCP packet header like the source and destination of the package.
+     * A PcapSession holds messages of TLS handshake (depending on implementation
+     * phase the messages it contains may
+     * change) and information from the TCP packet header like the source and
+     * destination of the package.
      * 
      */
+
+
+    private HashSet<String> pcapIdentifier= new HashSet<>();
+
+    public HashSet<String> getPcapIdentifier() {
+        return this.pcapIdentifier;
+    }
+
+    public void setPcapIdentifier(HashSet<String> pcapIdentifier) {
+        this.pcapIdentifier = pcapIdentifier;
+    }
 
     private ClientKeyExchangeMessage clientKeyExchangeMessage;
 
@@ -31,7 +47,9 @@ public class PcapSession {
     }
 
     public void setClientHelloMessage(ClientHelloMessage clientHelloMessage) {
-        this.clientHelloMessage = clientHelloMessage;
+        if (clientHelloMessage != null) {
+            this.clientHelloMessage = clientHelloMessage;
+        }
     }
 
     public ServerHelloMessage getServerHellomessage() {
@@ -80,7 +98,9 @@ public class PcapSession {
     }
 
     public void setClientKeyExchangeMessage(ClientKeyExchangeMessage clientKeyExchangeMessage) {
-        this.clientKeyExchangeMessage = clientKeyExchangeMessage;
+        if (clientKeyExchangeMessage != null) {
+            this.clientKeyExchangeMessage = clientKeyExchangeMessage;
+        }
     }
 
     public String getPacketPortSource() {
@@ -102,6 +122,5 @@ public class PcapSession {
     public String getDestinationHost() {
         return this.packetDestination + ":" + this.packetPortDestination;
     }
-
 
 }

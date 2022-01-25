@@ -41,6 +41,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -53,6 +54,8 @@ public class PcapAnalyzer {
     // Collections.synchronizedList(new ArrayList<>());
     PcapSession psession;
     Map<Long, List<Packet>> packets = new HashMap<Long, List<Packet>>();
+
+    Map<Integer, PcapSession> sessionsWithId = new HashMap<>();
 
     public PcapAnalyzer(String pcapFileLocation) {
         this.pcapFileLocation = pcapFileLocation;
@@ -120,11 +123,24 @@ public class PcapAnalyzer {
                                 tcpPacket.getHeader().getSrcPort().valueAsString(),
                                 tcpPacket.getHeader().getDstPort().valueAsString());
 
+                        foundSession.getPcapIdentifier().add(ipPacket.getHeader().getSrcAddr().getHostAddress());
+                        foundSession.getPcapIdentifier().add(ipPacket.getHeader().getDstAddr().getHostAddress());
+                        foundSession.getPcapIdentifier().add(tcpPacket.getHeader().getSrcPort().valueAsString());
+                        foundSession.getPcapIdentifier().add(tcpPacket.getHeader().getDstPort().valueAsString());
+
+                        System.out.println(foundSession.getPcapIdentifier().hashCode());
+
+                        if (sessionsWithId.containsKey(foundSession.getPcapIdentifier().hashCode())) {
+                            foundSession = sessionsWithId.get(foundSession.getPcapIdentifier().hashCode());
+                        }
+                        else{
+                            sessionsWithId.put(foundSession.getPcapIdentifier().hashCode(), foundSession);
+
+                        }
                         foundSession.setClientKeyExchangeMessage((ClientKeyExchangeMessage) ckemsg);
-                        foundSession.setClientHelloMessage((ClientHelloMessage)clHello);
+                        foundSession.setClientHelloMessage((ClientHelloMessage) clHello);
 
-                        pcapSessions.add(foundSession);
-
+                        
                     }
 
                     // System.out.println("-------------------------------------------------");
@@ -135,40 +151,12 @@ public class PcapAnalyzer {
             }
 
         }
-        // groupIntoStreams(pcapSessions);
+
+        for(int key:sessionsWithId.keySet()){
+            pcapSessions.add(sessionsWithId.get(key));
+        }
 
         return pcapSessions;
-    }
-
-    private HashMap<String, PcapSession> groupIntoStreams(List<PcapSession> sessions) {
-
-        HashMap<String, PcapSession> handshakeStreams = new HashMap<>();
-
-        for (PcapSession s : sessions) {
-
-            String direction_one = s.getPacketSource() + s.getPacketPortSource() +
-                    s.getPacketDestination() + s.getPacketPortDestination();
-
-            String direction_two = s.getPacketDestination() + s.getPacketPortDestination() +
-                    s.getPacketSource() + s.getPacketPortSource();
-
-            if (handshakeStreams.containsKey(direction_one) || handshakeStreams.containsKey(direction_two)) {
-
-                PcapSession hs = handshakeStreams.get(direction_one);
-
-                handshakeStreams.put(s.getPacketSource() + s.getPacketPortSource() +
-                        s.getPacketDestination() + s.getPacketPortDestination(), hs);
-            } else {
-                handshakeStreams.put(s.getPacketSource() + s.getPacketPortSource() +
-                        s.getPacketDestination() + s.getPacketPortDestination(), s);
-            }
-        }
-
-        for (String st : handshakeStreams.keySet()) {
-            System.out.println(st);
-        }
-
-        return handshakeStreams;
     }
 
     private HandshakeMessage parseToTLSMessage(Record record, HandshakeMessageType messageType) {
@@ -189,12 +177,12 @@ public class PcapAnalyzer {
 
                     // System.out.println(ar.getContentMessageType());
                     msg = rsaParser.parse();
-                }
-                else if(messageType == HandshakeMessageType.CLIENT_HELLO){
-                    ClientHelloParser clientHelloParser = new ClientHelloParser(0, record.getProtocolMessageBytes().getValue(),
-                     pversion, config);
+                } else if (messageType == HandshakeMessageType.CLIENT_HELLO) {
+                    ClientHelloParser clientHelloParser = new ClientHelloParser(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config);
 
-                     msg = clientHelloParser.parse();
+                    msg = clientHelloParser.parse();
                 }
 
             } catch (Exception e) {
