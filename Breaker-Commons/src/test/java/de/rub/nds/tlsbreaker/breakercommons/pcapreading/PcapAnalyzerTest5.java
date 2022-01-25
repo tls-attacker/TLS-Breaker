@@ -44,7 +44,7 @@ public class PcapAnalyzerTest5 {
     public static void tearDownClass() {
     }
 
-    @Test
+    // @Test
     public void testgetPreMasterSecret() {
         PcapAnalyzer sample = new PcapAnalyzer(FileLocation.getPath());
 
@@ -64,7 +64,6 @@ public class PcapAnalyzerTest5 {
         System.out.println("#########################   LIST OF SESSION 5 #############################");
         System.out.println(sessions.size());
         assertEquals(ClientKeyExchangeCount, sessions.size());
-
 
     }
 

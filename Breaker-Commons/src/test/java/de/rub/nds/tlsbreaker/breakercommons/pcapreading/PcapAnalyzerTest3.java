@@ -43,7 +43,7 @@ public class PcapAnalyzerTest3 {
     public static void tearDownClass() {
     }
 
-    @Test
+    // @Test
     public void testgetPreMasterSecret() {
 
         PcapAnalyzer sample = new PcapAnalyzer(FileLocation.getPath());
