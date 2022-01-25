@@ -104,7 +104,19 @@ public class Main {
         List<String> vulnerableServers =
             getVulnerableServers(uniqueServers, bleichenbacherCommandConfig, pcapAnalyzer, sessions);
         displayVulnerableServers(vulnerableServers);
-        if (!vulnerableServers.isEmpty()) {
+        if (vulnerableServers.size() == 1) {
+            CONSOLE.info("Do you want to execute the attack on the server? (Y/N):");
+            Scanner sc = new Scanner(System.in);
+            String userInput = sc.nextLine();
+            if ("Y".equals(userInput) || "y".equals(userInput)) {
+                String serverToAttack = vulnerableServers.get(0);
+                executeAttack(serverToAttack, bleichenbacherCommandConfig);
+            } else if ("N".equals(userInput) || "n".equals(userInput)) {
+                CONSOLE.info("Execution of attack cancelled.");
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        } else if (vulnerableServers.size() > 1) {
             CONSOLE.info("Please select a server number to attack.");
             CONSOLE.info("server number: ");
             String serverToAttack = getServerToAttack(vulnerableServers);
