@@ -39,3 +39,4 @@ release.properties
 
 # VS Code
 .factorypath
+.vscode/*
