@@ -18,9 +18,11 @@ import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
+import de.rub.nds.tlsattacker.core.protocol.parser.ServerHelloParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
@@ -103,7 +105,7 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
-                    System.out.println(record.getContentMessageType());
+                    // System.out.println(record.getContentMessageType());
 
                     // We try to get only ClientHello, ServerHello, and ClientKeyExchange, other
                     // messages are ignored.
@@ -111,8 +113,8 @@ public class PcapAnalyzer {
                     if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
 
                         HandshakeMessage ckemsg = parseToTLSMessage(record, HandshakeMessageType.CLIENT_KEY_EXCHANGE);
-
                         HandshakeMessage clHello = parseToTLSMessage(record, HandshakeMessageType.CLIENT_HELLO);
+                        HandshakeMessage sHello = parseToTLSMessage(record, HandshakeMessageType.SERVER_HELLO);
 
                         IpV4Packet ipPacket = list.get(0).get(IpV4Packet.class);
 
@@ -132,15 +134,14 @@ public class PcapAnalyzer {
 
                         if (sessionsWithId.containsKey(foundSession.getPcapIdentifier().hashCode())) {
                             foundSession = sessionsWithId.get(foundSession.getPcapIdentifier().hashCode());
-                        }
-                        else{
+                        } else {
                             sessionsWithId.put(foundSession.getPcapIdentifier().hashCode(), foundSession);
 
                         }
                         foundSession.setClientKeyExchangeMessage((ClientKeyExchangeMessage) ckemsg);
                         foundSession.setClientHelloMessage((ClientHelloMessage) clHello);
+                        foundSession.setServerHellomessage((ServerHelloMessage)sHello);
 
-                        
                     }
 
                     // System.out.println("-------------------------------------------------");
@@ -152,7 +153,7 @@ public class PcapAnalyzer {
 
         }
 
-        for(int key:sessionsWithId.keySet()){
+        for (int key : sessionsWithId.keySet()) {
             pcapSessions.add(sessionsWithId.get(key));
         }
 
@@ -183,6 +184,12 @@ public class PcapAnalyzer {
                             pversion, config);
 
                     msg = clientHelloParser.parse();
+                }
+                else if(messageType == HandshakeMessageType.SERVER_HELLO){
+                    ServerHelloParser serverHelloParser = new ServerHelloParser(0,
+                    record.getProtocolMessageBytes().getValue(), pversion, config);
+
+                    msg = serverHelloParser.parse();
                 }
 
             } catch (Exception e) {

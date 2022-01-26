@@ -57,7 +57,10 @@ public class PcapSession {
     }
 
     public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
-        this.serverHellomessage = serverHellomessage;
+        if(serverHellomessage != null){
+            this.serverHellomessage = serverHellomessage;
+        }
+        
     }
 
     private ServerHelloMessage serverHellomessage;
