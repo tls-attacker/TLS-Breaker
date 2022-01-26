@@ -20,15 +20,12 @@ import de.rub.nds.tlsattacker.transport.tcp.fragmentation.ClientTcpFragmentation
 
 public class PcapSession {
     /**
-     * A PcapSession holds messages of TLS handshake (depending on implementation
-     * phase the messages it contains may
-     * change) and information from the TCP packet header like the source and
-     * destination of the package.
+     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
+     * change) and information from the TCP packet header like the source and destination of the package.
      * 
      */
 
-
-    private HashSet<String> pcapIdentifier= new HashSet<>();
+    private HashSet<String> pcapIdentifier = new HashSet<>();
 
     public HashSet<String> getPcapIdentifier() {
         return this.pcapIdentifier;
@@ -121,6 +118,10 @@ public class PcapSession {
 
     public String getDestinationHost() {
         return this.packetDestination + ":" + this.packetPortDestination;
+    }
+
+    public String getSourceHost() {
+        return this.packetSource + ":" + this.packetPortSource;
     }
 
 }

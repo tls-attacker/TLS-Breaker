@@ -1,8 +1,8 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- *
+ * <p>
  * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- *
+ * <p>
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
@@ -13,43 +13,47 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.List;
+import java.util.Scanner;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.DisplaySessionInfo;
 
 public class ServerSelection {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public String getUserSelectedServer(List<PcapSession> sessions) {
-        List<String> serverList = getUniqueServers(sessions);
-        displayListOfServers(serverList);
-        return getServerFromUser(serverList);
+    public String getValidUserSelection(List<PcapSession> sessions) {
+        // List<String> serverList = getServers(sessions);
+        displayListOfServers(sessions);
+        return getUserInput(sessions);
     }
 
     // TODO: used at 2 places
-    public List<String> getUniqueServers(List<PcapSession> sessions) {
-        Set<String> serverSet = new HashSet<>();
-        sessions.forEach(pcapSession -> serverSet.add(pcapSession.getDestinationHost()));
-        return new ArrayList<>(serverSet);
-    }
+    /*
+     * public List<String> getServers(List<PcapSession> sessions) { List<String> serverList = new ArrayList<>();
+     * sessions.forEach(pcapSession -> serverList.add(pcapSession.getDestinationHost())); return serverList; }
+     */
 
-    private static String getServerFromUser(List<String> serverList) {
+    private String getUserInput(List<PcapSession> sessions) {
         String selectedServer = null;
         Scanner sc = new Scanner(System.in);
         try {
             if (sc.hasNextInt()) {
                 int serverNumber = sc.nextInt();
-                if (serverNumber > 0 & serverNumber <= serverList.size()) {
-                    selectedServer = serverList.get(serverNumber - 1);
-                    LOGGER.info("Selected server: " + selectedServer);
+                if (serverNumber > 0 && serverNumber <= sessions.size()) {
+                    /*
+                     * selectedServer = sessions.get(serverNumber - 1).getDestinationHost();
+                     * LOGGER.info("Selected server: " + selectedServer);
+                     */
+                    return Integer.toString(serverNumber);
                 } else {
                     throw new UnsupportedOperationException();
                 }
             } else {
-                String option = sc.nextLine();
-                if ("a".equals(option)) {
-                    return option;
+                String userOption = sc.nextLine();
+                if ("a".equals(userOption)) {
+                    return userOption;
                 } else {
                     throw new UnsupportedOperationException();
                 }
@@ -58,17 +62,18 @@ public class ServerSelection {
             throw new UnsupportedOperationException();
         }
 
-        return selectedServer;
+        // return selectedServer;
     }
 
-    private static void displayListOfServers(List<String> serverList) {
-        CONSOLE.info("Found " + serverList.size() + " server that can be vulnerable to Bleichenbacher.");
-        for (int i = 0; i < serverList.size(); i++) {
-            CONSOLE.info(i + 1 + ") " + serverList.get(i));
-        }
+    private void displayListOfServers(List<PcapSession> sessions) {
+        CONSOLE.info("Found " + sessions.size() + " sessions from the pcap file.");
+        DisplaySessionInfo(sessions);
+        /*
+         * for (int i = 0; i < serverList.size(); i++) { CONSOLE.info(i + 1 + ") " + serverList.get(i)); }
+         */
         CONSOLE.info("a) Check if all the above servers are vulnerable.");
         CONSOLE.info("Please select a server number to check for vulnerability "
-            + "or press 'a' to check for vulnerability of all the servers.");
+                + "or press 'a' to check for vulnerability of all the servers.");
         CONSOLE.info("Select Option: ");
     }
 }
