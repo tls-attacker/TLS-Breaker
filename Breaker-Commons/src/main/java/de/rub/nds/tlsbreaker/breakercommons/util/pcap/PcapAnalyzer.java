@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
@@ -24,6 +25,7 @@ import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ECDHClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
+import de.rub.nds.tlsattacker.core.protocol.parser.PskClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ServerHelloParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
@@ -31,6 +33,7 @@ import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 
+import org.bouncycastle.crypto.util.CipherFactory;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
@@ -45,9 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -59,7 +61,7 @@ public class PcapAnalyzer {
     // private List<Entry<IpV4Packet, TcpPacket>> sessionPackets =
     // Collections.synchronizedList(new ArrayList<>());
     PcapSession psession;
-    Map<Long, List<Packet>> packets = new HashMap<Long, List<Packet>>();
+    LinkedHashMap<Long, List<Packet>> packets = new LinkedHashMap<Long, List<Packet>>();
 
     Map<Integer, PcapSession> pcapSessions = new HashMap<>();
 
@@ -134,6 +136,8 @@ public class PcapAnalyzer {
 
                         }
 
+                        ClientKeyExchangeMessage ckeMessage = parseToCKEMessage(record, foundSession);
+
                         switch (getRecordHandshakeMessageType(record)) {
                             case CLIENT_HELLO:
                                 foundSession.setClientHelloMessage((ClientHelloMessage) tlsMessage);
@@ -142,7 +146,7 @@ public class PcapAnalyzer {
                                 foundSession.setServerHellomessage((ServerHelloMessage) tlsMessage);
                                 break;
                             case CLIENT_KEY_EXCHANGE:
-                                foundSession.setClientKeyExchangeMessage((ClientKeyExchangeMessage) tlsMessage);
+                                foundSession.setClientKeyExchangeMessage(ckeMessage);
                                 break;
                             default:
                                 break;
@@ -159,6 +163,49 @@ public class PcapAnalyzer {
         return new ArrayList<PcapSession>(pcapSessions.values());
     }
 
+    private ClientKeyExchangeMessage parseToCKEMessage(Record record, PcapSession session) {
+
+        ClientKeyExchangeMessage msg = null;
+
+        ProtocolVersion pversion = ProtocolVersion
+                .getProtocolVersion(record.getProtocolVersion().getValue());
+
+        Config config = Config.createConfig();
+
+        if (getRecordHandshakeMessageType(record) == HandshakeMessageType.CLIENT_KEY_EXCHANGE) {
+
+            if (session.getServerHellomessage() != null) {
+
+                ServerHelloMessage shm = session.getServerHellomessage();
+
+                CipherSuite selectedCipherSuite = CipherSuite
+                        .getCipherSuite(shm.getSelectedCipherSuite().getValue());
+
+                System.out.println(selectedCipherSuite);
+                        
+                if (selectedCipherSuite.name().contains("PSK")) {
+                    msg = new PskClientKeyExchangeParser(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+
+                } else if (selectedCipherSuite.name().contains("DHE_")) {
+                    msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
+                    record.getProtocolMessageBytes().getValue(),
+                    pversion, config).parse();
+                } else if (selectedCipherSuite.name().contains("TLS_RSA")) {
+                    msg = new RSAClientKeyExchangeParser<RSAClientKeyExchangeMessage>(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+                } else if (selectedCipherSuite.name().contains("TLS_ECDHE_RSA")) {
+                    
+                } else {
+                }
+            }
+        }
+
+        return msg;
+    }
+
     private HandshakeMessage parseToTLSMessage(Record record, HandshakeMessageType messageType) {
 
         ProtocolVersion pversion = ProtocolVersion
@@ -171,13 +218,7 @@ public class PcapAnalyzer {
         System.out.println(getRecordHandshakeMessageType(record));
 
         try {
-            if (messageType == HandshakeMessageType.CLIENT_KEY_EXCHANGE) {
-                ClientKeyExchangeParser<RSAClientKeyExchangeMessage> rsaParser = new RSAClientKeyExchangeParser(0,
-                        record.getProtocolMessageBytes().getValue(), pversion,
-                        config);
-
-                msg = rsaParser.parse();
-            } else if (messageType == HandshakeMessageType.CLIENT_HELLO) {
+            if (messageType == HandshakeMessageType.CLIENT_HELLO) {
                 ClientHelloParser clientHelloParser = new ClientHelloParser(0,
                         record.getProtocolMessageBytes().getValue(),
                         pversion, config);
