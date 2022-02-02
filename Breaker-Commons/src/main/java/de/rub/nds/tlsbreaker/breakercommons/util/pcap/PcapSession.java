@@ -13,10 +13,7 @@ import java.util.HashSet;
 
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.HelloMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
-import de.rub.nds.tlsattacker.transport.tcp.fragmentation.ClientTcpFragmentationTransportHandler;
 
 public class PcapSession {
     /**
@@ -27,43 +24,7 @@ public class PcapSession {
      * 
      */
 
-
     private HashSet<String> pcapIdentifier= new HashSet<>();
-
-    public HashSet<String> getPcapIdentifier() {
-        return this.pcapIdentifier;
-    }
-
-    public void setPcapIdentifier(HashSet<String> pcapIdentifier) {
-        this.pcapIdentifier = pcapIdentifier;
-    }
-
-    private ClientKeyExchangeMessage clientKeyExchangeMessage;
-
-    private ClientHelloMessage clientHelloMessage;
-
-    public ClientHelloMessage getClientHelloMessage() {
-        return this.clientHelloMessage;
-    }
-
-    public void setClientHelloMessage(ClientHelloMessage clientHelloMessage) {
-        if (clientHelloMessage != null) {
-            this.clientHelloMessage = clientHelloMessage;
-        }
-    }
-
-    public ServerHelloMessage getServerHellomessage() {
-        return this.serverHellomessage;
-    }
-
-    public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
-        if(serverHellomessage != null){
-            this.serverHellomessage = serverHellomessage;
-        }
-        
-    }
-
-    private ServerHelloMessage serverHellomessage;
 
     private String packetSource;
 
@@ -73,12 +34,28 @@ public class PcapSession {
 
     private String packetPortDestination;
 
+    private ClientKeyExchangeMessage clientKeyExchangeMessage;
+
+    private ClientHelloMessage clientHelloMessage;
+
+    private ServerHelloMessage serverHellomessage;
+
+
     public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
         packetDestination = destination;
         packetPortSource = packetPortSrc;
         packetPortDestination = PackerPortDst;
     }
+
+    public HashSet<String> getPcapIdentifier() {
+        return this.pcapIdentifier;
+    }
+
+    public void setPcapIdentifier(HashSet<String> pcapIdentifier) {
+        this.pcapIdentifier = pcapIdentifier;
+    }
+
 
     public String getPacketSource() {
         return this.packetSource;
@@ -124,6 +101,27 @@ public class PcapSession {
 
     public String getDestinationHost() {
         return this.packetDestination + ":" + this.packetPortDestination;
+    }
+
+    public ClientHelloMessage getClientHelloMessage() {
+        return this.clientHelloMessage;
+    }
+
+    public void setClientHelloMessage(ClientHelloMessage clientHelloMessage) {
+        if (clientHelloMessage != null) {
+            this.clientHelloMessage = clientHelloMessage;
+        }
+    }
+
+    public ServerHelloMessage getServerHellomessage() {
+        return this.serverHellomessage;
+    }
+
+    public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
+        if(serverHellomessage != null){
+            this.serverHellomessage = serverHellomessage;
+        }
+        
     }
 
 }
