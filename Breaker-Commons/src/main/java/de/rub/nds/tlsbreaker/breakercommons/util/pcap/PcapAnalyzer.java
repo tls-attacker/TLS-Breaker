@@ -9,6 +9,8 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -19,19 +21,24 @@ import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ECDHClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.PskRsaClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientKeyExchangeParser;
+import de.rub.nds.tlsattacker.core.protocol.parser.DHClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ECDHClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.PskClientKeyExchangeParser;
+import de.rub.nds.tlsattacker.core.protocol.parser.PskRsaClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ServerHelloParser;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
+import de.rub.nds.tlsattacker.util.ConsoleLogger;
 
 import org.bouncycastle.crypto.util.CipherFactory;
 import org.pcap4j.core.BpfProgram;
@@ -54,12 +61,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class PcapAnalyzer {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String pcapFileLocation;
     private PcapHandle handle;
-    // private List<Entry<IpV4Packet, TcpPacket>> sessionPackets =
-    // Collections.synchronizedList(new ArrayList<>());
     PcapSession psession;
     LinkedHashMap<Long, List<Packet>> packets = new LinkedHashMap<Long, List<Packet>>();
 
@@ -71,7 +81,7 @@ public class PcapAnalyzer {
         try {
             this.getPacketsFromPcapFile();
         } catch (NotOpenException e) {
-            // TODO Auto-generated catch block
+            CONSOLE.warn("The pcap file could not be found!");
             e.printStackTrace();
         }
     }
@@ -87,6 +97,8 @@ public class PcapAnalyzer {
      */
     public List<PcapSession> getAllSessions() {
 
+        LOGGER.debug("Extracting the packages");
+
         for (Long id : packets.keySet()) {
 
             List<Packet> list = packets.get(id);
@@ -94,6 +106,7 @@ public class PcapAnalyzer {
             byte[] defragmentedBytes = defragment(list);
 
             try {
+                LOGGER.debug("Parsing the records");
                 TlsContext context = new TlsContext();
 
                 TlsRecordLayer rec_layer = new TlsRecordLayer(context);
@@ -105,6 +118,7 @@ public class PcapAnalyzer {
                     continue;
                 }
 
+                LOGGER.debug("Parsing records to specific TLS messages");
                 for (AbstractRecord ar : allRecords) {
 
                     Record record = (Record) ar;
@@ -133,9 +147,9 @@ public class PcapAnalyzer {
                             foundSession = pcapSessions.get(foundSession.getPcapIdentifier().hashCode());
                         } else {
                             pcapSessions.put(foundSession.getPcapIdentifier().hashCode(), foundSession);
-
                         }
 
+                        // ClientKeyExchange is parsed based on the selected cipher suite
                         ClientKeyExchangeMessage ckeMessage = parseToCKEMessage(record, foundSession);
 
                         switch (getRecordHandshakeMessageType(record)) {
@@ -154,12 +168,10 @@ public class PcapAnalyzer {
                     }
                 }
             } catch (ParserException pe) {
-                // The packages that can not be parsed are ignored.
+                LOGGER.debug("Package could not be parsed to a TLS message!");
                 continue;
             }
-
         }
-
         return new ArrayList<PcapSession>(pcapSessions.values());
     }
 
@@ -181,28 +193,34 @@ public class PcapAnalyzer {
                 CipherSuite selectedCipherSuite = CipherSuite
                         .getCipherSuite(shm.getSelectedCipherSuite().getValue());
 
-                System.out.println(selectedCipherSuite);
-                        
-                if (selectedCipherSuite.name().contains("PSK")) {
-                    msg = new PskClientKeyExchangeParser(0,
+                if (selectedCipherSuite.name().contains("TLS_PSK")) {
+                    msg = new PskRsaClientKeyExchangeParser(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
+                    PskRsaClientKeyExchangeMessage pskmsg = (PskRsaClientKeyExchangeMessage) msg;
+                    System.out.println(pskmsg.getPublicKey());
 
-                } else if (selectedCipherSuite.name().contains("DHE_")) {
+                } else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
-                    record.getProtocolMessageBytes().getValue(),
-                    pversion, config).parse();
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+                    System.out.println(msg.getPublicKey());
+
                 } else if (selectedCipherSuite.name().contains("TLS_RSA")) {
                     msg = new RSAClientKeyExchangeParser<RSAClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                } else if (selectedCipherSuite.name().contains("TLS_ECDHE_RSA")) {
-                    
+                    System.out.println(msg.getPublicKey());
+
+                } else if (selectedCipherSuite.name().contains("TLS_DH_RSA")) {
+                    msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+
                 } else {
+                    LOGGER.debug("ClientKeyExchange message not yet supported!");
                 }
             }
         }
-
         return msg;
     }
 
@@ -214,8 +232,6 @@ public class PcapAnalyzer {
         Config config = Config.createConfig();
 
         HandshakeMessage msg = null;
-
-        System.out.println(getRecordHandshakeMessageType(record));
 
         try {
             if (messageType == HandshakeMessageType.CLIENT_HELLO) {
@@ -230,21 +246,22 @@ public class PcapAnalyzer {
 
                 msg = serverHelloParser.parse();
             }
-
-        } catch (Exception e) {
+        } catch (ParserException e) {
+            LOGGER.debug("Could not parse the message!");
         }
         return msg;
     }
 
     private void getPacketsFromPcapFile() throws NotOpenException {
-
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
 
+            //Filter the packages that pcap4j captures (TLS not yet supported)
             String filter = "tcp";
             BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
                     PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
+
         } catch (PcapNativeException e) {
             System.out.println("Can not find file");
         }
@@ -266,7 +283,6 @@ public class PcapAnalyzer {
                 } else {
                     continue;
                 }
-
             } catch (TimeoutException e) {
                 continue;
             } catch (EOFException e) {
@@ -275,7 +291,6 @@ public class PcapAnalyzer {
                 break;
             }
         }
-
     }
 
     private byte[] defragment(List<Packet> list) {
@@ -283,8 +298,8 @@ public class PcapAnalyzer {
 
         for (Packet pack : list) {
             try {
-
                 if (pack.get(TcpPacket.class) != null) {
+
                     TcpPacket tcpPacket = pack.get(TcpPacket.class);
 
                     if (tcpPacket.getPayload() != null) {
@@ -292,11 +307,10 @@ public class PcapAnalyzer {
                     }
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                LOGGER.debug("Could not defragment package!");
                 e.printStackTrace();
             }
         }
-
         return output.toByteArray();
     }
 
@@ -317,5 +331,4 @@ public class PcapAnalyzer {
         }
         return HandshakeMessageType.UNKNOWN;
     }
-
 }
