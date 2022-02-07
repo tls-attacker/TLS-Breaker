@@ -22,6 +22,7 @@ import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -110,7 +111,7 @@ public class Main {
         if (vulnerableServers.size() == 1) {
             CONSOLE.info("Do you want to execute the attack on the server? (Y/N):");
             Scanner sc = new Scanner(System.in);
-            String userInput = sc.nextLine();
+            String userInput = StringUtils.trim(sc.nextLine());
             if ("Y".equals(userInput) || "y".equals(userInput)) {
                 // String serverToAttack = vulnerableServers.get(0);
                 executeAttack(vulnerableServers.get(0), bleichenbacherCommandConfig, pcapAnalyzer);

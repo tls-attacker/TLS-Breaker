@@ -40,7 +40,6 @@ public class PcapSession {
 
     private ServerHelloMessage serverHellomessage;
 
-
     public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
         packetDestination = destination;
@@ -55,7 +54,6 @@ public class PcapSession {
     public void setPcapIdentifier(HashSet<String> pcapIdentifier) {
         this.pcapIdentifier = pcapIdentifier;
     }
-
 
     public String getPacketSource() {
         return this.packetSource;
@@ -101,6 +99,10 @@ public class PcapSession {
 
     public String getDestinationHost() {
         return this.packetDestination + ":" + this.packetPortDestination;
+    }
+
+    public String getSourceHost() {
+        return this.packetSource + ":" + this.packetPortSource;
     }
 
     public ClientHelloMessage getClientHelloMessage() {
