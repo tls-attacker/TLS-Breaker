@@ -86,10 +86,6 @@ public class PcapAnalyzer {
         }
     }
 
-    public byte[] getPreMasterSecret(ClientKeyExchangeMessage chosenCKEMessage) {
-        return chosenCKEMessage.getPublicKey().getValue();
-    }
-
     /**
      * Get a list PcapSessions that are extracted from the PcapFie
      * 
@@ -122,6 +118,8 @@ public class PcapAnalyzer {
                 for (AbstractRecord ar : allRecords) {
 
                     Record record = (Record) ar;
+
+                    System.out.println(record.getProtocolVersion());
 
                     if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
 
@@ -198,19 +196,19 @@ public class PcapAnalyzer {
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
                     PskRsaClientKeyExchangeMessage pskmsg = (PskRsaClientKeyExchangeMessage) msg;
-                    System.out.println(pskmsg.getPublicKey());
+                    // System.out.println(pskmsg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                    System.out.println(msg.getPublicKey());
+                    // System.out.println(msg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_RSA")) {
                     msg = new RSAClientKeyExchangeParser<RSAClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                    System.out.println(msg.getPublicKey());
+                    // System.out.println(msg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_DH_RSA")) {
                     msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
