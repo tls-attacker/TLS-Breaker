@@ -51,7 +51,7 @@ public class PcapAnalyzerTest3 {
         List<PcapSession> sessions = sample.getAllSessions();
 
         for (int i = 0; i < sessions.size(); i++) {
-            byte[] pms = sample.getPreMasterSecret(sessions.get(i).getClientKeyExchangeMessage());
+            byte[] pms = sessions.get(i).getPreMasterSecret();// sample.getPreMasterSecret(sessions.get(i).getClientKeyExchangeMessage());
 
             char[] pms_after_convert = Hex.encodeHex(pms);
             System.out.println("#########################   PCAPANALYZERTEST 3 #############################");

@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher;
 
 import com.beust.jcommander.JCommander;
@@ -22,12 +21,17 @@ import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.DisplaySessionInfo;
 
 /**
  *
@@ -80,16 +84,17 @@ public class Main {
 
         if (sessions != null || !sessions.isEmpty()) {
             ServerSelection serverSelection = new ServerSelection();
-            String userOption = serverSelection.getUserSelectedServer(sessions);
+            String userOption = serverSelection.getValidUserSelection(sessions);
             if ("a".equals(userOption)) {
-                List<String> uniqueServers = serverSelection.getUniqueServers(sessions);
-                checkVulnerabilityOfAllServersAndDisplay(uniqueServers, bleichenbacherCommandConfig, pcapAnalyzer,
-                    sessions);
+                // List<String> servers = serverSelection.getServers(sessions);
+                checkVulnerabilityOfAllServersAndDisplay(sessions, bleichenbacherCommandConfig);
             } else {
                 // TODO: place this in else block?
-                bleichenbacherCommandConfig.getClientDelegate().setHost(userOption);
-                bleichenbacherCommandConfig
-                    .setEncryptedPremasterSecret(getPreMasterSecret(pcapAnalyzer, sessions, userOption));
+                PcapSession session = sessions.get(Integer.parseInt(userOption) - 1);
+                // TODO: print entire information which is displayed to user when showing server options.
+                LOGGER.info("Selected server: " + session.getDestinationHost());
+                bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
+                bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
 
                 checkVulnerabilityOrExecuteAttack(bleichenbacherCommandConfig);
             }
@@ -98,47 +103,50 @@ public class Main {
         }
     }
 
-    private static void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-        BleichenbacherCommandConfig bleichenbacherCommandConfig, PcapAnalyzer pcapAnalyzer,
-        List<PcapSession> sessions) {
-        List<String> vulnerableServers =
-            getVulnerableServers(uniqueServers, bleichenbacherCommandConfig, pcapAnalyzer, sessions);
+    private static void checkVulnerabilityOfAllServersAndDisplay(List<PcapSession> sessions,
+                                                                 BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+        List<PcapSession> vulnerableServers = getVulnerableServers(sessions, bleichenbacherCommandConfig);
         displayVulnerableServers(vulnerableServers);
         if (vulnerableServers.size() == 1) {
             CONSOLE.info("Do you want to execute the attack on the server? (Y/N):");
             Scanner sc = new Scanner(System.in);
-            String userInput = sc.nextLine();
+            String userInput = StringUtils.trim(sc.nextLine());
             if ("Y".equals(userInput) || "y".equals(userInput)) {
-                String serverToAttack = vulnerableServers.get(0);
-                executeAttack(serverToAttack, bleichenbacherCommandConfig);
+                // String serverToAttack = vulnerableServers.get(0);
+                executeAttack(vulnerableServers.get(0), bleichenbacherCommandConfig);
             } else if ("N".equals(userInput) || "n".equals(userInput)) {
-                CONSOLE.info("Execution of attack cancelled.");
+                CONSOLE.info("Execution of the attack cancelled.");
             } else {
                 throw new UnsupportedOperationException();
             }
         } else if (vulnerableServers.size() > 1) {
             CONSOLE.info("Please select a server number to attack.");
             CONSOLE.info("server number: ");
-            String serverToAttack = getServerToAttack(vulnerableServers);
+            PcapSession serverToAttack = getUSerSelectionForAttack(vulnerableServers);
             executeAttack(serverToAttack, bleichenbacherCommandConfig);
         }
 
     }
 
-    private static void executeAttack(String serverToAttack, BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+    private static void executeAttack(PcapSession session, BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+
+        bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
+        bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
+
         Attacker<? extends TLSDelegateConfig> attacker =
-            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         attacker.attack();
     }
 
-    private static String getServerToAttack(List<String> vulnerableServers) {
-        String selectedServer = null;
+    private static PcapSession getUSerSelectionForAttack(List<PcapSession> vulnerableServers) {
+        PcapSession selectedSession = null;
         Scanner sc = new Scanner(System.in);
         try {
             int serverNumber = sc.nextInt();
-            if (serverNumber > 0 & serverNumber <= vulnerableServers.size()) {
-                selectedServer = vulnerableServers.get(serverNumber - 1);
-                LOGGER.info("Selected server: " + selectedServer);
+            if (serverNumber > 0 && serverNumber <= vulnerableServers.size()) {
+                selectedSession = vulnerableServers.get(serverNumber - 1);
+                // TODO: print entire information which is displayed to user when showing server options.
+                LOGGER.info("Selected server: " + selectedSession);
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -147,30 +155,26 @@ public class Main {
             throw new UnsupportedOperationException();
         }
 
-        return selectedServer;
+        return selectedSession;
     }
 
-    private static List<String> getVulnerableServers(List<String> uniqueServers,
-        BleichenbacherCommandConfig bleichenbacherCommandConfig, PcapAnalyzer pcapAnalyzer,
-        List<PcapSession> sessions) {
+    private static List<PcapSession> getVulnerableServers(List<PcapSession> sessions,
+                                                          BleichenbacherCommandConfig bleichenbacherCommandConfig) {
 
-        List<String> vulnerableServers = new ArrayList<>();
-        for (String server : uniqueServers) {
-            bleichenbacherCommandConfig.getClientDelegate().setHost(server);
-            bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(pcapAnalyzer, sessions, server));
+        List<PcapSession> vulnerableServers = new ArrayList<>();
+        for (PcapSession session : sessions) {
+            bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
+            bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
 
             Attacker<? extends TLSDelegateConfig> attacker =
-                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+                    new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
 
             try {
                 Boolean result = attacker.checkVulnerability();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
-                    vulnerableServers.add(server);
-                } /*
-                   * else if (Objects.equals(result, Boolean.FALSE)) { CONSOLE.info("Vulnerable:" + result.toString());
-                   * } else { CONSOLE.warn("Vulnerable: Uncertain"); }
-                   */
+                    vulnerableServers.add(session);
+                }
             } catch (UnsupportedOperationException e) {
                 LOGGER.info("The selected attacker is currently not implemented");
             }
@@ -178,18 +182,18 @@ public class Main {
         return vulnerableServers;
     }
 
-    private static void displayVulnerableServers(List<String> vulnerableServers) {
+    private static void displayVulnerableServers(List<PcapSession> sessions) {
 
-        CONSOLE.info("Found " + vulnerableServers.size() + " server that are vulnerable.");
-        for (int i = 0; i < vulnerableServers.size(); i++) {
-            CONSOLE.info(i + 1 + ") " + vulnerableServers.get(i));
-        }
-        // CONSOLE.info("Select Option: ");
+        CONSOLE.info("Found " + sessions.size() + " server that are vulnerable.");
+        DisplaySessionInfo(sessions);
+        /*
+         * for (int i = 0; i < vulnerableServers.size(); i++) { CONSOLE.info(i + 1 + ") " + vulnerableServers.get(i)); }
+         */
     }
 
     private static void checkVulnerabilityOrExecuteAttack(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
         Attacker<? extends TLSDelegateConfig> attacker =
-            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         // TODO: Remove log
         CONSOLE.info("Pcap file location = " + bleichenbacherCommandConfig.getPcapFileLocation());
 
@@ -211,16 +215,17 @@ public class Main {
         }
     }
 
-    private static String getPreMasterSecret(PcapAnalyzer pcapAnalyzer, List<PcapSession> sessions,
-        String serverToAttack) {
+    private static String getPreMasterSecret(PcapSession session) {
         String preMasterSecret = null;
-        Optional<PcapSession> filteredPcapSession = sessions.stream()
-            .filter(pcapSession -> serverToAttack.equals(pcapSession.getDestinationHost())).findFirst();
+        /*
+         * Optional<PcapSession> filteredPcapSession = sessions.stream() .filter(pcapSession ->
+         * serverToAttack.equals(pcapSession.getDestinationHost())).findFirst();
+         */
 
-        if (filteredPcapSession.isPresent()) {
-            byte[] pms = pcapAnalyzer.getPreMasterSecret(filteredPcapSession.get().getClientKeyExchangeMessage());
-            preMasterSecret = new String(Hex.encodeHex(pms));
-        }
+        // if (filteredPcapSession.isPresent()) {
+        byte[] pms = session.getPreMasterSecret();// pcapAnalyzer.getPreMasterSecret(session.getClientKeyExchangeMessage());
+        preMasterSecret = new String(Hex.encodeHex(pms));
+        // }
 
         return preMasterSecret;
     }
