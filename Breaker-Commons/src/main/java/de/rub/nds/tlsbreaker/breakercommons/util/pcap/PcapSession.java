@@ -47,6 +47,10 @@ public class PcapSession {
         packetPortDestination = PackerPortDst;
     }
 
+    public byte[] getPreMasterSecret() {
+        return this.clientKeyExchangeMessage.getPublicKey().getValue();
+    }
+
     public HashSet<String> getPcapIdentifier() {
         return this.pcapIdentifier;
     }
