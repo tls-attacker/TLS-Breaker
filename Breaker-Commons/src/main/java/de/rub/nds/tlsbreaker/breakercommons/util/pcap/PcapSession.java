@@ -24,7 +24,7 @@ public class PcapSession {
      * 
      */
 
-    private HashSet<String> pcapIdentifier= new HashSet<>();
+    private HashSet<String> pcapIdentifier = new HashSet<>();
 
     private String packetSource;
 
@@ -124,7 +124,7 @@ public class PcapSession {
     }
 
     public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
-        if(serverHellomessage != null){
+        if (serverHellomessage != null) {
             this.serverHellomessage = serverHellomessage;
         }
 

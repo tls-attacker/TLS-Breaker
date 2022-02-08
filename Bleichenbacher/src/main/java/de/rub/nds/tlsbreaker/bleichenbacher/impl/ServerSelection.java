@@ -73,7 +73,7 @@ public class ServerSelection {
          */
         CONSOLE.info("a) Check if all the above servers are vulnerable.");
         CONSOLE.info("Please select a server number to check for vulnerability "
-                + "or press 'a' to check for vulnerability of all the servers.");
+            + "or press 'a' to check for vulnerability of all the servers.");
         CONSOLE.info("Select Option: ");
     }
 }

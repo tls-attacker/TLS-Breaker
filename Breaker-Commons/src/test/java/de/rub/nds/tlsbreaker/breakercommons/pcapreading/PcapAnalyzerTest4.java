@@ -50,7 +50,7 @@ public class PcapAnalyzerTest4 {
         System.out.println(sessions.size());
 
         for (int i = 0; i < sessions.size(); i++) {
-            byte[] pms = sample.getPreMasterSecret(sessions.get(i).getClientKeyExchangeMessage());
+            byte[] pms = sessions.get(i).getPreMasterSecret();// sample.getPreMasterSecret(sessions.get(i).getClientKeyExchangeMessage());
 
             char[] pms_after_convert = Hex.encodeHex(pms);
             System.out.println("#########################   PCAPANALYZERTEST 4 #############################");
