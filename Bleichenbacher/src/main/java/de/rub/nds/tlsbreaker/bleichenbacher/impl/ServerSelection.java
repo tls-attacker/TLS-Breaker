@@ -9,10 +9,12 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
+import de.rub.nds.tlsattacker.core.state.session.Session;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,8 +27,9 @@ public class ServerSelection {
 
     public String getValidUserSelection(List<PcapSession> sessions) {
         // List<String> serverList = getServers(sessions);
-        displayListOfServers(sessions);
-        return getUserInput(sessions);
+        List<PcapSession> filteredServers = filterServers(sessions);
+        displayListOfServers(filteredServers);
+        return getUserInput(filteredServers);
     }
 
     // TODO: used at 2 places
@@ -34,6 +37,16 @@ public class ServerSelection {
      * public List<String> getServers(List<PcapSession> sessions) { List<String> serverList = new ArrayList<>();
      * sessions.forEach(pcapSession -> serverList.add(pcapSession.getDestinationHost())); return serverList; }
      */
+
+    private List<PcapSession> filterServers(List<PcapSession> sessions) {
+        List<PcapSession> filteredServers = new ArrayList<>();
+        for(PcapSession s:sessions){
+            if(s.getClientKeyExchangeMessage() !=null){
+                filteredServers.add(s);
+            }
+        }
+        return filteredServers;
+    }
 
     private String getUserInput(List<PcapSession> sessions) {
         String selectedServer = null;
