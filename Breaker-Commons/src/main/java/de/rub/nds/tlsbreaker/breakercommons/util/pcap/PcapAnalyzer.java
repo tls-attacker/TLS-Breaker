@@ -119,8 +119,6 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
-                    System.out.println(record.getProtocolVersion());
-
                     if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
 
                         HandshakeMessage tlsMessage = parseToTLSMessage(record, getRecordHandshakeMessageType(record));
@@ -195,8 +193,6 @@ public class PcapAnalyzer {
                     msg = new PskRsaClientKeyExchangeParser(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                    PskRsaClientKeyExchangeMessage pskmsg = (PskRsaClientKeyExchangeMessage) msg;
-                    // System.out.println(pskmsg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
@@ -254,9 +250,18 @@ public class PcapAnalyzer {
         try {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
 
-            //Filter the packages that pcap4j captures (TLS not yet supported)
-            String filter = "tcp";
-            BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
+            // Filter the packages that pcap4j captures (TLS not yet supported)
+            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))";
+            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) &&  (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) &&  (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))";
+        //    String filter = "(tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)";
+        // String filter ="((tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) &&  (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03))";
+            
+        // String filter = "tcp && (((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03 && (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))   ||   (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03)    ||    (((tcp[((tcp[12] & 0xf0) >> 2)] < 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] > 0x18)) && (tcp[((tcp[12] & 0xf0) >> 2)+3] = 0x00) && (tcp[((tcp[12] & 0xf0) >> 2)+4] = 0x02))";
+        // String filter = "tcp[tcp[12]>>2:4]&0xFFFFFCC0=0x17030000";
+        // String filter = "tcp[tcpflags] & (tcp-syn|tcp-ack) != 0";
+        // String filter = "!(tcp[tcpflags] & (tcp-syn|tcp-fin) != 0)";
+        String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] = 0x03))";
+        BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
                     PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
 

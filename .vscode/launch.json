@@ -76,11 +76,11 @@
         ,
         {
             "type": "java",
-            "name": "Random Sample",
+            "name": "PSK captured",
             "request": "launch",
             "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
             "projectName": "Bleichenbacher",
-            "args": "-pcap ~/Desktop/test_pcaps/randomsample.pcapng"
+            "args": "-pcap ~/Desktop/test_pcaps/psk_captured.pcapng"
         },
         {
             "type": "java",
