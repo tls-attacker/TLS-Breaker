@@ -67,6 +67,14 @@
         },
         {
             "type": "java",
+            "name": "Sample5",
+            "request": "launch",
+            "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
+            "projectName": "Bleichenbacher",
+            "args": "-pcap ~/Desktop/test_pcaps/Sample5.pcapng"
+        },
+        {
+            "type": "java",
             "name": "Bleichenbacher Sample 1",
             "request": "launch",
             "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
