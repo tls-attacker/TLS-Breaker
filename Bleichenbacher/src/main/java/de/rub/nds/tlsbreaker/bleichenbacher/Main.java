@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher;
 
 import com.beust.jcommander.JCommander;
@@ -240,7 +239,7 @@ public class Main {
 
         CONSOLE.info("Found " + sessions.size() + " server that are vulnerable.");
         // TODO: Uncomment DisplayServerDetails
-        //DisplayServerDetails(sessions);
+        // DisplayServerDetails(sessions);
         /*
          * for (int i = 0; i < vulnerableServers.size(); i++) { CONSOLE.info(i + 1 + ") " + vulnerableServers.get(i)); }
          */
