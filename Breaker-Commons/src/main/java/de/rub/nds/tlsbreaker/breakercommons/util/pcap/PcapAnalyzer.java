@@ -260,7 +260,8 @@ public class PcapAnalyzer {
         // String filter = "tcp[tcp[12]>>2:4]&0xFFFFFCC0=0x17030000";
         // String filter = "tcp[tcpflags] & (tcp-syn|tcp-ack) != 0";
         // String filter = "!(tcp[tcpflags] & (tcp-syn|tcp-fin) != 0)";
-        String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] = 0x03))";
+        // String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] = 0x03))";
+        String filter = "tcp";
         BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
                     PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
