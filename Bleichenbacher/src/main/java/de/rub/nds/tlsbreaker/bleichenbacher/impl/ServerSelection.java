@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
@@ -25,7 +24,8 @@ public class ServerSelection {
     }
 
     private void initializeServerSessionsMap(List<PcapSession> sessions) {
-        sessions.forEach(pcapSession -> {
+        List<PcapSession> filteredServers = filterServers(sessions);
+        filteredServers.forEach(pcapSession -> {
             String destinationHost = pcapSession.getDestinationHost();
             if (serverSessionsMap.containsKey(destinationHost)) {
                 serverSessionsMap.get(destinationHost).add(pcapSession);
@@ -50,6 +50,15 @@ public class ServerSelection {
      * public List<String> getServers(List<PcapSession> sessions) { List<String> serverList = new ArrayList<>();
      * sessions.forEach(pcapSession -> serverList.add(pcapSession.getDestinationHost())); return serverList; }
      */
+    private List<PcapSession> filterServers(List<PcapSession> sessions) {
+        List<PcapSession> filteredServers = new ArrayList<>();
+        for (PcapSession s : sessions) {
+            if (s.getClientKeyExchangeMessage() != null) {
+                filteredServers.add(s);
+            }
+        }
+        return filteredServers;
+    }
 
     private String getUserInput(List<String> uniqueServers) {
         String selectedServer = null;
