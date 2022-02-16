@@ -103,5 +103,4 @@ public class ConsoleInteractor {
         cwc.add(10, 0);
         table.getRenderer().setCWC(cwc);
     }
-
 }
