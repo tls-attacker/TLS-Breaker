@@ -8,6 +8,8 @@
  */
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
+import de.rub.nds.tlsattacker.core.constants.CipherSuite;
+import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +56,12 @@ public class ServerSelection {
         List<PcapSession> filteredServers = new ArrayList<>();
         for (PcapSession s : sessions) {
             if (s.getClientKeyExchangeMessage() != null) {
+                ServerHelloMessage shm = s.getServerHellomessage();
+                CipherSuite selectedCipher = CipherSuite
+                .getCipherSuite(shm.getSelectedCipherSuite().getValue());
+                if(selectedCipher.name().contains("TLS_RSA")){
                 filteredServers.add(s);
+            }
             }
         }
         return filteredServers;
