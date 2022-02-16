@@ -31,6 +31,7 @@ import de.rub.nds.tlsattacker.core.protocol.parser.DHClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ECDHClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.PskClientKeyExchangeParser;
+import de.rub.nds.tlsattacker.core.protocol.parser.PskDhClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.PskRsaClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ServerHelloParser;
@@ -189,12 +190,23 @@ public class PcapAnalyzer {
                 CipherSuite selectedCipherSuite = CipherSuite
                         .getCipherSuite(shm.getSelectedCipherSuite().getValue());
 
-                if (selectedCipherSuite.name().contains("TLS_PSK")) {
+                if (selectedCipherSuite.name().contains("TLS_RSA_PSK")) {
                     msg = new PskRsaClientKeyExchangeParser(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
 
-                } else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
+                }
+                else if (selectedCipherSuite.name().contains("TLS_DH_PSK")) {
+                    msg = new PskDhClientKeyExchangeParser(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+                }
+                else if (selectedCipherSuite.name().contains("TLS_PSK_")) {
+                    msg = new PskClientKeyExchangeParser(0,
+                            record.getProtocolMessageBytes().getValue(),
+                            pversion, config).parse();
+                }
+                 else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
@@ -206,11 +218,11 @@ public class PcapAnalyzer {
                             pversion, config).parse();
                     // System.out.println(msg.getPublicKey());
 
-                } else if (selectedCipherSuite.name().contains("TLS_DH_RSA")) {
+                } else if (selectedCipherSuite.name().contains("TLS_DH_")) {
                     msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-
-                } else {
+                }
+                else {
                     LOGGER.debug("ClientKeyExchange message not yet supported!");
                 }
             }
