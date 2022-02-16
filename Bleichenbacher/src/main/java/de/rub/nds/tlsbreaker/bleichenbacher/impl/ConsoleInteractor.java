@@ -46,7 +46,7 @@ public class ConsoleInteractor {
     public static void DisplaySessionDetails(List<PcapSession> sessions) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Session Number", "Source", "Cipher Suit", "Protocol Version", "First 10 digits of PMS");
+        table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "First 10 digits of PMS");
         table.addRule();
 
         for (int i = 0; i < sessions.size(); i++) {
