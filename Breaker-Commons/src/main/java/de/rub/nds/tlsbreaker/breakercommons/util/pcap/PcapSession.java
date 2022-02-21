@@ -9,8 +9,11 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
+import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
@@ -38,7 +41,27 @@ public class PcapSession {
 
     private ClientHelloMessage clientHelloMessage;
 
-    private ServerHelloMessage serverHellomessage;
+    private ServerHelloMessage serverHelloMessage;
+
+    List<ApplicationMessage> applicationMessages = new ArrayList<>();
+
+    public List<ApplicationMessage> getApplicationMessages() {
+        return this.applicationMessages;
+    }
+
+    public void addApplicationMessage(ApplicationMessage applicationMessage){
+        if(applicationMessage != null){
+            this.applicationMessages.add(applicationMessage);
+        }
+    }
+
+    public int getApplicationDataSize(){
+        int total_size=0;
+        for(ApplicationMessage am:applicationMessages){
+            total_size += am.getData().getValue().length;
+        }
+        return total_size;
+    }
 
     public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
@@ -120,12 +143,12 @@ public class PcapSession {
     }
 
     public ServerHelloMessage getServerHellomessage() {
-        return this.serverHellomessage;
+        return this.serverHelloMessage;
     }
 
-    public void setServerHellomessage(ServerHelloMessage serverHellomessage) {
-        if (serverHellomessage != null) {
-            this.serverHellomessage = serverHellomessage;
+    public void setServerHellomessage(ServerHelloMessage serverHelloMessage) {
+        if (serverHelloMessage != null) {
+            this.serverHelloMessage = serverHelloMessage;
         }
 
     }

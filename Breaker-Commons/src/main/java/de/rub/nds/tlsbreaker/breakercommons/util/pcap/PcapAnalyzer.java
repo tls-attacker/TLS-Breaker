@@ -17,6 +17,7 @@ import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
+import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ECDHClientKeyExchangeMessage;
@@ -25,6 +26,7 @@ import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.PskRsaClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
+import de.rub.nds.tlsattacker.core.protocol.parser.ApplicationMessageParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.ClientKeyExchangeParser;
 import de.rub.nds.tlsattacker.core.protocol.parser.DHClientKeyExchangeParser;
@@ -120,9 +122,13 @@ public class PcapAnalyzer {
 
                     Record record = (Record) ar;
 
-                    if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE) {
+                    if (record.getContentMessageType() == ProtocolMessageType.HANDSHAKE
+                    || record.getContentMessageType() == ProtocolMessageType.APPLICATION_DATA) {
 
-                        HandshakeMessage tlsMessage = parseToTLSMessage(record, getRecordHandshakeMessageType(record));
+                        HandshakeMessage tlsMessage = parseToHandshakeMessage(record,
+                                getRecordHandshakeMessageType(record));
+
+                        ApplicationMessage applicationMessage = parseToApplicationMessage(record);
 
                         IpV4Packet ipPacket = list.get(0).get(IpV4Packet.class);
 
@@ -145,6 +151,8 @@ public class PcapAnalyzer {
                         } else {
                             pcapSessions.put(foundSession.getPcapIdentifier().hashCode(), foundSession);
                         }
+
+                        foundSession.addApplicationMessage(applicationMessage);
 
                         // ClientKeyExchange is parsed based on the selected cipher suite
                         ClientKeyExchangeMessage ckeMessage = parseToCKEMessage(record, foundSession);
@@ -169,7 +177,27 @@ public class PcapAnalyzer {
                 continue;
             }
         }
+
         return new ArrayList<PcapSession>(pcapSessions.values());
+    }
+
+    private ApplicationMessage parseToApplicationMessage(Record record) {
+        ProtocolVersion pversion = ProtocolVersion
+                .getProtocolVersion(record.getProtocolVersion().getValue());
+
+        Config config = Config.createConfig();
+
+        ApplicationMessage applicationMessage = null;
+
+        if (record.getContentMessageType() == ProtocolMessageType.APPLICATION_DATA) {
+            ApplicationMessageParser amp = new ApplicationMessageParser(0,
+                    record.getProtocolMessageBytes().getValue(),
+                    pversion, config);
+
+        applicationMessage = amp.parse();
+            
+        }
+        return applicationMessage;
     }
 
     private ClientKeyExchangeMessage parseToCKEMessage(Record record, PcapSession session) {
@@ -195,18 +223,15 @@ public class PcapAnalyzer {
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
 
-                }
-                else if (selectedCipherSuite.name().contains("TLS_DH_PSK")) {
+                } else if (selectedCipherSuite.name().contains("TLS_DH_PSK")) {
                     msg = new PskDhClientKeyExchangeParser(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                }
-                else if (selectedCipherSuite.name().contains("TLS_PSK_")) {
+                } else if (selectedCipherSuite.name().contains("TLS_PSK_")) {
                     msg = new PskClientKeyExchangeParser(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                }
-                 else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
+                } else if (selectedCipherSuite.name().contains("TLS_ECDH_RSA")) {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
@@ -221,8 +246,7 @@ public class PcapAnalyzer {
                 } else if (selectedCipherSuite.name().contains("TLS_DH_")) {
                     msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                }
-                else {
+                } else {
                     LOGGER.debug("ClientKeyExchange message not yet supported!");
                 }
             }
@@ -230,7 +254,7 @@ public class PcapAnalyzer {
         return msg;
     }
 
-    private HandshakeMessage parseToTLSMessage(Record record, HandshakeMessageType messageType) {
+    private HandshakeMessage parseToHandshakeMessage(Record record, HandshakeMessageType messageType) {
 
         ProtocolVersion pversion = ProtocolVersion
                 .getProtocolVersion(record.getProtocolVersion().getValue());
@@ -263,18 +287,35 @@ public class PcapAnalyzer {
             handle = Pcaps.openOffline(pcapFileLocation, TimestampPrecision.NANO);
 
             // Filter the packages that pcap4j captures (TLS not yet supported)
-            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))";
-            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) &&  (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) &&  (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))";
-        //    String filter = "(tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)";
-        // String filter ="((tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) &&  (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03))";
-            
-        // String filter = "tcp && (((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03 && (tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)))   ||   (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03)    ||    (((tcp[((tcp[12] & 0xf0) >> 2)] < 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] > 0x18)) && (tcp[((tcp[12] & 0xf0) >> 2)+3] = 0x00) && (tcp[((tcp[12] & 0xf0) >> 2)+4] = 0x02))";
-        // String filter = "tcp[tcp[12]>>2:4]&0xFFFFFCC0=0x17030000";
-        // String filter = "tcp[tcpflags] & (tcp-syn|tcp-ack) != 0";
-        // String filter = "!(tcp[tcpflags] & (tcp-syn|tcp-fin) != 0)";
-        // String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) && (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] = 0x03))";
-        String filter = "tcp";
-        BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
+            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] &
+            // 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) &&
+            // (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+2] <
+            // 0x03)))";
+            // String filter = "(((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) || (tcp[((tcp[12] &
+            // 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x17)) &&
+            // (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+2] <
+            // 0x03)))";
+            // String filter = "(tcp[((tcp[12] & 0xf0) >> 2)+2] < 0x03)";
+            // String filter ="((tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] &
+            // 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) &&
+            // (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03))";
+
+            // String filter = "tcp && (((tcp[((tcp[12] & 0xf0) >> 2)] = 0x14) ||
+            // (tcp[((tcp[12] & 0xf0) >> 2)] = 0x15) || (tcp[((tcp[12] & 0xf0) >> 2)] =
+            // 0x17)) && (tcp[((tcp[12] & 0xf0) >> 2)+1] = 0x03 && (tcp[((tcp[12] & 0xf0) >>
+            // 2)+2] < 0x03))) || (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16) && (tcp[((tcp[12] &
+            // 0xf0) >> 2)+1] = 0x03) && (tcp[((tcp[12] & 0xf0) >> 2)+9] = 0x03) &&
+            // (tcp[((tcp[12] & 0xf0) >> 2)+10] < 0x03) || (((tcp[((tcp[12] & 0xf0) >> 2)] <
+            // 0x14) || (tcp[((tcp[12] & 0xf0) >> 2)] > 0x18)) && (tcp[((tcp[12] & 0xf0) >>
+            // 2)+3] = 0x00) && (tcp[((tcp[12] & 0xf0) >> 2)+4] = 0x02))";
+            // String filter = "tcp[tcp[12]>>2:4]&0xFFFFFCC0=0x17030000";
+            // String filter = "tcp[tcpflags] & (tcp-syn|tcp-ack) != 0";
+            // String filter = "!(tcp[tcpflags] & (tcp-syn|tcp-fin) != 0)";
+            // String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) &&
+            // (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] =
+            // 0x03))";
+            String filter = "tcp";
+            BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
                     PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
 
