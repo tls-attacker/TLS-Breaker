@@ -152,7 +152,6 @@ public class PcapAnalyzer {
                             foundSession.setPacketPortDestination(tcpPacket.getHeader().getSrcPort().valueAsString());
                         }
 
-                        System.out.println(tcpPacket.getHeader().getSrcPort().valueAsString()+" -- "+tcpPacket.getHeader().getDstPort().valueAsString());
 
                         // Addresses and ports are added in a HashSet whose HashCode will identify a
                         // Handshake(Stream in Wireshark)
@@ -250,13 +249,11 @@ public class PcapAnalyzer {
                     msg = new ECDHClientKeyExchangeParser<ECDHClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                    // System.out.println(msg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_RSA")) {
                     msg = new RSAClientKeyExchangeParser<RSAClientKeyExchangeMessage>(0,
                             record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
-                    // System.out.println(msg.getPublicKey());
 
                 } else if (selectedCipherSuite.name().contains("TLS_DH_")) {
                     msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
