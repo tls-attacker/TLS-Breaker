@@ -104,7 +104,7 @@
             "request": "launch",
             "mainClass": "de.rub.nds.tlsbreaker.bleichenbacher.Main",
             "projectName": "Bleichenbacher",
-            "args": "-pcap ~/Desktop/test_pcaps/SSL3.pcap"
+            "args": "-pcap ~/Desktop/test_pcaps/SSLV3_pcap.pcap"
         }
 
 

@@ -63,6 +63,8 @@ public class PcapSession {
         return total_size;
     }
 
+    public PcapSession(){}
+
     public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
         packetDestination = destination;

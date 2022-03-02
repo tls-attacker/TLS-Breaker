@@ -59,10 +59,13 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import com.google.common.hash.HashCode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,7 +114,7 @@ public class PcapAnalyzer {
                 TlsRecordLayer rec_layer = new TlsRecordLayer(context);
 
                 List<AbstractRecord> allRecords;
-                if (defragmentedBytes != null && defragmentedBytes.length != 0) {
+                if (defragmentedBytes != null && defragmentedBytes.length > 1) {
                     allRecords = rec_layer.parseRecords(defragmentedBytes);
                 } else {
                     continue;
@@ -134,10 +137,22 @@ public class PcapAnalyzer {
 
                         TcpPacket tcpPacket = list.get(0).get(TcpPacket.class);
 
-                        PcapSession foundSession = new PcapSession(ipPacket.getHeader().getSrcAddr().getHostAddress(),
-                                ipPacket.getHeader().getDstAddr().getHostAddress(),
-                                tcpPacket.getHeader().getSrcPort().valueAsString(),
-                                tcpPacket.getHeader().getDstPort().valueAsString());
+                        PcapSession foundSession = new PcapSession();
+
+                        if(getRecordHandshakeMessageType(record) == HandshakeMessageType.CLIENT_HELLO){
+                            foundSession.setPacketSource(ipPacket.getHeader().getSrcAddr().getHostAddress());
+                            foundSession.setPacketDestination(ipPacket.getHeader().getDstAddr().getHostAddress());
+                            foundSession.setPacketPortSource(tcpPacket.getHeader().getSrcPort().valueAsString());
+                            foundSession.setPacketPortDestination(tcpPacket.getHeader().getDstPort().valueAsString());
+                        }
+                        else if(getRecordHandshakeMessageType(record) == HandshakeMessageType.SERVER_HELLO){
+                            foundSession.setPacketSource(ipPacket.getHeader().getDstAddr().getHostAddress());
+                            foundSession.setPacketDestination(ipPacket.getHeader().getSrcAddr().getHostAddress());
+                            foundSession.setPacketPortSource(tcpPacket.getHeader().getDstPort().valueAsString());
+                            foundSession.setPacketPortDestination(tcpPacket.getHeader().getSrcPort().valueAsString());
+                        }
+
+                        System.out.println(tcpPacket.getHeader().getSrcPort().valueAsString()+" -- "+tcpPacket.getHeader().getDstPort().valueAsString());
 
                         // Addresses and ports are added in a HashSet whose HashCode will identify a
                         // Handshake(Stream in Wireshark)
@@ -314,7 +329,7 @@ public class PcapAnalyzer {
             // String filter = "tcp && (tcp[((tcp[12] & 0xf0) >>2)] = 0x16) &&
             // (tcp[((tcp[12] & 0xf0) >>2)+9] = 0x03) && (tcp[((tcp[12] & 0xf0) >>2)+10] =
             // 0x03))";
-            String filter = "tcp";
+            String filter = "";
             BpfProgram bpfFilter = handle.compileFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE,
                     PcapHandle.PCAP_NETMASK_UNKNOWN);
             handle.setFilter(bpfFilter);
@@ -328,7 +343,13 @@ public class PcapAnalyzer {
                 Packet packet = handle.getNextPacketEx();
 
                 if (packet.get(TcpPacket.class) != null) {
-                    long id = packet.get(TcpPacket.class).getHeader().getAcknowledgmentNumberAsLong();
+                    HashSet<String> fragmentsIdentifier = new HashSet<>();
+                    fragmentsIdentifier.add(String.valueOf(packet.get(TcpPacket.class).getHeader().getAcknowledgmentNumberAsLong()));
+                    fragmentsIdentifier.add(packet.get(TcpPacket.class).getHeader().getSrcPort().valueAsString());
+                    fragmentsIdentifier.add(packet.get(TcpPacket.class).getHeader().getDstPort().valueAsString());
+
+
+                    long id = fragmentsIdentifier.hashCode();
 
                     if (packets.containsKey(id)) {
                         packets.get(id).add(packet);
