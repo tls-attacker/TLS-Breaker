@@ -6,6 +6,7 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -57,11 +58,10 @@ public class ServerSelection {
         for (PcapSession s : sessions) {
             if (s.getClientKeyExchangeMessage() != null) {
                 ServerHelloMessage shm = s.getServerHellomessage();
-                CipherSuite selectedCipher = CipherSuite
-                .getCipherSuite(shm.getSelectedCipherSuite().getValue());
-                if(selectedCipher.name().contains("TLS_RSA")){
-                filteredServers.add(s);
-            }
+                CipherSuite selectedCipher = CipherSuite.getCipherSuite(shm.getSelectedCipherSuite().getValue());
+                if (selectedCipher.name().contains("TLS_RSA")) {
+                    filteredServers.add(s);
+                }
             }
         }
         return filteredServers;

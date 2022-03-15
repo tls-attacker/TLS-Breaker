@@ -6,6 +6,7 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -15,7 +16,6 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class ConsoleInteractor {
     public static void DisplaySessionDetails(List<PcapSession> sessions) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "First 10 digits of PMS");
+        table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "Application data size (byte)");
         table.addRule();
 
         for (int i = 0; i < sessions.size(); i++) {
@@ -57,7 +57,7 @@ public class ConsoleInteractor {
             ProtocolVersion protocolVersion =
                     ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
             table.addRow(i + 1, session.getSourceHost(), selectedCipherSuite, protocolVersion,
-                         new String(Hex.encodeHex(session.getPreMasterSecret())).substring(0, 10));
+                         session.getApplicationDataSize());
         }
         table.addRule();
         formatTable(table);
