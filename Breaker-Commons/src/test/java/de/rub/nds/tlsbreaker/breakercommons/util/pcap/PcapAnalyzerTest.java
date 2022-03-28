@@ -9,7 +9,6 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
-import junit.framework.TestCase;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -44,10 +43,12 @@ public class PcapAnalyzerTest {
     }
 
     public void extra_details(List<PcapSession> sessions) {
-        System.out.println("#########################   SESSION SIZE #############################");
-        System.out.println(sessions.size());
-        System.out.println("#########################   FILE LOCATION #############################");
-        System.out.println(FileLocation);
+//        System.out.println("#########################   SESSION SIZE #############################");
+//        System.out.println(sessions.size());
+//        System.out.println("#########################   FILE LOCATION #############################");
+//        System.out.println(FileLocation);
+//        System.out.println("#########################   Extracted ENC PMS Value #############################");
+//        System.out.println(pms_after_convert);
     }
 
     /*
@@ -69,10 +70,9 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
-                System.out.println(i);
+
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(i), String.valueOf(pms_after_convert));
 
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -100,10 +100,10 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+//            System.out.println("#########################   Extracted ENC PMS Value #############################");
+//            System.out.println(pms_after_convert);
             try {
-                System.out.println(i);
+//                System.out.println(i);
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(i), String.valueOf(pms_after_convert));
 
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -127,8 +127,7 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(i), String.valueOf(pms_after_convert));
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -155,8 +154,7 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(i), String.valueOf(pms_after_convert));
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -183,10 +181,9 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
-                System.out.println(i);
+
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(0), String.valueOf(pms_after_convert));
 
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -219,8 +216,7 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
                 boolean validation_result = PmsStoredValues.contains(new String(pms_after_convert));
                 if (!validation_result) {
@@ -291,8 +287,7 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
                 boolean validation_result = PmsStoredValues.contains(new String(pms_after_convert));
                 if (!validation_result) {
@@ -328,10 +323,9 @@ public class PcapAnalyzerTest {
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
             char[] pms_after_convert = Hex.encodeHex(pms);
-            System.out.println("#########################   Extracted ENC PMS Value #############################");
-            System.out.println(pms_after_convert);
+
             try {
-                System.out.println(i);
+
                 Assert.assertEquals("Expected PMS VALUES", PmsStoredValues.get(i), String.valueOf(pms_after_convert));
 
             } catch (ArrayIndexOutOfBoundsException e) {
