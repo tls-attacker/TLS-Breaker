@@ -6,6 +6,7 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -52,7 +53,7 @@ public class ServerSelection {
             CONSOLE.info("Do you want to check the vulnerability of the server? (Y/N):");
             return getUserDecisionForOneServer(uniqueServers);
         } else {
-            CONSOLE.info("Please select a server number to check for vulnerability "
+            CONSOLE.info("Please select server numbers to check for vulnerability "
                                  + "or press 'a' to check for vulnerability of all the servers.");
             CONSOLE.info("Select Option: ");
             return getUserInputForMultipleServers(uniqueServers);
