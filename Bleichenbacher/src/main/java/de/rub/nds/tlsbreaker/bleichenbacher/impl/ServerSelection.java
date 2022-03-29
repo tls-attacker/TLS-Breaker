@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -16,6 +15,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.getUserDecisionForOneServer;
+import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.getUserInputForMultipleServers;
 
 public class ServerSelection {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -45,7 +48,15 @@ public class ServerSelection {
     public String getValidUserSelection(List<String> uniqueServers) {
         // List<String> serverList = getServers(sessions);
         // displayListOfServers(sessions);
-        return getUserInput(uniqueServers);
+        if (uniqueServers.size() == 1) {
+            CONSOLE.info("Do you want to check the vulnerability of the server? (Y/N):");
+            return getUserDecisionForOneServer(uniqueServers);
+        } else {
+            CONSOLE.info("Please select a server number to check for vulnerability "
+                                 + "or press 'a' to check for vulnerability of all the servers.");
+            CONSOLE.info("Select Option: ");
+            return getUserInputForMultipleServers(uniqueServers);
+        }
     }
 
     // TODO: used at 2 places
@@ -65,36 +76,6 @@ public class ServerSelection {
             }
         }
         return filteredServers;
-    }
-
-    private String getUserInput(List<String> uniqueServers) {
-        String selectedServer = null;
-        Scanner sc = new Scanner(System.in);
-        try {
-            if (sc.hasNextInt()) {
-                int serverNumber = sc.nextInt();
-                if (serverNumber > 0 && serverNumber <= uniqueServers.size()) {
-                    /*
-                     * selectedServer = sessions.get(serverNumber - 1).getDestinationHost();
-                     * LOGGER.info("Selected server: " + selectedServer);
-                     */
-                    return Integer.toString(serverNumber);
-                } else {
-                    throw new UnsupportedOperationException();
-                }
-            } else {
-                String userOption = sc.nextLine();
-                if ("a".equals(userOption)) {
-                    return userOption;
-                } else {
-                    throw new UnsupportedOperationException();
-                }
-            }
-        } catch (Exception e) {
-            throw new UnsupportedOperationException();
-        }
-
-        // return selectedServer;
     }
 
     /*
