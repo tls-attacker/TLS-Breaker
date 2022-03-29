@@ -6,12 +6,14 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
+import de.vandermeer.asciitable.AT_Row;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
@@ -35,17 +37,23 @@ public class ConsoleInteractor {
         for (int i = 0; i < uniqueServers.size(); i++) {
             String hostAddress = uniqueServers.get(i);
             int numberOfSessions = serverSessionsMap.get(hostAddress).size();
-            table.addRow(i + 1, hostAddress, numberOfSessions);
+            AT_Row row = table.addRow(i + 1, hostAddress, numberOfSessions);
+            setServerTableTextAlignment(row);
         }
         table.addRule();
         formatTable(table);
         System.out.println(table.render());
     }
 
+    private static void setServerTableTextAlignment(AT_Row row) {
+        row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        row.getCells().get(2).getContext().setTextAlignment(TextAlignment.RIGHT);
+    }
+
     public static void displaySessionDetails(List<PcapSession> sessions) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "Application data size (byte)");
+        table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "Application data size (kB)");
         table.addRule();
 
         for (int i = 0; i < sessions.size(); i++) {
@@ -55,13 +63,19 @@ public class ConsoleInteractor {
                     CipherSuite.getCipherSuite(serverHellomessage.getSelectedCipherSuite().getValue());
             ProtocolVersion protocolVersion =
                     ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
-            table.addRow(i + 1, session.getSourceHost(), selectedCipherSuite, protocolVersion,
-                         session.getApplicationDataSize());
+            AT_Row row = table.addRow(i + 1, session.getSourceHost(), selectedCipherSuite, protocolVersion,
+                                      session.getApplicationDataSize() / 1000.0);
+            setSessionTableTextAlignment(row);
         }
         table.addRule();
         formatTable(table);
         System.out.println(table.render());
 
+    }
+
+    private static void setSessionTableTextAlignment(AT_Row row) {
+        row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        row.getCells().get(4).getContext().setTextAlignment(TextAlignment.RIGHT);
     }
 
     public static PcapSession getUserSelectedSession(List<PcapSession> hostSessions) {
@@ -158,7 +172,7 @@ public class ConsoleInteractor {
     }
 
     private static void formatTable(AsciiTable table) {
-        table.setTextAlignment(TextAlignment.CENTER);
+        // table.setTextAlignment(TextAlignment.CENTER);
         CWC_LongestLine cwc = new CWC_LongestLine();
         cwc.add(10, 0);
         table.getRenderer().setCWC(cwc);
