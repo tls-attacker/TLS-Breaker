@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -26,7 +25,7 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 public class ConsoleInteractor {
 
-    public static void DisplayServerDetails(List<String> uniqueServers,
+    public static void displayServerDetails(List<String> uniqueServers,
                                             Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
@@ -43,7 +42,7 @@ public class ConsoleInteractor {
         System.out.println(table.render());
     }
 
-    public static void DisplaySessionDetails(List<PcapSession> sessions) {
+    public static void displaySessionDetails(List<PcapSession> sessions) {
         AsciiTable table = new AsciiTable();
         table.addRule();
         table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "Application data size (byte)");
@@ -95,6 +94,67 @@ public class ConsoleInteractor {
             CONSOLE.error("Error!");
             return null;
         }
+    }
+
+    public static String getUserDecisionForOneServer(List<String> uniqueServers) {
+        Scanner sc = new Scanner(System.in);
+        String userInput = StringUtils.trim(sc.nextLine());
+        if ("Y".equals(userInput) || "y".equals(userInput)) {
+            int serverNumber = 1;
+            return Integer.toString(serverNumber);
+        } else if ("N".equals(userInput) || "n".equals(userInput)) {
+            return "N";
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static String getUserInputForMultipleServers(List<String> uniqueServers) {
+        String selectedServer = null;
+        Scanner sc = new Scanner(System.in);
+        try {
+            if (sc.hasNextInt()) {
+                int serverNumber = sc.nextInt();
+                if (isValidNumberSelected(serverNumber,
+                                          uniqueServers)/* serverNumber > 0 && serverNumber <= uniqueServers.size() */) {
+                    /*
+                     * selectedServer = sessions.get(serverNumber - 1).getDestinationHost();
+                     * LOGGER.info("Selected server: " + selectedServer);
+                     */
+                    return Integer.toString(serverNumber);
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            } else {
+                String userOption = sc.nextLine();
+                if ("a".equals(userOption)) {
+                    return userOption;
+                } else if (isCommaSeparatedInputValid(userOption, uniqueServers)) {
+                    return userOption;
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            }
+        } catch (Exception e) {
+            throw new UnsupportedOperationException();
+        }
+
+        // return selectedServer;
+    }
+
+    private static boolean isCommaSeparatedInputValid(String userOption, List<String> uniqueServers) {
+        String[] serverNumbers = userOption.split(",");
+        for (String serverNumber : serverNumbers) {
+            int server = Integer.parseInt(serverNumber);
+            if (!isValidNumberSelected(server, uniqueServers)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isValidNumberSelected(int number, List<String> list) {
+        return number > 0 && number <= list.size();
     }
 
     private static void formatTable(AsciiTable table) {
