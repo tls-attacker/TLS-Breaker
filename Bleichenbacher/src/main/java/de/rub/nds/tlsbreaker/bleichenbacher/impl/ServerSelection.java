@@ -12,17 +12,12 @@ package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.getUserDecisionForOneServer;
-import static de.rub.nds.tlsbreaker.bleichenbacher.impl.ConsoleInteractor.getUserInputForMultipleServers;
 
 public class ServerSelection {
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private Map<String, List<PcapSession>> serverSessionsMap = new HashMap<>();
 
@@ -46,25 +41,18 @@ public class ServerSelection {
         return this.serverSessionsMap;
     }
 
-    public String getValidUserSelection(List<String> uniqueServers) {
-        // List<String> serverList = getServers(sessions);
-        // displayListOfServers(sessions);
+    public String getValidUserSelection(List<String> uniqueServers, ConsoleInteractor consoleInteractor) {
         if (uniqueServers.size() == 1) {
-            CONSOLE.info("Do you want to check the vulnerability of the server? (Y/N):");
-            return getUserDecisionForOneServer(uniqueServers);
+            CONSOLE.info("Do you want to check the vulnerability of the server? (y/n):");
+            return consoleInteractor.getUserDecisionForOneServer();
         } else {
             CONSOLE.info("Please select server numbers to check for vulnerability "
                                  + "or press 'a' to check for vulnerability of all the servers.");
             CONSOLE.info("Select Option: ");
-            return getUserInputForMultipleServers(uniqueServers);
+            return consoleInteractor.getUserInputForMultipleServers(uniqueServers);
         }
     }
 
-    // TODO: used at 2 places
-    /*
-     * public List<String> getServers(List<PcapSession> sessions) { List<String> serverList = new ArrayList<>();
-     * sessions.forEach(pcapSession -> serverList.add(pcapSession.getDestinationHost())); return serverList; }
-     */
     private List<PcapSession> filterServers(List<PcapSession> sessions) {
         List<PcapSession> filteredServers = new ArrayList<>();
         for (PcapSession s : sessions) {
@@ -78,15 +66,4 @@ public class ServerSelection {
         }
         return filteredServers;
     }
-
-    /*
-     * private void displayListOfServers(List<PcapSession> sessions) { CONSOLE.info("Found " + sessions.size() +
-     * " sessions from the pcap file."); DisplaySessionInfo(sessions);
-     *//*
-     * for (int i = 0; i < serverList.size(); i++) { CONSOLE.info(i + 1 + ") " + serverList.get(i)); }
-     *//*
-     * CONSOLE.info("a) Check if all the above servers are vulnerable.");
-     * CONSOLE.info("Please select a server number to check for vulnerability " +
-     * "or press 'a' to check for vulnerability of all the servers."); CONSOLE.info("Select Option: "); }
-     */
 }
