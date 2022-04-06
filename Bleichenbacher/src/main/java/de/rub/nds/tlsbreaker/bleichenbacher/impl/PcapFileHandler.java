@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
@@ -57,9 +56,7 @@ public class PcapFileHandler {
                     checkVulnerabilityOfAllServersAndDisplay(hosts, bleichenbacherCommandConfig, serverSessionsMap,
                                                              consoleInteractor);
                 } else {
-                    // TODO: place this in else block?
                     String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
-                    // TODO: print entire information which is displayed to user when showing server options.
                     LOGGER.info("Selected server: " + host);
                     bleichenbacherCommandConfig.getClientDelegate().setHost(host);
                     Boolean vulnerability = checkVulnerability(bleichenbacherCommandConfig);
@@ -68,20 +65,19 @@ public class PcapFileHandler {
                         selectSessionAndExecuteAttack(serverSessionsMap, host, bleichenbacherCommandConfig,
                                                       consoleInteractor);
                     } else {
-
+                        CONSOLE.info("The server " + host + " is not vulnerable.");
                     }
                 }
             } else {
                 CONSOLE.info("\nFound no potential servers for Bleichenbacher attack.");
             }
         } else {
-            // TODO: throw exception
+            CONSOLE.info("No TLS handshake message found.");
         }
     }
 
     private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-                                                          BleichenbacherCommandConfig bleichenbacherCommandConfig,
-                                                          Map<String, List<PcapSession>> serverSessionsMap,
+                                                          BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
                                                           ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, bleichenbacherCommandConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + " server that are vulnerable.");
@@ -126,8 +122,7 @@ public class PcapFileHandler {
     }
 
     private void displayVulnerableServers(List<String> vulnerableServers,
-                                          Map<String, List<PcapSession>> serverSessionsMap,
-                                          ConsoleInteractor consoleInteractor) {
+                                          Map<String, List<PcapSession>> serverSessionsMap, ConsoleInteractor consoleInteractor) {
         consoleInteractor.displayServerDetails(vulnerableServers, serverSessionsMap);
     }
 
