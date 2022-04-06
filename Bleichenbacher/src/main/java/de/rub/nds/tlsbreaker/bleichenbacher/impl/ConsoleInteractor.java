@@ -27,8 +27,8 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 public class ConsoleInteractor {
 
-    public static void displayServerDetails(List<String> uniqueServers,
-                                            Map<String, List<PcapSession>> serverSessionsMap) {
+    public void displayServerDetails(List<String> uniqueServers,
+                                     Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
         table.addRow("Server Number", "Host Address", "Session Count");
@@ -45,12 +45,12 @@ public class ConsoleInteractor {
         System.out.println(table.render());
     }
 
-    private static void setServerTableTextAlignment(AT_Row row) {
+    private void setServerTableTextAlignment(AT_Row row) {
         row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
         row.getCells().get(2).getContext().setTextAlignment(TextAlignment.RIGHT);
     }
 
-    public static void displaySessionDetails(List<PcapSession> sessions) {
+    public void displaySessionDetails(List<PcapSession> sessions) {
         AsciiTable table = new AsciiTable();
         table.addRule();
         table.addRow("Session Number", "Source", "Cipher Suite", "Protocol Version", "Application data size (kB)");
@@ -73,15 +73,15 @@ public class ConsoleInteractor {
 
     }
 
-    private static void setSessionTableTextAlignment(AT_Row row) {
+    private void setSessionTableTextAlignment(AT_Row row) {
         row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
         row.getCells().get(4).getContext().setTextAlignment(TextAlignment.RIGHT);
     }
 
-    public static PcapSession getUserSelectedSession(List<PcapSession> hostSessions) {
+    public PcapSession getUserSelectedSession(List<PcapSession> hostSessions) {
         Scanner sc = new Scanner(System.in);
         if (hostSessions.size() == 1) {
-            CONSOLE.info("Do you want to execute the attack? (Y/N):");
+            CONSOLE.info("Do you want to execute the attack? (y/n):");
             String userInput = StringUtils.trim(sc.nextLine());
             if ("Y".equals(userInput) || "y".equals(userInput)) {
                 return hostSessions.get(0);
@@ -110,7 +110,7 @@ public class ConsoleInteractor {
         }
     }
 
-    public static String getUserDecisionForOneServer(List<String> uniqueServers) {
+    public String getUserDecisionForOneServer() {
         Scanner sc = new Scanner(System.in);
         String userInput = StringUtils.trim(sc.nextLine());
         if ("Y".equals(userInput) || "y".equals(userInput)) {
@@ -123,18 +123,12 @@ public class ConsoleInteractor {
         }
     }
 
-    public static String getUserInputForMultipleServers(List<String> uniqueServers) {
-        String selectedServer = null;
+    public String getUserInputForMultipleServers(List<String> uniqueServers) {
         Scanner sc = new Scanner(System.in);
         try {
             if (sc.hasNextInt()) {
                 int serverNumber = sc.nextInt();
-                if (isValidNumberSelected(serverNumber,
-                                          uniqueServers)/* serverNumber > 0 && serverNumber <= uniqueServers.size() */) {
-                    /*
-                     * selectedServer = sessions.get(serverNumber - 1).getDestinationHost();
-                     * LOGGER.info("Selected server: " + selectedServer);
-                     */
+                if (isValidNumberSelected(serverNumber, uniqueServers)) {
                     return Integer.toString(serverNumber);
                 } else {
                     throw new UnsupportedOperationException();
@@ -152,11 +146,9 @@ public class ConsoleInteractor {
         } catch (Exception e) {
             throw new UnsupportedOperationException();
         }
-
-        // return selectedServer;
     }
 
-    private static boolean isCommaSeparatedInputValid(String userOption, List<String> uniqueServers) {
+    private boolean isCommaSeparatedInputValid(String userOption, List<String> uniqueServers) {
         String[] serverNumbers = userOption.split(",");
         for (String serverNumber : serverNumbers) {
             int server = Integer.parseInt(serverNumber);
@@ -167,11 +159,11 @@ public class ConsoleInteractor {
         return true;
     }
 
-    private static boolean isValidNumberSelected(int number, List<String> list) {
+    private boolean isValidNumberSelected(int number, List<String> list) {
         return number > 0 && number <= list.size();
     }
 
-    private static void formatTable(AsciiTable table) {
+    private void formatTable(AsciiTable table) {
         // table.setTextAlignment(TextAlignment.CENTER);
         CWC_LongestLine cwc = new CWC_LongestLine();
         cwc.add(10, 0);
