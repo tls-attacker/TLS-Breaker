@@ -258,8 +258,12 @@ public class PcapAnalyzer {
                 } else if (selectedCipherSuite.name().contains("TLS_DH_")) {
                     msg = new DHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
                             pversion, config).parse();
+                }
+                else if(selectedCipherSuite.name().contains("TLS_ECDH_")){
+                    msg = new ECDHClientKeyExchangeParser<>(0, record.getProtocolMessageBytes().getValue(),
+                    pversion, config).parse();
                 } else {
-                    LOGGER.debug("ClientKeyExchange message not yet supported!");
+                    LOGGER.debug("ClientKeyExchange message not supported yet!");
                 }
             }
         }
