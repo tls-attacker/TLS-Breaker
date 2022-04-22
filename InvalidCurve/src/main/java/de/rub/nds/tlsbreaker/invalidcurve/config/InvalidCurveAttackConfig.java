@@ -14,11 +14,11 @@ import com.beust.jcommander.ParametersDelegate;
 
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.converters.BigIntegerConverter;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
@@ -122,6 +122,10 @@ public class InvalidCurveAttackConfig extends AttackConfig {
     @Parameter(names = "-renegotiation",
         description = "If set to true, the attack will be carried out in a renegotiation handshake")
     private boolean attackInRenegotiation = false;
+
+    @Parameter(names = "-pcap",
+        description = "Location of the pcap file that will be used for the Invalid Curve Attack.")
+    private String pcapFileLocation;
 
     /**
      *
@@ -425,5 +429,9 @@ public class InvalidCurveAttackConfig extends AttackConfig {
 
     public void setKeyOffset(int keyOffset) {
         this.keyOffset = keyOffset;
+    }
+
+    public String getPcapFileLocation() {
+        return pcapFileLocation;
     }
 }
