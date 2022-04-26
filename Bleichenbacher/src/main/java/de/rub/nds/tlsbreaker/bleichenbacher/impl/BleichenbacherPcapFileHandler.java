@@ -54,8 +54,8 @@ public class BleichenbacherPcapFileHandler {
                                                              serverSessionsMap, consoleInteractor);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(",")).forEach(
-                            serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+                    Arrays.stream(userOption.split(","))
+                          .forEach(serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
 
                     checkVulnerabilityOfAllServersAndDisplay(hosts, bleichenbacherCommandConfig, serverSessionsMap,
                                                              consoleInteractor);
