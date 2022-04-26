@@ -1,34 +1,33 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- * <p>
+ *
  * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- * <p>
+ *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.bleichenbacher.impl;
+package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.vandermeer.asciitable.AT_Row;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 public class ConsoleInteractor {
 
-    public void displayServerDetails(List<String> uniqueServers,
-                                     Map<String, List<PcapSession>> serverSessionsMap) {
+    public void displayServerAndSessionCount(List<String> uniqueServers,
+                                             Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
         table.addRow("Server Number", "Host Address", "Session Count");
@@ -39,6 +38,22 @@ public class ConsoleInteractor {
             int numberOfSessions = serverSessionsMap.get(hostAddress).size();
             AT_Row row = table.addRow(i + 1, hostAddress, numberOfSessions);
             setServerTableTextAlignment(row);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
+    }
+
+    public void displayServers(List<String> uniqueServers) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Server Number", "Host Address");
+        table.addRule();
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+            String hostAddress = uniqueServers.get(i);
+            AT_Row row = table.addRow(i + 1, hostAddress);
+            row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
         }
         table.addRule();
         formatTable(table);
@@ -82,7 +97,7 @@ public class ConsoleInteractor {
         Scanner sc = new Scanner(System.in);
         if (hostSessions.size() == 1) {
             CONSOLE.info("Do you want to execute the attack? (y/n):");
-            String userInput = StringUtils.trim(sc.nextLine());
+            String userInput = trim(sc.nextLine());
             if ("Y".equals(userInput) || "y".equals(userInput)) {
                 return hostSessions.get(0);
             } else if ("N".equals(userInput) || "n".equals(userInput)) {
@@ -112,7 +127,7 @@ public class ConsoleInteractor {
 
     public String getUserDecisionForOneServer() {
         Scanner sc = new Scanner(System.in);
-        String userInput = StringUtils.trim(sc.nextLine());
+        String userInput = trim(sc.nextLine());
         if ("Y".equals(userInput) || "y".equals(userInput)) {
             int serverNumber = 1;
             return Integer.toString(serverNumber);
@@ -151,7 +166,7 @@ public class ConsoleInteractor {
     private boolean isCommaSeparatedInputValid(String userOption, List<String> uniqueServers) {
         String[] serverNumbers = userOption.split(",");
         for (String serverNumber : serverNumbers) {
-            int server = Integer.parseInt(serverNumber);
+            int server = Integer.parseInt(trim(serverNumber));
             if (!isValidNumberSelected(server, uniqueServers)) {
                 return false;
             }
@@ -168,5 +183,44 @@ public class ConsoleInteractor {
         CWC_LongestLine cwc = new CWC_LongestLine();
         cwc.add(10, 0);
         table.getRenderer().setCWC(cwc);
+    }
+
+    public String getValidUserSelection(List<String> uniqueServers) {
+        if (uniqueServers.size() == 1) {
+            CONSOLE.info("Do you want to check the vulnerability of the server? (y/n):");
+            return getUserDecisionForOneServer();
+        } else {
+            CONSOLE.info("Please select server numbers to check for vulnerability "
+                                 + "or press 'a' to check for vulnerability of all the servers.");
+            CONSOLE.info("Select Option: ");
+            return getUserInputForMultipleServers(uniqueServers);
+        }
+    }
+
+    public int getUserSelectedServer(List<String> uniqueServers) {
+        Scanner sc = new Scanner(System.in);
+        try {
+            int serverNumber = sc.nextInt();
+            if (serverNumber > 0 && serverNumber <= uniqueServers.size()) {
+                return serverNumber;
+            } else {
+                throw new UnsupportedOperationException();
+            }
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public String getUserYesNoResponse() {
+        Scanner sc = new Scanner(System.in);
+        String userInput = trim(sc.nextLine());
+        if ("Y".equals(userInput) || "y".equals(userInput)) {
+            return "Y";
+        } else if ("N".equals(userInput) || "n".equals(userInput)) {
+            return "N";
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }

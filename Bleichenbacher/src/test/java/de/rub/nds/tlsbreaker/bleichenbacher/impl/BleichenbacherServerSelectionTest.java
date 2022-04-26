@@ -20,11 +20,11 @@ import org.junit.Test;
 import java.io.File;
 import java.util.*;
 
-public class ServerSelectionTest {
+public class BleichenbacherServerSelectionTest {
 
     private File FileLocation;
 
-    public ServerSelectionTest() {
+    public BleichenbacherServerSelectionTest() {
     }
 
     @BeforeClass
@@ -53,8 +53,8 @@ public class ServerSelectionTest {
 
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 0, uniqueServers.size());
@@ -72,8 +72,8 @@ public class ServerSelectionTest {
                 + "pcap_files" + File.separator + "2nd_TLS_RSA_PSK_AES.pcapng" + File.separator);
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
@@ -95,8 +95,8 @@ public class ServerSelectionTest {
         List<String> HostAddress =
             Arrays.asList("207.46.113.78:5443", "65.54.186.19:5443", "65.54.186.19:443", "207.46.113.78:443");
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 4, uniqueServers.size());
@@ -117,8 +117,8 @@ public class ServerSelectionTest {
                 + "pcap_files" + File.separator + "psk_captured.pcapng" + File.separator);
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
@@ -142,8 +142,8 @@ public class ServerSelectionTest {
             "184.85.226.161:443", "67.215.65.132:443", "207.46.113.78:5443"));
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 10, uniqueServers.size());
@@ -167,8 +167,8 @@ public class ServerSelectionTest {
                 + "pcap_files" + File.separator + "Sample2.pcapng" + File.separator);
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
@@ -190,8 +190,8 @@ public class ServerSelectionTest {
             Arrays.asList("127.0.0.1:4433", "127.0.0.8:4433", "127.0.0.2:4433", "127.0.0.3:4433"));
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
         Assert.assertEquals("Expected count of server displayed for user", 4, uniqueServers.size());
@@ -222,8 +222,8 @@ public class ServerSelectionTest {
         int numberOfSessions = 0;
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         // List<String> uniqueServers = new ArrayList(serverSessionsMap.keySet());
         for (int i = 0; i < HostAddress.size(); i++) {
             String hostAddress = HostAddress.get(i);
@@ -257,8 +257,8 @@ public class ServerSelectionTest {
         int numberOfSessions = 0;
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         // List<String> uniqueServers = new ArrayList(serverSessionsMap.keySet());
         for (int i = 0; i < HostAddress.size(); i++) {
             String hostAddress = HostAddress.get(i);
@@ -291,8 +291,8 @@ public class ServerSelectionTest {
         int numberOfSessions = 0;
 
         List<PcapSession> sessions = fetchsessions(FileLocation);
-        ServerSelection serverSelection = new ServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
+        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
+        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
         for (String hostAddress : uniqueServers) {
             numberOfSessions = serverSessionsMap.get(hostAddress).size();
