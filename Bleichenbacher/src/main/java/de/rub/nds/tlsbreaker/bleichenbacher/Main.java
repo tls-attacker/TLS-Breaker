@@ -1,8 +1,8 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- * <p>
+ *
  * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- * <p>
+ *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
@@ -15,7 +15,7 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherAttacker;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.PcapFileHandler;
+import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherPcapFileHandler;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
@@ -57,7 +57,8 @@ public class Main {
             if (FileUtils.isFileExists(bleichenbacherCommandConfig.getPcapFileLocation())) {
                 try {
                     CONSOLE.info("Pcap file location = " + bleichenbacherCommandConfig.getPcapFileLocation());
-                    PcapFileHandler pcapFileHandler = new PcapFileHandler(bleichenbacherCommandConfig);
+                    BleichenbacherPcapFileHandler pcapFileHandler =
+                            new BleichenbacherPcapFileHandler(bleichenbacherCommandConfig);
                     pcapFileHandler.handlePcapFile();
                     return;
                 } catch (UnsupportedOperationException e) {

@@ -431,6 +431,10 @@ public class InvalidCurveAttackConfig extends AttackConfig {
         this.keyOffset = keyOffset;
     }
 
+    public ClientDelegate getClientDelegate() {
+        return clientDelegate;
+    }
+
     public String getPcapFileLocation() {
         return pcapFileLocation;
     }

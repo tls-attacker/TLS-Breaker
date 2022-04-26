@@ -15,8 +15,10 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.invalidcurve.config.InvalidCurveAttackConfig;
 import de.rub.nds.tlsbreaker.invalidcurve.impl.InvalidCurveAttacker;
+import de.rub.nds.tlsbreaker.invalidcurve.impl.InvalidCurvePcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,8 +53,29 @@ public class Main {
             return;
         }
 
+        if (ellipticTest.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(ellipticTest.getPcapFileLocation())) {
+                try {
+                    CONSOLE.info("Pcap file location = " + ellipticTest.getPcapFileLocation());
+                    InvalidCurvePcapFileHandler pcapFileHandler = new InvalidCurvePcapFileHandler(ellipticTest);
+                    pcapFileHandler.handlePcapFile();
+                    return;
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error("Invalid option selected! Please run the jar file again.");
+                    return;
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+                return;
+            }
+        } else {
+            checkVulnerabilityOrExecuteAttack(ellipticTest);
+        }
+    }
+
+    private static void checkVulnerabilityOrExecuteAttack(InvalidCurveAttackConfig ellipticTest) {
         Attacker<? extends TLSDelegateConfig> attacker =
-            new InvalidCurveAttacker(ellipticTest, ellipticTest.createConfig());
+                new InvalidCurveAttacker(ellipticTest, ellipticTest.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();
