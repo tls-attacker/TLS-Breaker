@@ -60,23 +60,21 @@ public class Main {
                     BleichenbacherPcapFileHandler pcapFileHandler =
                             new BleichenbacherPcapFileHandler(bleichenbacherCommandConfig);
                     pcapFileHandler.handlePcapFile();
-                    return;
                 } catch (UnsupportedOperationException e) {
                     CONSOLE.error("Invalid option selected! Please run the jar file again.");
-                    return;
                 }
             } else {
                 CONSOLE.error("Invalid File Path!");
-                return;
             }
         } else {
             checkVulnerabilityOrExecuteAttack(bleichenbacherCommandConfig);
         }
+        System.exit(0);
     }
 
     private static void checkVulnerabilityOrExecuteAttack(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
         Attacker<? extends TLSDelegateConfig> attacker =
-                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();
