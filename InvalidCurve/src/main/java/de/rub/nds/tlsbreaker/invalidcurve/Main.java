@@ -59,18 +59,16 @@ public class Main {
                     CONSOLE.info("Pcap file location = " + ellipticTest.getPcapFileLocation());
                     InvalidCurvePcapFileHandler pcapFileHandler = new InvalidCurvePcapFileHandler(ellipticTest);
                     pcapFileHandler.handlePcapFile();
-                    return;
                 } catch (UnsupportedOperationException e) {
                     CONSOLE.error("Invalid option selected! Please run the jar file again.");
-                    return;
                 }
             } else {
                 CONSOLE.error("Invalid File Path!");
-                return;
             }
         } else {
             checkVulnerabilityOrExecuteAttack(ellipticTest);
         }
+        System.exit(0);
     }
 
     private static void checkVulnerabilityOrExecuteAttack(InvalidCurveAttackConfig ellipticTest) {
