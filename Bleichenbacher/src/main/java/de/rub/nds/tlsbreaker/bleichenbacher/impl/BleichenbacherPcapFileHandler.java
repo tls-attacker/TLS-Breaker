@@ -84,7 +84,7 @@ public class BleichenbacherPcapFileHandler {
                                                           BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
                                                           ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, bleichenbacherCommandConfig);
-        CONSOLE.info("Found " + vulnerableServers.size() + " server that are vulnerable.");
+        CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
             displayVulnerableServers(vulnerableServers, serverSessionsMap, consoleInteractor);
         }
@@ -125,6 +125,7 @@ public class BleichenbacherPcapFileHandler {
         return vulnerableServers;
     }
 
+    // TODO: this method can be removed. It's just delegating
     private void displayVulnerableServers(List<String> vulnerableServers,
                                           Map<String, List<PcapSession>> serverSessionsMap, ConsoleInteractor consoleInteractor) {
         consoleInteractor.displayServerAndSessionCount(vulnerableServers, serverSessionsMap);

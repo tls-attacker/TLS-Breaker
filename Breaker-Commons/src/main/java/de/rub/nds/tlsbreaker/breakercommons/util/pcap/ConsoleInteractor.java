@@ -60,6 +60,23 @@ public class ConsoleInteractor {
         System.out.println(table.render());
     }
 
+    public void displayServerAndPmsCount(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Server Number", "Host Address", "Encrypted Premaster Secret Count");
+        table.addRule();
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+            String hostAddress = uniqueServers.get(i);
+            int numberOfSessions = serverSessionsMap.get(hostAddress).size();
+            AT_Row row = table.addRow(i + 1, hostAddress, numberOfSessions);
+            setServerTableTextAlignment(row);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
+    }
+
     private void setServerTableTextAlignment(AT_Row row) {
         row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
         row.getCells().get(2).getContext().setTextAlignment(TextAlignment.RIGHT);

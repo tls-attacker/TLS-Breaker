@@ -15,11 +15,13 @@ import com.beust.jcommander.ParametersDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
-import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.layer.RecordLayerType;
+
+import java.util.List;
 
 public abstract class BaseDrownCommandConfig extends AttackConfig {
 
@@ -33,6 +35,12 @@ public abstract class BaseDrownCommandConfig extends AttackConfig {
     @Parameter(names = { "-premasterSecretsFile", "-premaster_secrets_file" },
         description = "File containing captured " + "Premaster secrets to be decrypted in hex format, one per line")
     private String premasterSecretsFilePath;
+
+    @Parameter(names = "-pcap", description = "Location of the pcap file that will be used for the Attack."
+        + "The server to be attacked and the associated pre-master secrets will be extracted from the given pcap file.")
+    private String pcapFileLocation;
+
+    private List<byte[]> premasterSecretsFromPcap;
 
     public BaseDrownCommandConfig(GeneralDelegate delegate) {
         super(delegate);
@@ -60,5 +68,21 @@ public abstract class BaseDrownCommandConfig extends AttackConfig {
 
     public String getPremasterSecretsFilePath() {
         return premasterSecretsFilePath;
+    }
+
+    public String getPcapFileLocation() {
+        return pcapFileLocation;
+    }
+
+    public ClientDelegate getClientDelegate() {
+        return clientDelegate;
+    }
+
+    public void setPremasterSecretsFromPcap(List<byte[]> premasterSecretsFromPcap) {
+        this.premasterSecretsFromPcap = premasterSecretsFromPcap;
+    }
+
+    public List<byte[]> getPremasterSecretsFromPcap() {
+        return premasterSecretsFromPcap;
     }
 }
