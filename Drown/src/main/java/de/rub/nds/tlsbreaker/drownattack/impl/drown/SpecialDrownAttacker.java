@@ -66,7 +66,11 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
 
         if (specialConfig.isExtraClearOracleEnabled()) {
             ExtraClearAttack attack = new ExtraClearAttack(getTlsConfig());
-            attack.execute(premasterSecrets, specialConfig);
+            if (specialConfig.getPremasterSecretsFromPcap() != null) {
+                attack.execute(specialConfig.getPremasterSecretsFromPcap(), specialConfig);
+            } else {
+                attack.execute(premasterSecrets, specialConfig);
+            }
         }
     }
 

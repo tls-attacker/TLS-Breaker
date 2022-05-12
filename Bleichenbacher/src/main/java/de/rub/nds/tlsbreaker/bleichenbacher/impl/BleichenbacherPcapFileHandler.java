@@ -84,9 +84,9 @@ public class BleichenbacherPcapFileHandler {
                                                           BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
                                                           ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, bleichenbacherCommandConfig);
-        CONSOLE.info("Found " + vulnerableServers.size() + " server that are vulnerable.");
+        CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
-            displayVulnerableServers(vulnerableServers, serverSessionsMap, consoleInteractor);
+            consoleInteractor.displayServerAndSessionCount(vulnerableServers, serverSessionsMap);
         }
         if (vulnerableServers.size() == 1) {
             String host = vulnerableServers.get(0);
@@ -123,11 +123,6 @@ public class BleichenbacherPcapFileHandler {
             }
         }
         return vulnerableServers;
-    }
-
-    private void displayVulnerableServers(List<String> vulnerableServers,
-                                          Map<String, List<PcapSession>> serverSessionsMap, ConsoleInteractor consoleInteractor) {
-        consoleInteractor.displayServerAndSessionCount(vulnerableServers, serverSessionsMap);
     }
 
     private void selectSessionAndExecuteAttack(Map<String, List<PcapSession>> serverSessionsMap, String host,
