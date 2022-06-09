@@ -73,7 +73,7 @@ public class Main {
 
     private static void checkVulnerabilityOrExecuteAttack(InvalidCurveAttackConfig ellipticTest) {
         Attacker<? extends TLSDelegateConfig> attacker =
-                new InvalidCurveAttacker(ellipticTest, ellipticTest.createConfig());
+            new InvalidCurveAttacker(ellipticTest, ellipticTest.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {
             attacker.attack();

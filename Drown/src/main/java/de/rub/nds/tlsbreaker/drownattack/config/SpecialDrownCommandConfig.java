@@ -30,7 +30,8 @@ public class SpecialDrownCommandConfig extends BaseDrownCommandConfig {
     @Parameter(names = { "-checkDataFile", "-check_data_file" },
         description = "Path of the state file for " + "'leaky export' oracle vulnerability check")
     private String checkDataFilePath;
-    @Parameter(names = { "-genCheckData", "-gen_check_data" }, description = "Generate state file for 'leaky export' vulnerability check")
+    @Parameter(names = { "-genCheckData", "-gen_check_data" },
+        description = "Generate state file for 'leaky export' vulnerability check")
     private boolean genCheckData;
     @Parameter(names = { "-analyzeCheckData", "-analyze_check_data" }, description = "Analyze given state file for "
         + "'leaky export' oracle vulnerability check, this might take a long time")

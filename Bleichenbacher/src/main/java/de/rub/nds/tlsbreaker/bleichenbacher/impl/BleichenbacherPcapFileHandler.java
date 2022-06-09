@@ -51,14 +51,14 @@ public class BleichenbacherPcapFileHandler {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
                     checkVulnerabilityOfAllServersAndDisplay(uniqueServers, bleichenbacherCommandConfig,
-                                                             serverSessionsMap, consoleInteractor);
+                        serverSessionsMap, consoleInteractor);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(","))
-                          .forEach(serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+                    Arrays.stream(userOption.split(",")).forEach(
+                        serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
 
                     checkVulnerabilityOfAllServersAndDisplay(hosts, bleichenbacherCommandConfig, serverSessionsMap,
-                                                             consoleInteractor);
+                        consoleInteractor);
                 } else {
                     String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
                     LOGGER.info("Selected server: " + host);
@@ -67,7 +67,7 @@ public class BleichenbacherPcapFileHandler {
                     if (Objects.equals(vulnerability, Boolean.TRUE)) {
                         CONSOLE.info("Server " + host + " is vulnerable.");
                         selectSessionAndExecuteAttack(serverSessionsMap, host, bleichenbacherCommandConfig,
-                                                      consoleInteractor);
+                            consoleInteractor);
                     } else {
                         CONSOLE.info("The server " + host + " is not vulnerable.");
                     }
@@ -81,8 +81,8 @@ public class BleichenbacherPcapFileHandler {
     }
 
     private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-                                                          BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
-                                                          ConsoleInteractor consoleInteractor) {
+        BleichenbacherCommandConfig bleichenbacherCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
+        ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, bleichenbacherCommandConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
@@ -103,14 +103,14 @@ public class BleichenbacherPcapFileHandler {
     }
 
     private List<String> getVulnerableServers(List<String> uniqueServers,
-                                              BleichenbacherCommandConfig bleichenbacherCommandConfig) {
+        BleichenbacherCommandConfig bleichenbacherCommandConfig) {
 
         List<String> vulnerableServers = new ArrayList<>();
         for (String server : uniqueServers) {
             bleichenbacherCommandConfig.getClientDelegate().setHost(server);
 
             Attacker<? extends TLSDelegateConfig> attacker =
-                    new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
 
             try {
                 Boolean result = attacker.checkVulnerability();
@@ -126,7 +126,7 @@ public class BleichenbacherPcapFileHandler {
     }
 
     private void selectSessionAndExecuteAttack(Map<String, List<PcapSession>> serverSessionsMap, String host,
-                                               BleichenbacherCommandConfig bleichenbacherCommandConfig, ConsoleInteractor consoleInteractor) {
+        BleichenbacherCommandConfig bleichenbacherCommandConfig, ConsoleInteractor consoleInteractor) {
         List<PcapSession> hostSessions = serverSessionsMap.get(host);
         consoleInteractor.displaySessionDetails(hostSessions);
         PcapSession selectedSession = consoleInteractor.getUserSelectedSession(hostSessions);
@@ -140,10 +140,10 @@ public class BleichenbacherPcapFileHandler {
         bleichenbacherCommandConfig.getClientDelegate().setHost(session.getDestinationHost());
         bleichenbacherCommandConfig.setEncryptedPremasterSecret(getPreMasterSecret(session));
         LOGGER.info("host=" + bleichenbacherCommandConfig.getClientDelegate().getHost()
-                            + " and encryptedPremasterSecret=" + bleichenbacherCommandConfig.getEncryptedPremasterSecret());
+            + " and encryptedPremasterSecret=" + bleichenbacherCommandConfig.getEncryptedPremasterSecret());
 
         Attacker<? extends TLSDelegateConfig> attacker =
-                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         attacker.attack();
     }
 
@@ -160,7 +160,7 @@ public class BleichenbacherPcapFileHandler {
 
     private Boolean checkVulnerability(BleichenbacherCommandConfig bleichenbacherCommandConfig) {
         Attacker<? extends TLSDelegateConfig> attacker =
-                new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
+            new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         Boolean result = null;
         try {
             result = attacker.checkVulnerability();

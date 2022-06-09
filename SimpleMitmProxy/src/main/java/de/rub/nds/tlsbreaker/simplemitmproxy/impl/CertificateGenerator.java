@@ -1,4 +1,13 @@
-package com.mkyong.hashing;
+/**
+ * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
+ *
+ * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ *
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ */
+
+package de.rub.nds.tlsbreaker.simplemitmproxy.impl;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -30,55 +39,42 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 // Based on https://github.com/misterpki/selfsignedcert/blob/master/src/main/java/com/misterpki/SelfSignedCertGenerator.java
 
-public  class CertificateGenerator {
+public class CertificateGenerator {
 
-  private CertificateGenerator() {}
+    private CertificateGenerator() {
+    }
 
+    public static X509Certificate generate(KeyPair keyPair, String hashAlgorithm, String cn, int days)
+        throws OperatorCreationException, CertificateException, CertIOException {
+        Instant now = Instant.now();
+        Date notBefore = Date.from(now);
+        Date notAfter = Date.from(now.plus(Duration.ofDays(days)));
 
-  public static X509Certificate generate( KeyPair keyPair,
-                                          String hashAlgorithm,
-                                          String cn,
-                                          int days)
-    throws OperatorCreationException, CertificateException, CertIOException
-  {
-     Instant now = Instant.now();
-     Date notBefore = Date.from(now);
-     Date notAfter = Date.from(now.plus(Duration.ofDays(days)));
+        ContentSigner contentSigner = new JcaContentSignerBuilder(hashAlgorithm).build(keyPair.getPrivate());
+        X500Name x500Name = new X500Name("CN=" + cn);
+        X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(x500Name,
+            BigInteger.valueOf(now.toEpochMilli()), notBefore, notAfter, x500Name, keyPair.getPublic())
+                .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
+                .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
+                .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 
-     ContentSigner contentSigner = new JcaContentSignerBuilder(hashAlgorithm).build(keyPair.getPrivate());
-     X500Name x500Name = new X500Name("CN=" + cn);
-     X509v3CertificateBuilder certificateBuilder =
-      new JcaX509v3CertificateBuilder(x500Name,
-        BigInteger.valueOf(now.toEpochMilli()),
-        notBefore,
-        notAfter,
-        x500Name,
-        keyPair.getPublic())
-        .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
-        .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
-        .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+        return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
+            .getCertificate(certificateBuilder.build(contentSigner));
+    }
 
-    return new JcaX509CertificateConverter()
-      .setProvider(new BouncyCastleProvider()).getCertificate(certificateBuilder.build(contentSigner));
-  }
-  
+    private static SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey) throws OperatorCreationException {
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+        DigestCalculator digCalc =
+            new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
 
-  private static SubjectKeyIdentifier createSubjectKeyId( PublicKey publicKey) throws OperatorCreationException {
-     SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
-     DigestCalculator digCalc =
-      new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+        return new X509ExtensionUtils(digCalc).createSubjectKeyIdentifier(publicKeyInfo);
+    }
 
-    return new X509ExtensionUtils(digCalc).createSubjectKeyIdentifier(publicKeyInfo);
-  }
+    private static AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey) throws OperatorCreationException {
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+        DigestCalculator digCalc =
+            new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
 
-
-  private static AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
-    throws OperatorCreationException
-  {
-     SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
-     DigestCalculator digCalc =
-      new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
-
-    return new X509ExtensionUtils(digCalc).createAuthorityKeyIdentifier(publicKeyInfo);
-  }
+        return new X509ExtensionUtils(digCalc).createAuthorityKeyIdentifier(publicKeyInfo);
+    }
 }

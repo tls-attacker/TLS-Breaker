@@ -52,7 +52,8 @@ public class PskBruteForcerAttackServerCommandConfig extends AttackConfig {
     @ParametersDelegate
     private AttackDelegate attackDelegate;
 
-    @Parameter(names = { "-guessProviderType", "-guess_provider_type" }, description = "Chooses how the BruteForcer will choose the keys to guess")
+    @Parameter(names = { "-guessProviderType", "-guess_provider_type" },
+        description = "Chooses how the BruteForcer will choose the keys to guess")
     private GuessProviderType guessProviderType = GuessProviderType.INCREMENTING;
 
     @Parameter(names = { "-guessProviderInputFile", "-guess_provider_input_file" },

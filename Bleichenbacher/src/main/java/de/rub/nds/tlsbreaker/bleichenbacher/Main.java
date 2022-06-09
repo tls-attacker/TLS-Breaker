@@ -58,7 +58,7 @@ public class Main {
                 try {
                     CONSOLE.info("Pcap file location = " + bleichenbacherCommandConfig.getPcapFileLocation());
                     BleichenbacherPcapFileHandler pcapFileHandler =
-                            new BleichenbacherPcapFileHandler(bleichenbacherCommandConfig);
+                        new BleichenbacherPcapFileHandler(bleichenbacherCommandConfig);
                     pcapFileHandler.handlePcapFile();
                 } catch (UnsupportedOperationException e) {
                     CONSOLE.error("Invalid option selected! Please run the jar file again.");

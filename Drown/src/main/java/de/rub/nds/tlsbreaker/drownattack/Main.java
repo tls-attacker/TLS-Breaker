@@ -76,7 +76,7 @@ public class Main {
         }
 
         if (jc.getParsedCommand() == GeneralDrownCommandConfig.COMMAND
-                && generalDrownConfig.getPcapFileLocation() != null) {
+            && generalDrownConfig.getPcapFileLocation() != null) {
             if (FileUtils.isFileExists(generalDrownConfig.getPcapFileLocation())) {
                 try {
                     CONSOLE.info("Pcap file location = " + generalDrownConfig.getPcapFileLocation());
@@ -89,7 +89,7 @@ public class Main {
                 CONSOLE.error("Invalid File Path!");
             }
         } else if (jc.getParsedCommand() == SpecialDrownCommandConfig.COMMAND
-                && specialDrownConfig.getPcapFileLocation() != null) {
+            && specialDrownConfig.getPcapFileLocation() != null) {
             if (FileUtils.isFileExists(specialDrownConfig.getPcapFileLocation())) {
                 try {
                     CONSOLE.info("Pcap file location = " + specialDrownConfig.getPcapFileLocation());
