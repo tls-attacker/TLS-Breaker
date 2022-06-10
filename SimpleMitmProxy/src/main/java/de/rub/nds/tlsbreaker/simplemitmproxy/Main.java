@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -42,6 +43,8 @@ import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig
 import de.rub.nds.tlsbreaker.simplemitmproxy.impl.CertificateGenerator;
 import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
 
+
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 /**
  *
  */
@@ -74,7 +77,7 @@ public class Main {
         if(simpleMITMProxy.getDelegate(CertificateDelegate.class).getCertificate() == null){
             Scanner sc = new Scanner(System.in);
 
-            System.out.println("No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes)");
+            CONSOLE.info("No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes, Enter - Continue)");
             String userInput = trim(sc.nextLine());
 
             if ("Y".equals(userInput) || "y".equals(userInput)) {
@@ -113,24 +116,34 @@ public class Main {
                 String pemCertPre = new String(encoder.encode(derCert));
                 String pemCert = cert_begin + pemCertPre + end_cert;
 
-                try (PrintStream out = new PrintStream(new FileOutputStream("self_signed.pem"))) {
+                try (PrintStream out = new PrintStream(new FileOutputStream("self_signed_cert.pem"))) {
                     out.print(pemCert);
                 }
 
-                // InputStream in = new FileInputStream("self_signed.pem");
-                // CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                // X509Certificate cert = (X509Certificate) factory.generateCertificate(in);
+                PrivateKey prv = keyPair.getPrivate();
+                byte[] prvBytes = prv.getEncoded();
 
-                simpleMITMProxy.getDelegate(CertificateDelegate.class).setCertificate("self_signed.pem");
+
+                String key_begin = "-----BEGIN PRIVATE KEY-----\n";
+                String key_end = "\n-----END PRIVATE KEY-----";
+                String privateKeyEncoded = new String(encoder.encode(prvBytes));
+                String privateKey = key_begin + privateKeyEncoded + key_end;
+
+                try (PrintStream out = new PrintStream(new FileOutputStream("self_signed_key.pem"))) {
+                    out.print(privateKey);
+                }
+                
+                simpleMITMProxy.getDelegate(CertificateDelegate.class).setCertificate("self_signed_cert.pem");
+                simpleMITMProxy.getDelegate(CertificateDelegate.class).setKey("self_signed_key.pem");
 
                 
             } 
             else {
-                System.out.println("Continuing without a certificate!");
+                CONSOLE.info("Continuing without a certificate!");
             }
         }
         else{
-            System.out.println("The certificate is given");
+            // System.out.println("The certificate is given");
         }
 
         Attacker<? extends TLSDelegateConfig> attacker =
