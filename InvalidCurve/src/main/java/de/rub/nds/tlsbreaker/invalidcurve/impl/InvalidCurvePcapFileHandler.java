@@ -6,6 +6,7 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsbreaker.invalidcurve.impl;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
@@ -49,11 +50,11 @@ public class InvalidCurvePcapFileHandler {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
                     checkVulnerabilityOfAllServersAndDisplay(uniqueServers, invalidCurveAttackConfig,
-                                                             consoleInteractor);
+                        consoleInteractor);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(","))
-                          .forEach(serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+                    Arrays.stream(userOption.split(",")).forEach(
+                        serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
 
                     checkVulnerabilityOfAllServersAndDisplay(hosts, invalidCurveAttackConfig, consoleInteractor);
                 } else {
@@ -83,7 +84,7 @@ public class InvalidCurvePcapFileHandler {
     }
 
     private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-                                                          InvalidCurveAttackConfig invalidCurveAttackConfig, ConsoleInteractor consoleInteractor) {
+        InvalidCurveAttackConfig invalidCurveAttackConfig, ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, invalidCurveAttackConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
@@ -109,14 +110,14 @@ public class InvalidCurvePcapFileHandler {
     }
 
     private List<String> getVulnerableServers(List<String> uniqueServers,
-                                              InvalidCurveAttackConfig invalidCurveAttackConfig) {
+        InvalidCurveAttackConfig invalidCurveAttackConfig) {
 
         List<String> vulnerableServers = new ArrayList<>();
         for (String server : uniqueServers) {
             invalidCurveAttackConfig.getClientDelegate().setHost(server);
 
             Attacker<? extends TLSDelegateConfig> attacker =
-                    new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+                new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
 
             try {
                 Boolean result = attacker.checkVulnerability();
@@ -137,7 +138,7 @@ public class InvalidCurvePcapFileHandler {
         LOGGER.info("host=" + invalidCurveAttackConfig.getClientDelegate().getHost());
 
         Attacker<? extends TLSDelegateConfig> attacker =
-                new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+            new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
         attacker.attack();
     }
 
@@ -147,7 +148,7 @@ public class InvalidCurvePcapFileHandler {
 
     private Boolean checkVulnerability(InvalidCurveAttackConfig invalidCurveAttackConfig) {
         Attacker<? extends TLSDelegateConfig> attacker =
-                new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+            new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
         Boolean result = null;
         try {
             result = attacker.checkVulnerability();

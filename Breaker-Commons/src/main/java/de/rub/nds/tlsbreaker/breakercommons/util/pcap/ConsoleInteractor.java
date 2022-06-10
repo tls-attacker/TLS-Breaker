@@ -27,7 +27,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
 public class ConsoleInteractor {
 
     public void displayServerAndSessionCount(List<String> uniqueServers,
-                                             Map<String, List<PcapSession>> serverSessionsMap) {
+        Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
         table.addRow("Server Number", "Host Address", "Session Count");
@@ -92,11 +92,11 @@ public class ConsoleInteractor {
             PcapSession session = sessions.get(i);
             ServerHelloMessage serverHellomessage = session.getServerHellomessage();
             CipherSuite selectedCipherSuite =
-                    CipherSuite.getCipherSuite(serverHellomessage.getSelectedCipherSuite().getValue());
+                CipherSuite.getCipherSuite(serverHellomessage.getSelectedCipherSuite().getValue());
             ProtocolVersion protocolVersion =
-                    ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
+                ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
             AT_Row row = table.addRow(i + 1, session.getSourceHost(), selectedCipherSuite, protocolVersion,
-                                      session.getApplicationDataSize() / 1000.0);
+                session.getApplicationDataSize() / 1000.0);
             setSessionTableTextAlignment(row);
         }
         table.addRule();
@@ -208,7 +208,7 @@ public class ConsoleInteractor {
             return getUserDecisionForOneServer();
         } else {
             CONSOLE.info("Please select server numbers to check for vulnerability "
-                                 + "or press 'a' to check for vulnerability of all the servers.");
+                + "or press 'a' to check for vulnerability of all the servers.");
             CONSOLE.info("Select Option: ");
             return getUserInputForMultipleServers(uniqueServers);
         }

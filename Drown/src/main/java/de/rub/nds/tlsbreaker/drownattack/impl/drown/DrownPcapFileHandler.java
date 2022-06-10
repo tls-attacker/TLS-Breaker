@@ -52,14 +52,14 @@ public class DrownPcapFileHandler {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
                     checkVulnerabilityOfAllServersAndDisplay(uniqueServers, baseDrownCommandConfig, serverSessionsMap,
-                                                             consoleInteractor);
+                        consoleInteractor);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
                     Arrays.stream(userOption.split(",")).forEach(
-                            serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+                        serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
 
                     checkVulnerabilityOfAllServersAndDisplay(hosts, baseDrownCommandConfig, serverSessionsMap,
-                                                             consoleInteractor);
+                        consoleInteractor);
                 } else {
                     String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
                     LOGGER.info("Selected server: " + host);
@@ -87,8 +87,8 @@ public class DrownPcapFileHandler {
     }
 
     private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-                                                          BaseDrownCommandConfig baseDrownCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
-                                                          ConsoleInteractor consoleInteractor) {
+        BaseDrownCommandConfig baseDrownCommandConfig, Map<String, List<PcapSession>> serverSessionsMap,
+        ConsoleInteractor consoleInteractor) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, baseDrownCommandConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
@@ -113,7 +113,7 @@ public class DrownPcapFileHandler {
     }
 
     private List<String> getVulnerableServers(List<String> uniqueServers,
-                                              BaseDrownCommandConfig baseDrownCommandConfig) {
+        BaseDrownCommandConfig baseDrownCommandConfig) {
         List<String> vulnerableServers = new ArrayList<>();
         for (String server : uniqueServers) {
             baseDrownCommandConfig.getClientDelegate().setHost(server);
@@ -134,13 +134,13 @@ public class DrownPcapFileHandler {
     }
 
     private void executeAttack(String host, Map<String, List<PcapSession>> serverSessionsMap,
-                               BaseDrownCommandConfig baseDrownCommandConfig) {
+        BaseDrownCommandConfig baseDrownCommandConfig) {
 
         baseDrownCommandConfig.getClientDelegate().setHost(host);
         baseDrownCommandConfig.setPremasterSecretsFromPcap(getPreMasterSecrets(serverSessionsMap.get(host)));
         LOGGER.info(
-                "host=" + baseDrownCommandConfig.getClientDelegate().getHost() + " and count of encrypted Premaster Secret="
-                        + baseDrownCommandConfig.getPremasterSecretsFromPcap().size());
+            "host=" + baseDrownCommandConfig.getClientDelegate().getHost() + " and count of encrypted Premaster Secret="
+                + baseDrownCommandConfig.getPremasterSecretsFromPcap().size());
 
         Attacker<? extends TLSDelegateConfig> attacker = getAttacker(baseDrownCommandConfig);
         attacker.attack();

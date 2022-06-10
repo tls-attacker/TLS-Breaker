@@ -20,10 +20,8 @@ import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 
 public class PcapSession {
     /**
-     * A PcapSession holds messages of TLS handshake (depending on implementation
-     * phase the messages it contains may
-     * change) and information from the TCP packet header like the source and
-     * destination of the package.
+     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
+     * change) and information from the TCP packet header like the source and destination of the package.
      * 
      */
 
@@ -49,21 +47,22 @@ public class PcapSession {
         return this.applicationMessages;
     }
 
-    public void addApplicationMessage(ApplicationMessage applicationMessage){
-        if(applicationMessage != null){
+    public void addApplicationMessage(ApplicationMessage applicationMessage) {
+        if (applicationMessage != null) {
             this.applicationMessages.add(applicationMessage);
         }
     }
 
-    public int getApplicationDataSize(){
-        int total_size=0;
-        for(ApplicationMessage am:applicationMessages){
+    public int getApplicationDataSize() {
+        int total_size = 0;
+        for (ApplicationMessage am : applicationMessages) {
             total_size += am.getData().getValue().length;
         }
         return total_size;
     }
 
-    public PcapSession(){}
+    public PcapSession() {
+    }
 
     public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
