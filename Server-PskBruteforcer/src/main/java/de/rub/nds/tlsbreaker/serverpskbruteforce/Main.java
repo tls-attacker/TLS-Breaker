@@ -15,14 +15,17 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerAttackServer;
+import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerPcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+//import de.rub.nds.tlsbreaker.bleichenbacher;
 
 /**
  *
@@ -52,6 +55,27 @@ public class Main {
             return;
         }
 
+        if (pskBruteForcerAttackServerTest.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(pskBruteForcerAttackServerTest.getPcapFileLocation())) {
+                try {
+                    CONSOLE.info("Pcap file location = " + pskBruteForcerAttackServerTest.getPcapFileLocation());
+                    PskBruteForcerPcapFileHandler pcapFileHandler =
+                        new PskBruteForcerPcapFileHandler(pskBruteForcerAttackServerTest);
+                    pcapFileHandler.handlePcapFile();
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error("Invalid option selected! Please run the jar file again.");
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+            }
+        } else {
+            checkVulnerabilityOrExecuteAttack(pskBruteForcerAttackServerTest);
+        }
+        System.exit(0);
+    }
+
+    private static void
+        checkVulnerabilityOrExecuteAttack(PskBruteForcerAttackServerCommandConfig pskBruteForcerAttackServerTest) {
         Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackServer(pskBruteForcerAttackServerTest,
             pskBruteForcerAttackServerTest.createConfig());
 

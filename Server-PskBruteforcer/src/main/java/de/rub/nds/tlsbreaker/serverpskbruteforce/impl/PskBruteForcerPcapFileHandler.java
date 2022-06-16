@@ -16,7 +16,6 @@ import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
@@ -29,9 +28,6 @@ import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServ
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.stringtemplate.v4.ST;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherPcapFileHandler;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
-import de.rub.nds.tlsbreaker.bleichenbacher.impl.BleichenbacherAttacker;
 
 import java.util.*;
 
