@@ -240,4 +240,23 @@ public class ConsoleInteractor {
             throw new UnsupportedOperationException();
         }
     }
+
+    public String getUserchoiceforpsk() {
+        Scanner sc = new Scanner(System.in);
+        String userInput = trim(sc.nextLine());
+        if ("A".equals(userInput) || "a".equals(userInput)) {
+            return "A";
+        } else if ("B".equals(userInput) || "b".equals(userInput)) {
+            return "B";
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public String getUserfilepathinput() {
+        CONSOLE.info("Enter the File Path: ");
+        Scanner sc = new Scanner(System.in);
+        String userInputfile = trim(sc.nextLine());
+        return userInputfile;
+    }
 }
