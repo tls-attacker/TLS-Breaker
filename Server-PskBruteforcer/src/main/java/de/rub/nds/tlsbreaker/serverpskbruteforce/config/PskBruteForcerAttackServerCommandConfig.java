@@ -16,9 +16,10 @@ import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProviderType;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.exception.WordlistNotFoundException;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
+//import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -65,6 +66,10 @@ public class PskBruteForcerAttackServerCommandConfig extends AttackConfig {
 
     @Parameter(names = { "-pskIdentity", "-psk_identity" }, description = "Set the Psk Identity, that should be used")
     private String pskIdentity = "Client_identity";
+
+    @Parameter(names = "-pcap",
+        description = "Location of the pcap file that will be used for the Invalid Curve Attack.")
+    private String pcapFileLocation;
 
     /**
      *
@@ -173,5 +178,22 @@ public class PskBruteForcerAttackServerCommandConfig extends AttackConfig {
      */
     public void setGuessProviderType(GuessProviderType guessProviderType) {
         this.guessProviderType = guessProviderType;
+    }
+
+    public String getPcapFileLocation() {
+        return pcapFileLocation;
+    }
+
+    public ClientDelegate getClientDelegate() {
+        return clientDelegate;
+    }
+
+//    ####################
+    /**
+     *
+     * @param guessProviderInputFile
+     */
+    public void setGuessProviderInputFile(String guessProviderInputFile) {
+        this.guessProviderInputFile = guessProviderInputFile;
     }
 }
