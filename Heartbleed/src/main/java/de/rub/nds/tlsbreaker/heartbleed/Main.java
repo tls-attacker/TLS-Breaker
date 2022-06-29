@@ -15,8 +15,10 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.heartbleed.config.HeartbleedCommandConfig;
 import de.rub.nds.tlsbreaker.heartbleed.impl.HeartbleedAttacker;
+import de.rub.nds.tlsbreaker.heartbleed.impl.HeartbleedPcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +54,26 @@ public class Main {
             return;
         }
 
+        if (heartbleed.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(heartbleed.getPcapFileLocation())) {
+                try {
+                    CONSOLE.info("Pcap file location = " + heartbleed.getPcapFileLocation());
+                    HeartbleedPcapFileHandler pcapFileHandler = new HeartbleedPcapFileHandler(heartbleed);
+                    pcapFileHandler.handlePcapFile();
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error(e.getMessage());
+
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+            }
+        } else {
+            checkVulnerabilityOrExecuteAttack(heartbleed);
+        }
+        System.exit(0);
+    }
+
+    private static void checkVulnerabilityOrExecuteAttack(HeartbleedCommandConfig heartbleed) {
         Attacker<? extends TLSDelegateConfig> attacker = new HeartbleedAttacker(heartbleed, heartbleed.createConfig());
 
         if (attacker.getConfig().isExecuteAttack()) {

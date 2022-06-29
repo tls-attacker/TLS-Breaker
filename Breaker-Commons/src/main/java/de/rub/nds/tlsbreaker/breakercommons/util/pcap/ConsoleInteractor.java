@@ -121,7 +121,7 @@ public class ConsoleInteractor {
                 CONSOLE.info("Execution of the attack cancelled.");
                 return null;
             } else {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Invalid option selected!");
             }
         } else if (hostSessions.size() > 1) {
             CONSOLE.info("Please select a session number to execute an attack.");
@@ -131,10 +131,10 @@ public class ConsoleInteractor {
                 if (sessionNumber > 0 && sessionNumber <= hostSessions.size()) {
                     return hostSessions.get(sessionNumber - 1);
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("Invalid option selected!");
                 }
             } catch (Exception e) {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Invalid option selected!");
             }
         } else {
             CONSOLE.error("Error!");
@@ -151,7 +151,7 @@ public class ConsoleInteractor {
         } else if ("N".equals(userInput) || "n".equals(userInput)) {
             return "N";
         } else {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Invalid option selected!");
         }
     }
 
@@ -163,7 +163,7 @@ public class ConsoleInteractor {
                 if (isValidNumberSelected(serverNumber, uniqueServers)) {
                     return Integer.toString(serverNumber);
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("Invalid option selected!");
                 }
             } else {
                 String userOption = sc.nextLine();
@@ -172,11 +172,11 @@ public class ConsoleInteractor {
                 } else if (isCommaSeparatedInputValid(userOption, uniqueServers)) {
                     return userOption;
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("Invalid option selected!");
                 }
             }
         } catch (Exception e) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Invalid option selected!");
         }
     }
 
@@ -221,11 +221,11 @@ public class ConsoleInteractor {
             if (serverNumber > 0 && serverNumber <= uniqueServers.size()) {
                 return serverNumber;
             } else {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Invalid option selected!");
             }
 
         } catch (Exception e) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Invalid option selected!");
         }
     }
 
@@ -237,7 +237,7 @@ public class ConsoleInteractor {
         } else if ("N".equals(userInput) || "n".equals(userInput)) {
             return "N";
         } else {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Invalid option selected!");
         }
     }
 
