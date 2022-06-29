@@ -29,11 +29,6 @@ public class FileUtils {
     }
 
     public static ArrayList<byte[]> readHexStringContentFromFile(String filePath) {
-        // String secretsPath = config.getPremasterSecretsFilePath();
-        /*
-         * if (secretsPath == null) { throw new
-         * ConfigurationException("Premaster secrets file is required for the attack"); }
-         */
         if (!isFileExists(filePath)) {
             throw new UnsupportedOperationException("The file '" + filePath + "' does not exists.");
         }

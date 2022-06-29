@@ -1,8 +1,8 @@
 /**
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
- * <p>
+ *
  * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
- * <p>
+ *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
@@ -272,7 +272,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
             // LOGGER.info("heartbeat(" + count + ") chunk(" + i + ") size = " + chunk.length);
             // LOGGER.info("heartbeat(" + count + ") chunk(" + i + ") firstElement = " + chunk[0]);
             // LOGGER.info("heartbeat(" + count + ") chunk(" + i + ") lastElement = " + chunk[chunk.length - 1]);
-            LOGGER.debug("Processing  memory chunk = " + bytesToRawHexString(chunk));
+            LOGGER.info("Processing  memory chunk = " + bytesToRawHexString(chunk));
 
             // TODO: Remove Testing
             /*
