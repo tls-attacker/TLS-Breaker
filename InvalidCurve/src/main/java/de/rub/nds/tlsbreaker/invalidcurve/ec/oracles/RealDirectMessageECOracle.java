@@ -38,6 +38,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.bouncycastle.util.BigIntegers;
+//################
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 
 /**
  *
@@ -52,6 +54,8 @@ public class RealDirectMessageECOracle extends ECOracle {
     private Point checkPoint;
 
     private byte[] checkPMS;
+
+    byte[] explicitPMS = new byte[100];
 
     /**
      *
@@ -90,10 +94,17 @@ public class RealDirectMessageECOracle extends ECOracle {
         y.setModification(BigIntegerModificationFactory.explicitValue(ecPoint.getFieldY().getData()));
         message.getComputations().setPublicKeyY(y);
 
-        // set explicit premaster secret value (X value of the resulting point
-        // coordinate)
+        // set explicit premaster secret value (X value of the resulting point coordinate)
+
+        // byte[] explicitPMS = BigIntegers.asUnsignedByteArray(curve.getModulus().bitLength() / Bits.IN_A_BYTE,
+        // secret);
+        // ADDED BELOW CODE BLOCK BECAUSE THERE WAS AN ISSUE bouncycastle IMPLEMENTATION WHEN PROCESSING BIGGER VALUES
+        // MAINLY IN THE CASE OF SECP521R1 POINTS.
         ModifiableByteArray pms = ModifiableVariableFactory.createByteArrayModifiableVariable();
-        byte[] explicitPMS = BigIntegers.asUnsignedByteArray(curve.getModulus().bitLength() / Bits.IN_A_BYTE, secret);
+        int elementLength = ArrayConverter.bigIntegerToByteArray(curve.getModulus()).length;
+        LOGGER.info("ELEMENT LENGTH" + elementLength);
+        byte[] explicitPMS = ArrayConverter.bigIntegerToNullPaddedByteArray(secret, elementLength);
+
         pms.setModification(ByteArrayModificationFactory.explicitValue(explicitPMS));
         message.getComputations().setPremasterSecret(pms);
 
