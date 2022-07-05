@@ -134,6 +134,7 @@ public class InvalidCurveAttackConfig extends AttackConfig {
     public InvalidCurveAttackConfig(GeneralDelegate delegate) {
         super(delegate);
         clientDelegate = new ClientDelegate();
+        this.getNamedGroup();
         ciphersuiteDelegate = new CipherSuiteDelegate();
         protocolVersionDelegate = new ProtocolVersionDelegate();
         attackDelegate = new AttackDelegate();
