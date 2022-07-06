@@ -38,12 +38,14 @@ public class SimpleMitmProxy extends Attacker<SimpleMitmProxyCommandConfig> {
         Config conf = super.getBaseConfig();
         conf.setWorkflowTraceType(WorkflowTraceType.SIMPLE_MITM_PROXY);
         conf.setDefaultRunningMode(RunningModeType.MITM);
+        conf.setWorkflowExecutorShouldClose(false);
 
         State state = new State(conf);
 
         WorkflowExecutor workflowExecutor =
             WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
         workflowExecutor.executeWorkflow();
+
     }
 
     /**

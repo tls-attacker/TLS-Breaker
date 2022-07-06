@@ -67,8 +67,6 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
         return true;
     }
 
-
-
     /**
      *
      * @return
