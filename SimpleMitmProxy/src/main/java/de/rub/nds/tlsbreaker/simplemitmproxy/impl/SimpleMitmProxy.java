@@ -74,7 +74,7 @@ public class SimpleMitmProxy extends Attacker<SimpleMitmProxyCommandConfig> {
 
                 MessageActionResult mar = receiveMessageHelper.receiveMessages(state.getInboundTlsContexts().get(0));
 
-                for(ProtocolMessage message:mar.getMessageList()){
+                for (ProtocolMessage message : mar.getMessageList()) {
                     System.out.println(message.getCompleteResultingMessage());
                 }
 
