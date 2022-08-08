@@ -44,19 +44,20 @@ public class InvalidCurvePcapFileHandler {
             if (!uniqueServers.isEmpty()) {
                 CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
                 ConsoleInteractor consoleInteractor = new ConsoleInteractor();
-                consoleInteractor.displayServers(uniqueServers);
+                consoleInteractor.displayServers(uniqueServers, serverSessionsMap);
                 String userOption = consoleInteractor.getValidUserSelection(uniqueServers);
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
-                    checkVulnerabilityOfAllServersAndDisplay(uniqueServers, invalidCurveAttackConfig,
-                        consoleInteractor);
+                    checkVulnerabilityOfAllServersAndDisplay(uniqueServers, invalidCurveAttackConfig, consoleInteractor,
+                        serverSessionsMap);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
                     Arrays.stream(userOption.split(",")).forEach(
                         serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
 
-                    checkVulnerabilityOfAllServersAndDisplay(hosts, invalidCurveAttackConfig, consoleInteractor);
+                    checkVulnerabilityOfAllServersAndDisplay(hosts, invalidCurveAttackConfig, consoleInteractor,
+                        serverSessionsMap);
                 } else {
                     String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
                     LOGGER.info("Selected server: " + host);
@@ -84,11 +85,12 @@ public class InvalidCurvePcapFileHandler {
     }
 
     private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-        InvalidCurveAttackConfig invalidCurveAttackConfig, ConsoleInteractor consoleInteractor) {
+        InvalidCurveAttackConfig invalidCurveAttackConfig, ConsoleInteractor consoleInteractor,
+        Map<String, List<PcapSession>> serverSessionsMap) {
         List<String> vulnerableServers = getVulnerableServers(uniqueServers, invalidCurveAttackConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
-            consoleInteractor.displayServers(vulnerableServers);
+            consoleInteractor.displayServers(vulnerableServers, serverSessionsMap);
         }
         if (vulnerableServers.size() == 1) {
             CONSOLE.info("Do you want to execute the attack? (y/n):");

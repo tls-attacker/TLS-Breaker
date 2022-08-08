@@ -9,9 +9,11 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.ServerNameIndicationExtensionMessage;
 import de.vandermeer.asciitable.AT_Row;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
@@ -25,18 +27,20 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 public class ConsoleInteractor {
+    static final String NO_DATA = "-";
 
     public void displayServerAndSessionCount(List<String> uniqueServers,
         Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Server Number", "Host Address", "Session Count");
+        table.addRow("Server Number", "Host Address", "Hostname", "Session Count");
         table.addRule();
 
         for (int i = 0; i < uniqueServers.size(); i++) {
             String hostAddress = uniqueServers.get(i);
+            PcapSession pcapSession = serverSessionsMap.get(hostAddress).get(0);
             int numberOfSessions = serverSessionsMap.get(hostAddress).size();
-            AT_Row row = table.addRow(i + 1, hostAddress, numberOfSessions);
+            AT_Row row = table.addRow(i + 1, hostAddress, getHostName(pcapSession), numberOfSessions);
             setServerTableTextAlignment(row);
         }
         table.addRule();
@@ -44,15 +48,27 @@ public class ConsoleInteractor {
         System.out.println(table.render());
     }
 
-    public void displayServers(List<String> uniqueServers) {
+    private String getHostName(PcapSession pcapSession) {
+        ServerNameIndicationExtensionMessage sniMessage =
+            pcapSession.getClientHelloMessage().getExtension(ServerNameIndicationExtensionMessage.class);
+        if (sniMessage != null) {
+            return ArrayConverter.bytesToHexString(sniMessage.getServerNameList().get(0).getServerName().getValue());
+            // new String(sniMessage.getServerNameList().get(0).getServerName())
+        } else {
+            return NO_DATA;
+        }
+    }
+
+    public void displayServers(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Server Number", "Host Address");
+        table.addRow("Server Number", "Host Address", "Hostname");
         table.addRule();
 
         for (int i = 0; i < uniqueServers.size(); i++) {
             String hostAddress = uniqueServers.get(i);
-            AT_Row row = table.addRow(i + 1, hostAddress);
+            PcapSession pcapSession = serverSessionsMap.get(hostAddress).get(0);
+            AT_Row row = table.addRow(i + 1, hostAddress, getHostName(pcapSession));
             row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
         }
         table.addRule();
@@ -63,13 +79,14 @@ public class ConsoleInteractor {
     public void displayServerAndPmsCount(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("Server Number", "Host Address", "Encrypted Premaster Secret Count");
+        table.addRow("Server Number", "Host Address", "Hostname", "Encrypted Premaster Secret Count");
         table.addRule();
 
         for (int i = 0; i < uniqueServers.size(); i++) {
             String hostAddress = uniqueServers.get(i);
+            PcapSession pcapSession = serverSessionsMap.get(hostAddress).get(0);
             int numberOfSessions = serverSessionsMap.get(hostAddress).size();
-            AT_Row row = table.addRow(i + 1, hostAddress, numberOfSessions);
+            AT_Row row = table.addRow(i + 1, hostAddress, getHostName(pcapSession), numberOfSessions);
             setServerTableTextAlignment(row);
         }
         table.addRule();
@@ -79,7 +96,7 @@ public class ConsoleInteractor {
 
     private void setServerTableTextAlignment(AT_Row row) {
         row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
-        row.getCells().get(2).getContext().setTextAlignment(TextAlignment.RIGHT);
+        row.getCells().get(3).getContext().setTextAlignment(TextAlignment.RIGHT);
     }
 
     public void displaySessionDetails(List<PcapSession> sessions) {
@@ -97,6 +114,30 @@ public class ConsoleInteractor {
                 ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
             AT_Row row = table.addRow(i + 1, session.getSourceHost(), selectedCipherSuite, protocolVersion,
                 session.getApplicationDataSize() / 1000.0);
+            setSessionTableTextAlignment(row);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
+
+    }
+
+    public void displayServerAndSessionDetails(List<PcapSession> sessions) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Session Number", "Source", "Target", "Cipher Suite", "Protocol Version",
+            "Application data size (kB)");
+        table.addRule();
+
+        for (int i = 0; i < sessions.size(); i++) {
+            PcapSession session = sessions.get(i);
+            ServerHelloMessage serverHellomessage = session.getServerHellomessage();
+            CipherSuite selectedCipherSuite =
+                CipherSuite.getCipherSuite(serverHellomessage.getSelectedCipherSuite().getValue());
+            ProtocolVersion protocolVersion =
+                ProtocolVersion.getProtocolVersion(serverHellomessage.getProtocolVersion().getValue());
+            AT_Row row = table.addRow(i + 1, session.getSourceHost(), session.getDestinationHost(), selectedCipherSuite,
+                protocolVersion, session.getApplicationDataSize() / 1000.0);
             setSessionTableTextAlignment(row);
         }
         table.addRule();

