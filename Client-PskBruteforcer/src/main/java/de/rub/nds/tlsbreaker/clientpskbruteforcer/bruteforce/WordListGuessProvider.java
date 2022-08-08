@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 /**
  * A GuessProvider based on a WordList. It reads bytes from the input stream until a newline character is found. If the
  * InputStream does not contain anymore lines. Null is returned.
@@ -47,6 +49,10 @@ public class WordListGuessProvider extends GuessProvider {
                 return null;
             }
             return ArrayConverter.hexStringToByteArray(line);
+        } catch (IllegalArgumentException ie) {
+            CONSOLE.warn("Incorrect HexaDecimal value is provided in wordlist, Please provide correct value");
+            CONSOLE.info(ie);
+            return null;
         } catch (IOException ex) {
             return null;
         }

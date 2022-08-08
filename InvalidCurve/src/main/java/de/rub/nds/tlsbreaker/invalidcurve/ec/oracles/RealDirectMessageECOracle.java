@@ -29,6 +29,8 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+
+import java.io.Console;
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.logging.log4j.Level;
@@ -158,9 +160,15 @@ public class RealDirectMessageECOracle extends ECOracle {
             .getFirstSendMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
         // TODO Those values can be retrieved from the context
         // get public point base X and Y coordinates
-        BigInteger x = message.getComputations().getPublicKeyX().getValue();
-        BigInteger y = message.getComputations().getPublicKeyY().getValue();
-        checkPoint = Point.createPoint(x, y, state.getTlsContext().getSelectedGroup());
-        checkPMS = message.getComputations().getPremasterSecret().getValue();
+        try {
+            BigInteger x = message.getComputations().getPublicKeyX().getValue();
+            BigInteger y = message.getComputations().getPublicKeyY().getValue();
+
+            checkPoint = Point.createPoint(x, y, state.getTlsContext().getSelectedGroup());
+            checkPMS = message.getComputations().getPremasterSecret().getValue();
+        } catch (Exception e) {
+            LOGGER.warn("Failed due to Incorrect Curve Selection!!");
+            System.exit(1);
+        }
     }
 }
