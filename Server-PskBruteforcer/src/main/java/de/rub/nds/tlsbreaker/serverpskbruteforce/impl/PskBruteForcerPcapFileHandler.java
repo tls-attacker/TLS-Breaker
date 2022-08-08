@@ -52,11 +52,11 @@ public class PskBruteForcerPcapFileHandler {
             ServerSelection pskBruteForcerServerSelection = new PskBruteForcerServerSelection(sessions);
             Map<String, List<PcapSession>> serverSessionsMap = pskBruteForcerServerSelection.getServerSessionsMap();
             List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-            //Display the server list and ask for the user to provide the desired input.
+            // Display the server list and ask for the user to provide the desired input.
             if (!uniqueServers.isEmpty()) {
                 CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
                 ConsoleInteractor consoleInteractor = new ConsoleInteractor();
-                consoleInteractor.displayServerAndSessionCount(uniqueServers, serverSessionsMap);
+                consoleInteractor.displayServers(uniqueServers);
                 String userOption = consoleInteractor.getValidUserSelection(uniqueServers);
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
@@ -147,7 +147,6 @@ public class PskBruteForcerPcapFileHandler {
 
             try {
                 Boolean result = attacker.checkVulnerability();
-                // result = Boolean.TRUE;
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -185,14 +184,9 @@ public class PskBruteForcerPcapFileHandler {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {
                 CONSOLE.info("Vulnerable:" + result.toString());
-            } else if (Objects.equals(result, null)) {
-                result = Boolean.TRUE;
-                CONSOLE.info("Maybe vulnerable - server supports PSK#################" + result.toString());
             }
-            // }
             else {
                 CONSOLE.warn("Vulnerable: Uncertain");
-                // result = Boolean.TRUE;
             }
         } catch (UnsupportedOperationException e) {
             LOGGER.info("The selected attacker is currently not implemented");
@@ -200,8 +194,8 @@ public class PskBruteForcerPcapFileHandler {
         return result;
     }
 
-    //Method is specific to the PSK_SERVER_Bruteforcer attack. Provide different option to the user
-    //to select. Based on the selected option different attack methods are executed.
+    // Method is specific to the PSK_SERVER_Bruteforcer attack. Provide different option to the user
+    // to select. Based on the selected option different attack methods are executed.
     private void select_attack_method(ConsoleInteractor consoleInteractor) {
         CONSOLE.info("What type of attack method do you prefer:");
         CONSOLE.info("A: BRUTEFORCER    B: WORDLIST");
@@ -228,13 +222,12 @@ public class PskBruteForcerPcapFileHandler {
                 }
 
             } else {
-                CONSOLE.info("U have selected Default file: Started executing attack based on default wordlist");
+                CONSOLE.info("You have selected Default file option: Started executing attack based on default wordlist");
             }
         } else {
 
-            CONSOLE.info("U have selected Bruteforce");
-            CONSOLE.info("Using INCREMENTAL Approach ...............");
-            CONSOLE.info(".............");
+            CONSOLE.info("You have selected Bruteforce option.");
+            CONSOLE.info("Starting INCREMENTAL Approach");
             pskBruteForcerAttackServerCommandConfig.setGuessProviderType(GuessProviderType.INCREMENTING);
             CONSOLE.info(pskBruteForcerAttackServerCommandConfig.getGuessProviderType());
             pskBruteForcerAttackServerCommandConfig.setGuessProviderInputFile(null);
@@ -243,7 +236,7 @@ public class PskBruteForcerPcapFileHandler {
 
     }
 
-    //Method to filter out the tls_rsa server from the filtered server which are vulnarable to PSK_Bruteforcer attack
+    // Method to filter out the tls_rsa server from the filtered server which are vulnarable to PSK_Bruteforcer attack
 
     private List<PcapSession> FindTlsserver(List<PcapSession> sessions) {
         List<PcapSession> filteredRsaServers = new ArrayList<>();

@@ -99,12 +99,25 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         boolean supportsPsk = getSupportedPskCipherSuite() != null;
         if (supportsPsk) {
             CONSOLE.info("Maybe vulnerable - server supports PSK");
-            return null;
+            return true;
         } else {
             CONSOLE.info("Not Vulnerable - server does not support PSK");
             return false;
         }
     }
+//    ##########################    OLDER IMPLEMENTATION    #########
+//    public Boolean isVulnerable() {
+//        CONSOLE.info("Connecting to the Server...");
+//        boolean supportsPsk = getSupportedPskCipherSuite() != null;
+//        if (supportsPsk) {
+//            CONSOLE.info("Maybe vulnerable - server supports PSK");
+//            return null;
+//        } else {
+//            CONSOLE.info("Not Vulnerable - server does not support PSK");
+//            return false;
+//        }
+//    }
+//    ############################################################
 
     private CipherSuite getSupportedPskCipherSuite() {
         Config tlsConfig = getTlsConfig();
