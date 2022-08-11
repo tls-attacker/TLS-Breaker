@@ -56,7 +56,7 @@ public class PskBruteForcerPcapFileHandler {
             if (!uniqueServers.isEmpty()) {
                 CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
                 ConsoleInteractor consoleInteractor = new ConsoleInteractor();
-                consoleInteractor.displayServers(uniqueServers);
+                consoleInteractor.displayServers(uniqueServers, serverSessionsMap);
                 String userOption = consoleInteractor.getValidUserSelection(uniqueServers);
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
