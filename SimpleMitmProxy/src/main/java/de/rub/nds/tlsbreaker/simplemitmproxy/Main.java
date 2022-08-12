@@ -43,8 +43,8 @@ import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig
 import de.rub.nds.tlsbreaker.simplemitmproxy.impl.CertificateGenerator;
 import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
 
-
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 /**
  *
  */
@@ -54,7 +54,7 @@ public class Main {
 
     /**
      *
-     * @param args
+     * @param  args
      * @throws FileNotFoundException
      */
     public static void main(String[] args) throws FileNotFoundException {
@@ -74,15 +74,16 @@ public class Main {
             return;
         }
 
-        if(simpleMITMProxy.getDelegate(CertificateDelegate.class).getCertificate() == null){
+        if (simpleMITMProxy.getDelegate(CertificateDelegate.class).getCertificate() == null) {
             Scanner sc = new Scanner(System.in);
 
-            CONSOLE.info("No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes, Enter - Continue)");
+            CONSOLE.info(
+                "No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes, Enter - Continue)");
             String userInput = trim(sc.nextLine());
 
             if ("Y".equals(userInput) || "y".equals(userInput)) {
-                //Generate certificate
-                KeyPairGenerator keyPairGenerator=null;
+                // Generate certificate
+                KeyPairGenerator keyPairGenerator = null;
                 try {
                     keyPairGenerator = KeyPairGenerator.getInstance("RSA");
                 } catch (NoSuchAlgorithmException e1) {
@@ -95,18 +96,17 @@ public class Main {
                 X509Certificate cert = null;
 
                 try {
-                     cert = CertificateGenerator.generate(keyPair, "SHA256withRSA", "localhost", 730);
+                    cert = CertificateGenerator.generate(keyPair, "SHA256withRSA", "localhost", 730);
                 } catch (OperatorCreationException | CertificateException | CertIOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
-
                 Base64 encoder = new Base64();
                 String cert_begin = "-----BEGIN CERTIFICATE-----\n";
                 String end_cert = "\n-----END CERTIFICATE-----";
-               
-                byte[] derCert=null;
+
+                byte[] derCert = null;
                 try {
                     derCert = cert.getEncoded();
                 } catch (CertificateEncodingException e) {
@@ -123,7 +123,6 @@ public class Main {
                 PrivateKey prv = keyPair.getPrivate();
                 byte[] prvBytes = prv.getEncoded();
 
-
                 String key_begin = "-----BEGIN PRIVATE KEY-----\n";
                 String key_end = "\n-----END PRIVATE KEY-----";
                 String privateKeyEncoded = new String(encoder.encode(prvBytes));
@@ -132,17 +131,14 @@ public class Main {
                 try (PrintStream out = new PrintStream(new FileOutputStream("self_signed_key.pem"))) {
                     out.print(privateKey);
                 }
-                
+
                 simpleMITMProxy.getDelegate(CertificateDelegate.class).setCertificate("self_signed_cert.pem");
                 simpleMITMProxy.getDelegate(CertificateDelegate.class).setKey("self_signed_key.pem");
 
-                
-            } 
-            else {
+            } else {
                 CONSOLE.info("Continuing without a certificate!");
             }
-        }
-        else{
+        } else {
             // System.out.println("The certificate is given");
         }
 

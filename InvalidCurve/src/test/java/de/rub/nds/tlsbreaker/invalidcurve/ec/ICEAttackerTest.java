@@ -9,37 +9,30 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.ec;
 
-import de.rub.nds.tlsbreaker.invalidcurve.ec.oracles.TestECOracle;
-import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import de.rub.nds.tlsattacker.util.tests.SlowTests;
-import java.math.BigInteger;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.rub.nds.tlsattacker.core.constants.NamedGroup;
+import de.rub.nds.tlsattacker.util.tests.TestCategories;
+import de.rub.nds.tlsbreaker.invalidcurve.ec.oracles.TestECOracle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- *
- */
+import java.math.BigInteger;
+
 public class ICEAttackerTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     *
-     */
-    public ICEAttackerTest() {
-    }
-
-    /**
      * Test of attack method, of class ICEAttacker.
      */
-    @Test()
-    @Category(SlowTests.class)
+    @Test
+    @Tag(TestCategories.SLOW_TEST)
+    @Disabled("To be fixed")
     public void testAttack() {
         CONSOLE.info("Starting ICEAttacker test... this may take some time");
         TestECOracle oracle = new TestECOracle(NamedGroup.SECP256R1);

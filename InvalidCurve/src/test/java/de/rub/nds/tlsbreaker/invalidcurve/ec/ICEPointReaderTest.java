@@ -9,15 +9,13 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.ec;
 
-import de.rub.nds.tlsattacker.core.constants.NamedGroup;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- *
- *
- */
+import de.rub.nds.tlsattacker.core.constants.NamedGroup;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 public class ICEPointReaderTest {
 
     /**

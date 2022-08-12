@@ -23,7 +23,7 @@ import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import java.util.LinkedList;
 import java.util.List;
 
-/** 
+/**
  *
  */
 public class PoodleAttacker extends Attacker<PoodleCommandConfig> {

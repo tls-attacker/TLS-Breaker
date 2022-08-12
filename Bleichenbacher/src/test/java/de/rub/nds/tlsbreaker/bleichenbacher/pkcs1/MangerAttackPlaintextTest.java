@@ -10,9 +10,18 @@
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.StdPlainPkcs1Oracle;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.TestPkcs1Oracle;
+import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import javax.crypto.Cipher;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -21,33 +30,20 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import javax.crypto.Cipher;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-/**
- *
- *
- */
 public class MangerAttackPlaintextTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int PREMASTER_SECRET_LENGTH = 48;
 
-    /**
-     *
-     * @throws Exception
-     */
+    @BeforeAll
+    public static void setUpClass() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     @Test
     public void testMangerAttack() throws Exception {
-
-        Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.genKeyPair();
@@ -73,8 +69,8 @@ public class MangerAttackPlaintextTest {
         attacker.attack();
         BigInteger solution = attacker.getSolution();
 
-        Assert.assertArrayEquals("The computed solution for Manger attack must be equal to the original message",
-            message, solution.toByteArray());
+        Assertions.assertArrayEquals(message, solution.toByteArray(),
+            "The computed solution for Manger attack must be equal to the original message");
 
         // test with a message not starting with 0x00
         message = ArrayConverter.concatenate(new byte[] { 1 }, message);
@@ -83,19 +79,13 @@ public class MangerAttackPlaintextTest {
         attacker.attack();
         solution = attacker.getSolution();
 
-        Assert.assertArrayEquals("The computed solution for Manger attack must be equal to the original message",
-            message, solution.toByteArray());
+        Assertions.assertArrayEquals(message, solution.toByteArray(),
+            "The computed solution for Manger attack must be equal to the original message");
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Test
-    @Ignore
+    @Disabled("Manual execution only, may take up to a few minutes to complete")
     public void testMangerAttackPerformance() throws Exception {
-
-        Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(4096);
         KeyPair keyPair = keyPairGenerator.genKeyPair();
@@ -124,8 +114,8 @@ public class MangerAttackPlaintextTest {
             attacker.attack();
             BigInteger solution = attacker.getSolution();
 
-            Assert.assertArrayEquals("The computed solution for Manger attack must be equal to the original message",
-                message, solution.toByteArray());
+            Assertions.assertArrayEquals(message, solution.toByteArray(),
+                "The computed solution for Manger attack must be equal to the original message");
 
             queries.add(oracle.getNumberOfQueries());
         }

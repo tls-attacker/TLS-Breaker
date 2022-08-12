@@ -9,27 +9,9 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- *
- */
 public class IncrementingGuessProviderTest {
-
-    /**
-     *
-     */
-    public IncrementingGuessProviderTest() {
-    }
-
-    /**
-     *
-     */
-    @Before
-    public void setUp() {
-    }
 
     /**
      * Test of getGuess method, of class IncrementingGuessProvider.

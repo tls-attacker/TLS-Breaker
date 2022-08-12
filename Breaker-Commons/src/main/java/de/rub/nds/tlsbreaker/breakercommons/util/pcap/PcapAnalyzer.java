@@ -93,9 +93,9 @@ public class PcapAnalyzer {
     }
 
     /**
-     * Get a list PcapSessions that are extracted from the PcapFie
+     * Get a list PcapSessions that are extracted from the PcapFile.
      *
-     * @see PcapSesession.java for the definition of a session.
+     * @see PcapSession
      */
     public List<PcapSession> getAllSessions() {
 
