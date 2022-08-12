@@ -12,8 +12,8 @@ package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.util.tests.TestCategories;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,7 +67,7 @@ public class PcapAnalyzerTest {
         int i = 0;
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
-            String pmsHex = new String(Hex.encodeHex(pms));
+            String pmsHex = ArrayConverter.bytesToRawHexString(pms).toLowerCase();
 
             assertTrue(i < expectedPmsValues.size(),
                 "Trying to extract more encrypted PMS values then present in the PCAP file");

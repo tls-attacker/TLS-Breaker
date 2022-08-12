@@ -13,9 +13,8 @@ import java.io.EOFException;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
-import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.codec.binary.Hex;
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
@@ -61,8 +60,8 @@ public class ExtractPmsData {
 
                     byte[] pms_data = Arrays.copyOfRange(packet_hex_stream, 77, 205);
 
-                    LOGGER.info(Hex.encodeHex(pms_data));
-                    return new String(Hex.encodeHex(pms_data));
+                    LOGGER.info(ArrayConverter.bytesToHexString(pms_data));
+                    return ArrayConverter.bytesToRawHexString(pms_data).toLowerCase();
                 }
 
 //                System.out.println(packet);

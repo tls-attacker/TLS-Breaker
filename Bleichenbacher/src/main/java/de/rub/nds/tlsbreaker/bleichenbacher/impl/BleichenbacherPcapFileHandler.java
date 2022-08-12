@@ -9,6 +9,7 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
 import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
@@ -17,7 +18,6 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -230,7 +230,7 @@ public class BleichenbacherPcapFileHandler {
     private String getPreMasterSecret(PcapSession session) {
         String preMasterSecret = null;
         byte[] pms = session.getPreMasterSecret();
-        preMasterSecret = new String(Hex.encodeHex(pms));
+        preMasterSecret = ArrayConverter.bytesToRawHexString(pms).toLowerCase();
         return preMasterSecret;
     }
 
