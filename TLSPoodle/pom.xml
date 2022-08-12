@@ -21,7 +21,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>${name}</finalName>
+		<finalName>${project.name}</finalName>
 		<plugins>
 			<!--################## clean lifecycle plugins ##################-->
 			<plugin>
