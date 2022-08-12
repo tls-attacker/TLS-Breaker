@@ -9,8 +9,8 @@
 		<version>1.0.0</version>
 	</parent>
 
-	<name>Poodle</name>
-	<artifactId>poodle</artifactId>
+	<name>Server-PSK-Bruteforcer</name>
+	<artifactId>server-psk-bruteforcer</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -55,7 +55,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>de.rub.nds.tlsbreaker.poodle.Main</mainClass>
+							<mainClass>de.rub.nds.tlsbreaker.serverpskbruteforce.Main</mainClass>
 							<useUniqueVersions>false</useUniqueVersions>
 						</manifest>
 					</archive>

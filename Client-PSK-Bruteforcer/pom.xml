@@ -4,22 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>de.rub.nds.tlsbreaker</groupId>
+      <groupId>de.rub.nds.tlsbreaker</groupId>
         <artifactId>tls-breaker</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <name>EarlyFinished</name>
-    <artifactId>early-finished</artifactId>
+    <name>Client-PSK-Bruteforcer</name>
+    <artifactId>client-psk-bruteforcer</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <!-- scope: compile -->
-		<dependency>
+        <dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>breaker-commons</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
+        </dependency>
     </dependencies>
 
     <build>
@@ -55,7 +55,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>de.rub.nds.tlsbreaker.earlyfinished.Main</mainClass>
+                            <mainClass>de.rub.nds.tlsbreaker.clientpskbruteforcer.Main</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>

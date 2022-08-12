@@ -194,7 +194,7 @@ public class ResponseFingerprint {
     /**
      * Overrides the built-in hashCode() function. toString().hashCode() assures same hashes for responses with
      * essentially the same content but differences in their record bytes.
-     * 
+     *
      * @return The hash of the string representation
      */
     @Override
@@ -204,7 +204,7 @@ public class ResponseFingerprint {
 
     /**
      * Returns whether two ResponseFingerprints are equal using the {@link FingerPrintChecker}.
-     * 
+     *
      * @param  obj
      *             ResponseFingerprint to compare this one to
      * @return     True, if both ResponseFingerprints are equal
