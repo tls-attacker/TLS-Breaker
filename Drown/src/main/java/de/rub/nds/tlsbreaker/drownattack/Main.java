@@ -9,6 +9,8 @@
 
 package de.rub.nds.tlsbreaker.drownattack;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.JCommander.Builder;
 import com.beust.jcommander.ParameterException;
@@ -27,8 +29,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  *

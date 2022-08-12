@@ -9,19 +9,19 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.task;
 
-import de.rub.nds.tlsbreaker.breakercommons.cca.CcaCertificateManager;
-import de.rub.nds.tlsbreaker.breakercommons.cca.CcaWorkflowGenerator;
-import de.rub.nds.tlsbreaker.breakercommons.cca.vector.CcaVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.DefaultWorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
-import java.io.IOException;
-
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaCertificateManager;
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaWorkflowGenerator;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.CcaVector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class CcaTask extends TlsTask {
 

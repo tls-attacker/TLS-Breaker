@@ -9,8 +9,6 @@
 
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
-import de.rub.nds.tlsbreaker.drownattack.config.GeneralDrownCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
@@ -29,10 +27,12 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
-import java.util.List;
-
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.drownattack.config.GeneralDrownCommandConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 public class GeneralDrownAttacker extends BaseDrownAttacker {
 

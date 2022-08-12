@@ -9,13 +9,13 @@
 
 package de.rub.nds.tlsbreaker.attacks.impl;
 
-import de.rub.nds.tlsbreaker.attacks.config.SimpleMitmProxyCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.attacks.config.SimpleMitmProxyCommandConfig;
 
 /**
  *

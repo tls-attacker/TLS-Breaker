@@ -9,6 +9,9 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.impl;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
@@ -20,9 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
 
 public class InvalidCurvePcapFileHandler {
 

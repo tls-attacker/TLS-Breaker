@@ -14,10 +14,6 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.modifiablevariable.util.Modifiable;
-import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
-import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
-import de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles.ExtraClearDrownOracle;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.Bits;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -34,18 +30,18 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
+import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
+import de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles.ExtraClearDrownOracle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.concurrent.*;
 
 class ExtraClearAttack {
 

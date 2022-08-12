@@ -9,24 +9,20 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.response;
 
-import java.io.EOFException;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeoutException;
-
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
-
 import org.pcap4j.packet.Packet;
-
 import org.pcap4j.packet.TcpPacket;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+
+import java.io.EOFException;
+import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings("javadoc")
 public class ExtractPmsData {

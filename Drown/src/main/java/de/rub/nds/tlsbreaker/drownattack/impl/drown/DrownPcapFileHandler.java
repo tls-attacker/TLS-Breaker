@@ -9,6 +9,9 @@
 
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
@@ -25,9 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
 
 public class DrownPcapFileHandler {
 

@@ -9,8 +9,8 @@
 
 package de.rub.nds.tlsbreaker.attacks.impl;
 
-import de.rub.nds.tlsbreaker.attacks.pkcs1.Pkcs1Vector;
 import de.rub.nds.tlsattacker.core.state.State;
+import de.rub.nds.tlsbreaker.attacks.pkcs1.Pkcs1Vector;
 
 /**
  *

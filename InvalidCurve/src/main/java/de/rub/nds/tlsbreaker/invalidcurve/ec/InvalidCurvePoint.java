@@ -12,6 +12,7 @@
 package de.rub.nds.tlsbreaker.invalidcurve.ec;
 
 import de.rub.nds.tlsattacker.core.constants.NamedGroup;
+
 import java.math.BigInteger;
 
 /**

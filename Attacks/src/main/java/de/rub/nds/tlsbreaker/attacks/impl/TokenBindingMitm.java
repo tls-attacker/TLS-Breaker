@@ -9,7 +9,6 @@
 
 package de.rub.nds.tlsbreaker.attacks.impl;
 
-import de.rub.nds.tlsbreaker.attacks.config.TokenBindingMitmCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.ExtensionType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
@@ -21,6 +20,7 @@ import de.rub.nds.tlsattacker.core.workflow.action.RemBufferedChExtensionsAction
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.attacks.config.TokenBindingMitmCommandConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

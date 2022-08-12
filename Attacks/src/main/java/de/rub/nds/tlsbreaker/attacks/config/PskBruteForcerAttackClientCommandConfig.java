@@ -11,13 +11,13 @@ package de.rub.nds.tlsbreaker.attacks.config;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import de.rub.nds.tlsbreaker.attacks.bruteforce.GuessProviderType;
-import de.rub.nds.tlsbreaker.attacks.config.delegate.AttackDelegate;
-import de.rub.nds.tlsbreaker.attacks.exception.WordlistNotFoundException;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ServerDelegate;
+import de.rub.nds.tlsbreaker.attacks.bruteforce.GuessProviderType;
+import de.rub.nds.tlsbreaker.attacks.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.attacks.exception.WordlistNotFoundException;
 
 import java.io.File;
 import java.io.FileInputStream;

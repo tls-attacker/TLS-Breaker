@@ -9,13 +9,14 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  * A GuessProvider based on a WordList. It reads bytes from the input stream until a newline character is found. If the

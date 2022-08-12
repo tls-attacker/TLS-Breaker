@@ -11,9 +11,9 @@ package de.rub.nds.tlsbreaker.attacks.padding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

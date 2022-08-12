@@ -9,8 +9,6 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.padding;
 
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.AlertDescription;
 import de.rub.nds.tlsattacker.core.constants.AlertLevel;
@@ -24,6 +22,8 @@ import de.rub.nds.tlsattacker.core.workflow.action.GenericReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
+import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
 
 import java.util.LinkedList;
 

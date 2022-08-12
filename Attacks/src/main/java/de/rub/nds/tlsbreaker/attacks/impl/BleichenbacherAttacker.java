@@ -12,6 +12,15 @@ package de.rub.nds.tlsbreaker.attacks.impl;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.constants.Bits;
+import de.rub.nds.tlsattacker.core.constants.CipherSuite;
+import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
+import de.rub.nds.tlsattacker.core.state.State;
+import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
+import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
+import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
 import de.rub.nds.tlsbreaker.attacks.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsbreaker.attacks.exception.AttackFailedException;
 import de.rub.nds.tlsbreaker.attacks.exception.OracleUnstableException;
@@ -27,23 +36,14 @@ import de.rub.nds.tlsbreaker.attacks.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.attacks.util.response.EqualityErrorTranslator;
 import de.rub.nds.tlsbreaker.attacks.util.response.FingerPrintChecker;
 import de.rub.nds.tlsbreaker.attacks.util.response.ResponseFingerprint;
-import de.rub.nds.tlsattacker.core.config.Config;
-import de.rub.nds.tlsattacker.core.constants.Bits;
-import de.rub.nds.tlsattacker.core.constants.CipherSuite;
-import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
-import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
-import de.rub.nds.tlsattacker.core.state.State;
-import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
-import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
-import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Sends differently formatted PKCS#1 messages to the TLS server and observes the server responses. In case there are

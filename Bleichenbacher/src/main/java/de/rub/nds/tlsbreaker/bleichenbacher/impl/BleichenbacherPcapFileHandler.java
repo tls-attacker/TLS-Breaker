@@ -9,6 +9,9 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
@@ -24,9 +27,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
 
 public class BleichenbacherPcapFileHandler {
 

@@ -11,9 +11,9 @@ package de.rub.nds.tlsbreaker.breakercommons.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
+import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.connectivity.ConnectivityChecker;
-import de.rub.nds.tlsattacker.core.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

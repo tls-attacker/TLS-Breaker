@@ -9,10 +9,10 @@
 
 package de.rub.nds.tlsbreaker.earlyccs.cca.vector;
 
-import de.rub.nds.tlsbreaker.earlyccs.cca.CcaCertificateType;
-import de.rub.nds.tlsbreaker.earlyccs.cca.CcaWorkflowType;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.earlyccs.cca.CcaCertificateType;
+import de.rub.nds.tlsbreaker.earlyccs.cca.CcaWorkflowType;
 
 /**
  *

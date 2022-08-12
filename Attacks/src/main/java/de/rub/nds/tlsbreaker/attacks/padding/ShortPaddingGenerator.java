@@ -14,12 +14,12 @@ import de.rub.nds.modifiablevariable.bytearray.ByteArrayExplicitValueModificatio
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayXorModification;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
-import de.rub.nds.tlsbreaker.attacks.padding.vector.PlainPaddingVector;
-import de.rub.nds.tlsbreaker.attacks.padding.vector.TripleVector;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
+import de.rub.nds.tlsbreaker.attacks.padding.vector.PlainPaddingVector;
+import de.rub.nds.tlsbreaker.attacks.padding.vector.TripleVector;
 
 import java.util.LinkedList;
 import java.util.List;

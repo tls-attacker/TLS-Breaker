@@ -9,10 +9,10 @@
 
 package de.rub.nds.tlsbreaker.attacks.padding.vector;
 
-import de.rub.nds.tlsbreaker.attacks.general.Vector;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.Record;
+import de.rub.nds.tlsbreaker.attacks.general.Vector;
 
 /**
  *

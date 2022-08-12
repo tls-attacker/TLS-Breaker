@@ -9,12 +9,6 @@
 
 package de.rub.nds.tlsbreaker.attacks.pkcs1.oracles;
 
-import de.rub.nds.tlsbreaker.attacks.pkcs1.BleichenbacherWorkflowGenerator;
-import de.rub.nds.tlsbreaker.attacks.pkcs1.BleichenbacherWorkflowType;
-import de.rub.nds.tlsbreaker.attacks.util.response.EqualityError;
-import de.rub.nds.tlsbreaker.attacks.util.response.FingerPrintChecker;
-import de.rub.nds.tlsbreaker.attacks.util.response.ResponseExtractor;
-import de.rub.nds.tlsbreaker.attacks.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.Bits;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
@@ -23,12 +17,18 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.util.MathHelper;
+import de.rub.nds.tlsbreaker.attacks.pkcs1.BleichenbacherWorkflowGenerator;
+import de.rub.nds.tlsbreaker.attacks.pkcs1.BleichenbacherWorkflowType;
+import de.rub.nds.tlsbreaker.attacks.util.response.EqualityError;
+import de.rub.nds.tlsbreaker.attacks.util.response.FingerPrintChecker;
+import de.rub.nds.tlsbreaker.attacks.util.response.ResponseExtractor;
+import de.rub.nds.tlsbreaker.attacks.util.response.ResponseFingerprint;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *

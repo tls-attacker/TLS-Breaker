@@ -9,6 +9,9 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
@@ -22,9 +25,6 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
 
 public class ConsoleInteractor {
     static final String NO_DATA = "-";

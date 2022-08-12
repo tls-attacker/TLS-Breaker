@@ -9,9 +9,10 @@
 
 package de.rub.nds.tlsbreaker.attacks.padding;
 
-import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.attacks.padding.vector.PaddingVector;
+
 import java.util.List;
 
 /**

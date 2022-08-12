@@ -35,17 +35,16 @@ import de.rub.nds.tlsbreaker.breakercommons.padding.vector.FingerprintTaskVector
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Sends differently formatted PKCS#1 messages to the TLS server and observes the server responses. In case there are

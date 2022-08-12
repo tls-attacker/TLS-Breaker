@@ -9,6 +9,14 @@
 
 package de.rub.nds.tlsbreaker.heartbleed.impl;
 
+import static de.rub.nds.modifiablevariable.util.ArrayConverter.bytesToRawHexString;
+import static de.rub.nds.tlsattacker.core.constants.ProtocolMessageType.HEARTBEAT;
+import static de.rub.nds.tlsattacker.core.constants.ProtocolMessageType.UNKNOWN;
+import static de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil.getAllReceivedMessages;
+import static de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils.readHexStringContentFromFile;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.integer.IntegerModificationFactory;
@@ -52,14 +60,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static de.rub.nds.modifiablevariable.util.ArrayConverter.bytesToRawHexString;
-import static de.rub.nds.tlsattacker.core.constants.ProtocolMessageType.HEARTBEAT;
-import static de.rub.nds.tlsattacker.core.constants.ProtocolMessageType.UNKNOWN;
-import static de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil.getAllReceivedMessages;
-import static de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils.readHexStringContentFromFile;
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
 
 /**
  * Executes the Heartbeat attack against a server and logs an error in case the server responds with a valid heartbeat

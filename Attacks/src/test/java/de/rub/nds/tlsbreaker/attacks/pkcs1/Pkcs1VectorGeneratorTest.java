@@ -12,8 +12,8 @@ package de.rub.nds.tlsbreaker.attacks.pkcs1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.rub.nds.tlsbreaker.attacks.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.attacks.config.BleichenbacherCommandConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

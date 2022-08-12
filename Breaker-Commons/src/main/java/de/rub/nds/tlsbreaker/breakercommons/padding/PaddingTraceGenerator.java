@@ -9,10 +9,10 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.padding;
 
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
+import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
+import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
 
 /**
  *

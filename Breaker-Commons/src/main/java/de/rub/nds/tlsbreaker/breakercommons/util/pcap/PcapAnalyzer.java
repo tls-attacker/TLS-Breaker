@@ -17,39 +17,16 @@ import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.exceptions.ParserException;
-import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ECDHClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.PskClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.PskRsaClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.RSAClientKeyExchangeMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
-import de.rub.nds.tlsattacker.core.protocol.parser.ApplicationMessageParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.ClientHelloParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.ClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.DHClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.ECDHClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.HandshakeMessageParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.PskClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.PskDhClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.PskRsaClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.RSAClientKeyExchangeParser;
-import de.rub.nds.tlsattacker.core.protocol.parser.ServerHelloParser;
+import de.rub.nds.tlsattacker.core.protocol.message.*;
+import de.rub.nds.tlsattacker.core.protocol.parser.*;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.layer.TlsRecordLayer;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
-import de.rub.nds.tlsattacker.util.ConsoleLogger;
-
-import org.bouncycastle.crypto.util.CipherFactory;
-import org.pcap4j.core.BpfProgram;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PcapHandle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.pcap4j.core.*;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
@@ -57,18 +34,8 @@ import org.pcap4j.packet.TcpPacket;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
-
-import com.google.common.hash.HashCode;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class PcapAnalyzer {
 

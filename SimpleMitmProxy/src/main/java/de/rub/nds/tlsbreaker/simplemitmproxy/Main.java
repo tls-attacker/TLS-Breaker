@@ -12,6 +12,22 @@ package de.rub.nds.tlsbreaker.simplemitmproxy;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
+import de.rub.nds.tlsattacker.core.config.delegate.CertificateDelegate;
+import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig;
+import de.rub.nds.tlsbreaker.simplemitmproxy.impl.CertificateGenerator;
+import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.encoders.Base64;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -24,26 +40,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
 import java.util.Scanner;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.encoders.Base64;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-
-import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsattacker.core.config.delegate.CertificateDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
-import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig;
-import de.rub.nds.tlsbreaker.simplemitmproxy.impl.CertificateGenerator;
-import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 /**
  *

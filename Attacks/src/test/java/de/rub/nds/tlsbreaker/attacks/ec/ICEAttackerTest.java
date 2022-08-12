@@ -9,19 +9,19 @@
 
 package de.rub.nds.tlsbreaker.attacks.ec;
 
-import de.rub.nds.tlsattacker.util.tests.TestCategories;
-import de.rub.nds.tlsbreaker.attacks.ec.oracles.TestECOracle;
-import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.math.BigInteger;
-
+import de.rub.nds.tlsattacker.core.constants.NamedGroup;
+import de.rub.nds.tlsattacker.util.tests.TestCategories;
+import de.rub.nds.tlsbreaker.attacks.ec.oracles.TestECOracle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 
 public class ICEAttackerTest {
 

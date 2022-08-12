@@ -9,16 +9,16 @@
 
 package de.rub.nds.tlsbreaker.attacks.task;
 
-import de.rub.nds.tlsbreaker.attacks.util.response.ResponseExtractor;
-import de.rub.nds.tlsbreaker.attacks.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
-import java.io.IOException;
-
+import de.rub.nds.tlsbreaker.attacks.util.response.ResponseExtractor;
+import de.rub.nds.tlsbreaker.attacks.util.response.ResponseFingerprint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class FingerPrintTask extends TlsTask {
 

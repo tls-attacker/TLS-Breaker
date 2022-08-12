@@ -10,6 +10,7 @@
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import de.rub.nds.tlsattacker.core.constants.SSL2CipherSuite;
+
 import java.util.concurrent.Callable;
 
 /**

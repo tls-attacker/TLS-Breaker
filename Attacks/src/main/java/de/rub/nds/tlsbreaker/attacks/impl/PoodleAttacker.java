@@ -9,7 +9,6 @@
 
 package de.rub.nds.tlsbreaker.attacks.impl;
 
-import de.rub.nds.tlsbreaker.attacks.config.PoodleCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -18,6 +17,7 @@ import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.DefaultWorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.attacks.config.PoodleCommandConfig;
 
 import java.util.LinkedList;
 import java.util.List;
