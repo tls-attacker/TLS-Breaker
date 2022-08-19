@@ -128,9 +128,9 @@ public class HeartbleedCommandConfig extends AttackConfig {
         config.setAddSignatureAndHashAlgorithmsExtension(true);
         config.setAddPaddingExtension(true);
         config.setQuickReceive(true);
-        config.setStopActionsAfterFatal(true);
+        config.setStopActionsAfterFatal(false);
         config.setStopActionsAfterIOException(true);
-        config.setStopReceivingAfterFatal(true);
+        config.setStopReceivingAfterFatal(false);
         config.setEarlyStop(true);
         boolean containsEc = false;
         for (CipherSuite suite : config.getDefaultClientSupportedCipherSuites()) {
