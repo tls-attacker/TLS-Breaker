@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.heartbleed.impl;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
@@ -76,7 +75,7 @@ public class HeartbleedPcapFileHandler {
                     }
                 }
             } else {
-                CONSOLE.info("\nFound no potential servers for DROWN attack.");
+                CONSOLE.info("\nFound no potential servers for the Heartbleed attack.");
             }
         } else {
             CONSOLE.info("No TLS handshake message found.");
@@ -134,11 +133,7 @@ public class HeartbleedPcapFileHandler {
     private void executeAttack(String host, HeartbleedCommandConfig heartbleedCommandConfig) {
 
         heartbleedCommandConfig.getClientDelegate().setHost(host);
-        // heartbleedCommandConfig.setPremasterSecretsFromPcap(getPreMasterSecrets(serverSessionsMap.get(host)));
         LOGGER.info("host=" + heartbleedCommandConfig.getClientDelegate().getHost());
-        /*
-         * + " and count of encrypted Premaster Secret=" + baseDrownCommandConfig.getPremasterSecretsFromPcap().size());
-         */
 
         Attacker<? extends TLSDelegateConfig> attacker =
             new HeartbleedAttacker(heartbleedCommandConfig, heartbleedCommandConfig.createConfig());
@@ -147,14 +142,6 @@ public class HeartbleedPcapFileHandler {
         } catch (UnsupportedOperationException e) {
             LOGGER.info("The selected attacker is currently not implemented");
         }
-    }
-
-    private List<byte[]> getPreMasterSecrets(List<PcapSession> hostSessions) {
-        List<byte[]> preMasterSecrets = new ArrayList<>();
-        for (PcapSession session : hostSessions) {
-            preMasterSecrets.add(session.getPreMasterSecret());
-        }
-        return preMasterSecrets;
     }
 
     private boolean isCommaSeparatedList(String userOption) {
@@ -180,12 +167,4 @@ public class HeartbleedPcapFileHandler {
         return result;
     }
 
-    /*
-     * private Attacker<? extends TLSDelegateConfig> getAttacker(BaseDrownCommandConfig baseDrownCommandConfig) { if
-     * (baseDrownCommandConfig instanceof GeneralDrownCommandConfig) { GeneralDrownCommandConfig generalDrownConfig =
-     * (GeneralDrownCommandConfig) baseDrownCommandConfig; return new GeneralDrownAttacker(generalDrownConfig,
-     * generalDrownConfig.createConfig()); } else if (baseDrownCommandConfig instanceof SpecialDrownCommandConfig) {
-     * SpecialDrownCommandConfig specialDrownConfig = (SpecialDrownCommandConfig) baseDrownCommandConfig; return new
-     * SpecialDrownAttacker(specialDrownConfig, specialDrownConfig.createConfig()); } else return null; }
-     */
 }
