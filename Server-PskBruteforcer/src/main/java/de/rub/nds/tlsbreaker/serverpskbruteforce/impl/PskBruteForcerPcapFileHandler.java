@@ -184,8 +184,7 @@ public class PskBruteForcerPcapFileHandler {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {
                 CONSOLE.info("Vulnerable:" + result.toString());
-            }
-            else {
+            } else {
                 CONSOLE.warn("Vulnerable: Uncertain");
             }
         } catch (UnsupportedOperationException e) {
@@ -222,7 +221,8 @@ public class PskBruteForcerPcapFileHandler {
                 }
 
             } else {
-                CONSOLE.info("You have selected Default file option: Started executing attack based on default wordlist");
+                CONSOLE
+                    .info("You have selected Default file option: Started executing attack based on default wordlist");
             }
         } else {
 

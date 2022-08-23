@@ -14,6 +14,7 @@ import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsattacker.core.config.delegate.MitmDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -33,12 +34,14 @@ public class PoodleCommandConfig extends AttackConfig {
      *
      */
     public static final String ATTACK_COMMAND = "poodle";
-    @ParametersDelegate
-    private ClientDelegate clientDelegate;
+    // @ParametersDelegate
+    // private ClientDelegate clientDelegate;
     @ParametersDelegate
     private StarttlsDelegate starttlsDelegate;
     @ParametersDelegate
     private CipherSuiteDelegate cipherSuiteDelegate;
+    @ParametersDelegate
+    private MitmDelegate mitmDelegate;
 
     /**
      *
@@ -46,11 +49,11 @@ public class PoodleCommandConfig extends AttackConfig {
      */
     public PoodleCommandConfig(GeneralDelegate delegate) {
         super(delegate);
-        clientDelegate = new ClientDelegate();
         starttlsDelegate = new StarttlsDelegate();
+        mitmDelegate = new MitmDelegate();
         cipherSuiteDelegate = new CipherSuiteDelegate();
-        addDelegate(clientDelegate);
         addDelegate(starttlsDelegate);
+        addDelegate(mitmDelegate);
         addDelegate(cipherSuiteDelegate);
     }
 
@@ -60,7 +63,7 @@ public class PoodleCommandConfig extends AttackConfig {
      */
     @Override
     public boolean isExecuteAttack() {
-        return false;
+        return true;
     }
 
     /**
