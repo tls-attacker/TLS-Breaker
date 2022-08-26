@@ -9,6 +9,7 @@
 
 package de.rub.nds.tlsbreaker.simplemitmproxy.config;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CertificateDelegate;
@@ -41,6 +42,12 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
     @ParametersDelegate
     private CertificateDelegate certificateDelegate;
 
+    @Parameter(names = { "-noCert", "-no_cert" },
+        description = "Use the flag to signal that SimpleMitmProxy should skip the certificate"
+        +"generation process.")
+    private boolean noCert = false;
+
+
     /**
      *
      * @param delegate
@@ -67,6 +74,8 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
         return true;
     }
 
+
+
     /**
      *
      * @return
@@ -77,4 +86,8 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
         return config;
     }
 
+
+    public boolean isNoCert() {
+        return this.noCert;
+    }
 }

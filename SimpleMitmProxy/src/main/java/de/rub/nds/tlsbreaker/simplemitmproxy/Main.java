@@ -69,51 +69,53 @@ public class Main {
             return;
         }
 
-        if (simpleMITMProxy.getDelegate(CertificateDelegate.class).getCertificate() == null) {
-            Scanner sc = new Scanner(System.in);
-
-            CONSOLE.info(
-                "No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes, Enter - Continue)");
-            String userInput = trim(sc.nextLine());
-
-            if ("Y".equals(userInput) || "y".equals(userInput)) {
-                // Generate certificate
-                KeyPairGenerator keyPairGenerator = null;
-                try {
-                    keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-                } catch (NoSuchAlgorithmException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+        if(!simpleMITMProxy.isNoCert()){
+            if (simpleMITMProxy.getDelegate(CertificateDelegate.class).getCertificate() == null) {
+                Scanner sc = new Scanner(System.in);
+    
+                CONSOLE.info(
+                    "No certificate was given! Should we generate a self signed certificate for you? (Y/y - Yes, Enter - Continue)");
+                String userInput = trim(sc.nextLine());
+    
+                if ("Y".equals(userInput) || "y".equals(userInput)) {
+                    // Generate certificate
+                    KeyPairGenerator keyPairGenerator = null;
+                    try {
+                        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+                    } catch (NoSuchAlgorithmException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    keyPairGenerator.initialize(4096);
+                    KeyPair keyPair = keyPairGenerator.generateKeyPair();
+    
+                    X509Certificate cert = null;
+    
+                    try {
+                        cert = CertificateGenerator.generate(keyPair, "SHA256withRSA", "localhost", 730);
+                    } catch (OperatorCreationException | CertificateException | CertIOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+    
+                    DerEncode encoder = new DerEncode();
+    
+                    String certeficateFileName = "self_signed_cert.pem";
+                    encoder.encodeCertificateAndWrite(cert, certeficateFileName);
+    
+                    String keyFileName = "self_signed_key.pem";
+                    encoder.encodePrivateKeyAndWrite(keyPair, keyFileName);
+    
+                    simpleMITMProxy.getDelegate(CertificateDelegate.class).setCertificate(certeficateFileName);
+                    simpleMITMProxy.getDelegate(CertificateDelegate.class).setKey(keyFileName);
+    
+                } else {
+                    CONSOLE.info("Continuing without a certificate!");
                 }
-                keyPairGenerator.initialize(4096);
-                KeyPair keyPair = keyPairGenerator.generateKeyPair();
-
-                X509Certificate cert = null;
-
-                try {
-                    cert = CertificateGenerator.generate(keyPair, "SHA256withRSA", "localhost", 730);
-                } catch (OperatorCreationException | CertificateException | CertIOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                DerEncode encoder = new DerEncode();
-
-                String certeficateFileName = "self_signed_cert.pem";
-                encoder.encodeCertificateAndWrite(cert, certeficateFileName);
-
-                String keyFileName = "self_signed_key.pem";
-                encoder.encodePrivateKeyAndWrite(keyPair, keyFileName);
-
-                simpleMITMProxy.getDelegate(CertificateDelegate.class).setCertificate(certeficateFileName);
-                simpleMITMProxy.getDelegate(CertificateDelegate.class).setKey(keyFileName);
-
-            } else {
-                CONSOLE.info("Continuing without a certificate!");
             }
-        } else {
-            // System.out.println("The certificate is given");
         }
+
+         
 
         Attacker<? extends TLSDelegateConfig> attacker =
             new SimpleMitmProxy(simpleMITMProxy, simpleMITMProxy.createConfig());
