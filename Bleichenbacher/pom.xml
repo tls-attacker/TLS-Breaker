@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>de.rub.nds.tlsbreaker</groupId>
 		<artifactId>TLS-Breaker</artifactId>
-		<version>1.0.0</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>Bleichenbacher</artifactId>
 	<packaging>jar</packaging>
@@ -14,23 +14,23 @@
 		<dependency>
 			<groupId>de.rub.nds.tlsattacker</groupId>
 			<artifactId>TLS-Core</artifactId>
-			<version>3.9.0-SNAPSHOT</version>
+			<version>${TLS-Attacker.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.rub.nds.tlsbreaker</groupId>
 			<artifactId>Breaker-Commons</artifactId>
-			<version>1.0.0</version>
+			<version>${revision}</version>
 		</dependency>
 		<!-- Pcap4j dependencies-->
 		<dependency>
 			<groupId>org.pcap4j</groupId>
 			<artifactId>pcap4j-core</artifactId>
-			<version>1.8.2</version>
+			<version>${pcap4j-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pcap4j</groupId>
 			<artifactId>pcap4j-packetfactory-static</artifactId>
-			<version>1.8.2</version>
+			<version>${pcap4j-core.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

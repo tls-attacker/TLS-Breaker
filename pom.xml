@@ -3,7 +3,7 @@
         <modelVersion>4.0.0</modelVersion>
     <groupId>de.rub.nds.tlsbreaker</groupId>
     <artifactId>TLS-Breaker</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <inceptionYear>2021</inceptionYear>
     <name>TLS-Breaker</name>
@@ -419,6 +419,10 @@
         <skip.signature>true</skip.signature>
         <jmockit.version>1.49</jmockit.version>
         <slowTests>de.rub.nds.tlsattacker.util.tests.SlowTests,de.rub.nds.tlsattacker.util.tests.IntegrationTests</slowTests>
+        <TLS-Attacker.version>3.9.0-SNAPSHOT</TLS-Attacker.version>
+        <pcap4j-core.version>1.8.2</pcap4j-core.version>
+<!--        TLS-Breaker version-->
+        <revision>1.0.0</revision>
     </properties>
 
 </project>
