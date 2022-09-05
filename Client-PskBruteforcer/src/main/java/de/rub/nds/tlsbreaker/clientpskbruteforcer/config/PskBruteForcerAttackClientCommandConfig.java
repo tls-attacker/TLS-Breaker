@@ -19,13 +19,18 @@ import de.rub.nds.tlsbreaker.breakercommons.exception.WordlistNotFoundException;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.ServerDelegate;
-
+//import de.rub.nds.tlsattacker.core.config.delegate.ServerDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ServerDelegate;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+//#####
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
+
+//#######
 /**
  *
  */
@@ -48,6 +53,10 @@ public class PskBruteForcerAttackClientCommandConfig extends AttackConfig {
     @Parameter(names = { "-guessProviderInputFile", "-guess_provider_input_file" },
         description = "Set the path to an input file which can be used in the guess provider eg. a path to a wordlist")
     private String guessProviderInputFile = null;
+
+    @Parameter(names = "-pcap",
+        description = "Location of the pcap file that will be used for the Invalid Curve Attack.")
+    private String pcapFileLocation;
 
     /**
      *
@@ -123,6 +132,20 @@ public class PskBruteForcerAttackClientCommandConfig extends AttackConfig {
         return guessProviderType;
     }
 
+    public String getPcapFileLocation() {
+        return pcapFileLocation;
+    }
+
+    public ServerDelegate getServerDelegate() {
+        return serverDelegate;
+    }
+
+    @Override
+
+    public void setSkipConnectionCheck(boolean skipConnectionCheck) {
+        super.setSkipConnectionCheck(skipConnectionCheck);
+    }
+
     /**
      *
      * @param guessProviderType
@@ -130,4 +153,9 @@ public class PskBruteForcerAttackClientCommandConfig extends AttackConfig {
     public void setGuessProviderType(GuessProviderType guessProviderType) {
         this.guessProviderType = guessProviderType;
     }
+
+    public void setGuessProviderInputFile(String guessProviderInputFile) {
+        this.guessProviderInputFile = guessProviderInputFile;
+    }
+
 }
