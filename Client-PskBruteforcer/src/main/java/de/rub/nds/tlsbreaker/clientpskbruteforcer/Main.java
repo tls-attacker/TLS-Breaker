@@ -15,8 +15,13 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerAttackClient;
+//import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerPcapFileHandler;
+//####
+import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerClientPcapFileHandler;
+//####
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +57,28 @@ public class Main {
             return;
         }
 
+//        ##################
+        if (pskBruteForcerAttackClientTest.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(pskBruteForcerAttackClientTest.getPcapFileLocation())) {
+                try {
+                    CONSOLE.info("Pcap file location = " + pskBruteForcerAttackClientTest.getPcapFileLocation());
+                    PskBruteForcerClientPcapFileHandler pcapFileHandler =
+                        new PskBruteForcerClientPcapFileHandler(pskBruteForcerAttackClientTest);
+                    pcapFileHandler.handlePcapFile();
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error("Invalid option selected! Please run the jar file again.");
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+            }
+        } else {
+            checkVulnerabilityOrExecuteAttack(pskBruteForcerAttackClientTest);
+        }
+        System.exit(0);
+    }
+
+    private static void
+        checkVulnerabilityOrExecuteAttack(PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientTest) {
         Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
             pskBruteForcerAttackClientTest.createConfig());
 
@@ -72,4 +99,25 @@ public class Main {
             }
         }
     }
+//        ##################
+//        Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
+//            pskBruteForcerAttackClientTest.createConfig());
+//
+//        if (attacker.getConfig().isExecuteAttack()) {
+//            attacker.attack();
+//        } else {
+//            try {
+//                Boolean result = attacker.checkVulnerability();
+//                if (Objects.equals(result, Boolean.TRUE)) {
+//                    CONSOLE.error("Vulnerable:" + result.toString());
+//                } else if (Objects.equals(result, Boolean.FALSE)) {
+//                    CONSOLE.info("Vulnerable:" + result.toString());
+//                } else {
+//                    CONSOLE.warn("Vulnerable: Uncertain");
+//                }
+//            } catch (UnsupportedOperationException e) {
+//                LOGGER.info("The selected attacker is currently not implemented");
+//            }
+//        }
+//    }
 }
