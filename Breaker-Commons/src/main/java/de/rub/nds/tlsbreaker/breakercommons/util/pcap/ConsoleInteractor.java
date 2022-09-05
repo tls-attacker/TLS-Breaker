@@ -255,6 +255,18 @@ public class ConsoleInteractor {
         }
     }
 
+    public String getValidUserSelectionForPSK(List<String> uniqueServers) {
+        if (uniqueServers.size() == 1) {
+            CONSOLE.info("Do you want to check the vulnerability of the server? (y/n):");
+            return getUserDecisionForOneServer();
+        } else {
+            CONSOLE.info("Please select server numbers to check for vulnerability ");
+            CONSOLE.info("Make Sure Client is Active");
+            CONSOLE.info("Select Option: ");
+            return getUserInputForMultipleServers(uniqueServers);
+        }
+    }
+
     public int getUserSelectedServer(List<String> uniqueServers) {
         Scanner sc = new Scanner(System.in);
         try {
@@ -299,5 +311,41 @@ public class ConsoleInteractor {
         Scanner sc = new Scanner(System.in);
         String userInputfile = trim(sc.nextLine());
         return userInputfile;
+    }
+
+    public void displayClients(List<String> uniqueServers) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Client Number", "Client Address");
+        table.addRule();
+        String previous_host = " ";
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+
+            String clientAddress = uniqueServers.get(i);
+            AT_Row row = table.addRow(i + 1, clientAddress);
+            row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
+    }
+
+
+    public void displayClientWithServers(List<String> uniqueServers, List<String> uniqueClient) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Serial Number", "Client Address", "Host Address");
+        table.addRule();
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+            String hostAddress = uniqueServers.get(i);
+            String sourceAddress = uniqueClient.get(i);
+            AT_Row row = table.addRow(i + 1, sourceAddress, hostAddress);
+            row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
     }
 }
