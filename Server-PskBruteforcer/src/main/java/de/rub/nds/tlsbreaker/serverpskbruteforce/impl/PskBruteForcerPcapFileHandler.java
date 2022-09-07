@@ -9,14 +9,7 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsattacker.core.constants.CipherSuite;
-import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
-import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
@@ -27,7 +20,6 @@ import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProviderType;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.stringtemplate.v4.ST;
 
 import java.util.*;
 
@@ -234,21 +226,6 @@ public class PskBruteForcerPcapFileHandler {
 
         }
 
-    }
-
-    // Method to filter out the tls_rsa server from the filtered server which are vulnarable to PSK_Bruteforcer attack
-
-    private List<PcapSession> FindTlsserver(List<PcapSession> sessions) {
-        List<PcapSession> filteredRsaServers = new ArrayList<>();
-        for (PcapSession s : sessions) {
-            ServerHelloMessage shm = s.getServerHellomessage();
-            ProtocolVersion selectedProtocol = ProtocolVersion.getProtocolVersion(shm.getProtocolVersion().getValue());
-            CipherSuite selectedCipher = CipherSuite.getCipherSuite(shm.getSelectedCipherSuite().getValue());
-            if ((selectedCipher.name().contains("TLS_RSA_PSK_")) && !selectedProtocol.name().contains("TLS13")) {
-                filteredRsaServers.add(s);
-            }
-        }
-        return filteredRsaServers;
     }
 
 }

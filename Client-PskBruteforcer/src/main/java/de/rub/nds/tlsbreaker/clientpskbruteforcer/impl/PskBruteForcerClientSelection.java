@@ -33,7 +33,6 @@ public class PskBruteForcerClientSelection extends ClientSelection {
     @Override
     protected List<PcapSession> filterClient(List<PcapSession> sessions) {
         List<PcapSession> filteredClients = new ArrayList<>();
-        // List<PcapSession> newfilteredServers = new ArrayList<>();
         for (PcapSession s : sessions) {
             ServerHelloMessage shm = s.getServerHellomessage();
             ProtocolVersion selectedProtocol = ProtocolVersion.getProtocolVersion(shm.getProtocolVersion().getValue());
@@ -46,18 +45,6 @@ public class PskBruteForcerClientSelection extends ClientSelection {
 
         }
         return filteredClients;
-//        final String[] previous_host = { " " };
-//        filteredServers.forEach(pcapSession -> {
-//            String sourceHost = pcapSession.getSourceHost();
-//
-//            String[] parts = sourceHost.split(":");
-//            String portless_hostaddress = parts[0];
-//            if (previous_host[0].equals(portless_hostaddress)) {
-//                return;
-//            }
-//            previous_host[0] = portless_hostaddress;
-//            newfilteredServers.add(pcapSession);
-//        });
 
     }
 }

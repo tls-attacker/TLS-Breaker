@@ -19,7 +19,6 @@ import de.rub.nds.tlsbreaker.breakercommons.exception.WordlistNotFoundException;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-//import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -188,7 +187,6 @@ public class PskBruteForcerAttackServerCommandConfig extends AttackConfig {
         return clientDelegate;
     }
 
-//    ####################
     /**
      *
      * @param guessProviderInputFile
