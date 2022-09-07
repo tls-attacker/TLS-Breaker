@@ -18,10 +18,7 @@ import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerAttackClient;
-//import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerPcapFileHandler;
-//####
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerClientPcapFileHandler;
-//####
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,7 +54,6 @@ public class Main {
             return;
         }
 
-//        ##################
         if (pskBruteForcerAttackClientTest.getPcapFileLocation() != null) {
             if (FileUtils.isFileExists(pskBruteForcerAttackClientTest.getPcapFileLocation())) {
                 try {
@@ -99,25 +95,4 @@ public class Main {
             }
         }
     }
-//        ##################
-//        Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
-//            pskBruteForcerAttackClientTest.createConfig());
-//
-//        if (attacker.getConfig().isExecuteAttack()) {
-//            attacker.attack();
-//        } else {
-//            try {
-//                Boolean result = attacker.checkVulnerability();
-//                if (Objects.equals(result, Boolean.TRUE)) {
-//                    CONSOLE.error("Vulnerable:" + result.toString());
-//                } else if (Objects.equals(result, Boolean.FALSE)) {
-//                    CONSOLE.info("Vulnerable:" + result.toString());
-//                } else {
-//                    CONSOLE.warn("Vulnerable: Uncertain");
-//                }
-//            } catch (UnsupportedOperationException e) {
-//                LOGGER.info("The selected attacker is currently not implemented");
-//            }
-//        }
-//    }
 }

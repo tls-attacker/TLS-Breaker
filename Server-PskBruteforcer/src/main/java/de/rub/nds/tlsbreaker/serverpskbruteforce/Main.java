@@ -21,11 +21,8 @@ import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerAttackServer
 import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerPcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.util.Objects;
-
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-//import de.rub.nds.tlsbreaker.bleichenbacher;
 
 /**
  *

@@ -17,12 +17,9 @@ import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.*;
-//#################
-//import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProviderType;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce.GuessProviderType;
-//import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
-//###################
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
