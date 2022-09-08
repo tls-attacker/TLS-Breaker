@@ -19,6 +19,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/*
+ * TESTING THE PCAP WHICH HAS RSA KEY EXCHANGE SESSIONS. EXPECTED RESULT : 1 PMS
+ * Failing to pass this test will indicate that the pcap session extraction code block is broken.
+ */
+
 public class PcapAnalyzerTest1 {
 
     private String PmsStoredValues;
@@ -49,8 +54,6 @@ public class PcapAnalyzerTest1 {
         byte[] pms = sessions.get(0).getPreMasterSecret();// sample.getPreMasterSecret(sessions.get(0).getClientKeyExchangeMessage());
 
         char[] pms_after_convert = Hex.encodeHex(pms);
-        System.out.println("#########################   PCAPANALYZERTEST 1 #############################");
-        System.out.println(pms_after_convert);
 
         boolean validation_result = PmsStoredValues.equals(new String(pms_after_convert));
         assert (validation_result);
