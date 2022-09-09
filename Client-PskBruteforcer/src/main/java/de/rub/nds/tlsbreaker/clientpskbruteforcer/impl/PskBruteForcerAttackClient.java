@@ -180,7 +180,7 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
             for (CipherSuite cipherSuite : tlsContext.getClientSupportedCipherSuites()) {
                 if (cipherSuite.isPsk()) {
-                    CONSOLE.info("The Client uses Psk. If he uses a weak Password he is vulnerable.");
+                    CONSOLE.info("The Client uses Psk. If it uses a weak key then it is vulnerable.");
                     return true;
                 }
             }

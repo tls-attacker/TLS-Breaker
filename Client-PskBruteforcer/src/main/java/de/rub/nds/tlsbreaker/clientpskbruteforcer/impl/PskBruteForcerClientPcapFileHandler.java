@@ -65,15 +65,9 @@ public class PskBruteForcerClientPcapFileHandler {
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
-                    checkVulnerabilityOfAllServersAndDisplay(uniqueClient, pskBruteForcerAttackClientCommandConfig,
-                        consoleInteractor);
+                    throw new UnsupportedOperationException("Invalid option selected!");
                 } else if (isCommaSeparatedList(userOption)) {
-                    List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(","))
-                        .forEach(serverNumber -> hosts.add(uniqueClient.get(Integer.parseInt(trim(serverNumber)) - 1)));
-
-                    checkVulnerabilityOfAllServersAndDisplay(hosts, pskBruteForcerAttackClientCommandConfig,
-                        consoleInteractor);
+                    throw new UnsupportedOperationException("Invalid option selected!");
                 } else {
                     String host = clientServers.get(Integer.parseInt(userOption) - 1);
                     String source = uniqueClient.get(Integer.parseInt(userOption) - 1);
@@ -231,7 +225,7 @@ public class PskBruteForcerClientPcapFileHandler {
         CONSOLE.info("A: BRUTEFORCER    B: WORDLIST");
         String userchoiceforattack = consoleInteractor.getUserchoiceforpsk();
         if ("B".equals(userchoiceforattack)) {
-            CONSOLE.info("You have selected Wordlist");
+            CONSOLE.info("You have selected wordlist");
             pskBruteForcerAttackClientCommandConfig.setGuessProviderType(GuessProviderType.WORDLIST);
             CONSOLE.info(pskBruteForcerAttackClientCommandConfig.getGuessProviderType());
             CONSOLE.info("Select the preferred wordlist type:");
