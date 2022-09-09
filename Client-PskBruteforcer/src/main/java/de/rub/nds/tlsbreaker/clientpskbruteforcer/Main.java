@@ -54,6 +54,8 @@ public class Main {
             return;
         }
 
+        pskBruteForcerAttackClientTest.setSkipConnectionCheck(true);
+
         if (pskBruteForcerAttackClientTest.getPcapFileLocation() != null) {
             if (FileUtils.isFileExists(pskBruteForcerAttackClientTest.getPcapFileLocation())) {
                 try {
