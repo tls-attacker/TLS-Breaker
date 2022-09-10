@@ -117,6 +117,7 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
                 }
             } else {
                 LOGGER.warn("Could not find the EncryptedRecord - attack stopped");
+                CONSOLE.warn("Client does not support PSK");
             }
         } else {
             LOGGER.warn("Did not receive ClientHello - attack stopped");
@@ -139,7 +140,11 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
             }
         }
         tlsConfig.setEnforceSettings(true);
-        continueProtocolFlowToClient(state);
+        try {
+            continueProtocolFlowToClient(state);
+        } catch (Exception e) {
+            LOGGER.info("No PSK Cipher Supported");
+        }
         return state;
     }
 

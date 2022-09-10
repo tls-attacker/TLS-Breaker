@@ -79,8 +79,10 @@ public class PskBruteForcerPcapFileHandler {
                         } else if ("N".equals(userResponse)) {
                             CONSOLE.info("Execution of the attack cancelled.");
                         }
+                    } else if (Objects.equals(vulnerability, Boolean.FALSE)) {
+                        CONSOLE.info("Server " + host + " is not vulnerable.");
                     } else {
-                        CONSOLE.info("The server " + host + " is not vulnerable.");
+                        CONSOLE.warn("Vulnerable: Uncertain");
                     }
                 }
             } else {
@@ -173,7 +175,7 @@ public class PskBruteForcerPcapFileHandler {
         try {
             result = attacker.checkVulnerability();
             if (Objects.equals(result, Boolean.TRUE)) {
-                CONSOLE.error("Vulnerable:" + result.toString());
+                CONSOLE.info("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {
                 CONSOLE.info("Vulnerable:" + result.toString());
             } else {

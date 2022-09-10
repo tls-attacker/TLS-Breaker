@@ -82,7 +82,7 @@ public class Main {
             try {
                 Boolean result = attacker.checkVulnerability();
                 if (Objects.equals(result, Boolean.TRUE)) {
-                    CONSOLE.error("Vulnerable:" + result.toString());
+                    CONSOLE.info("Vulnerable:" + result.toString());
                 } else if (Objects.equals(result, Boolean.FALSE)) {
                     CONSOLE.info("Vulnerable:" + result.toString());
                 } else {
