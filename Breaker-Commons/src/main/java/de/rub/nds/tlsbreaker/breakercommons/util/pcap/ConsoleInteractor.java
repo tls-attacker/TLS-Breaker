@@ -259,12 +259,12 @@ public class ConsoleInteractor {
         }
     }
 
-    public String getValidUserSelectionForPSK(List<String> uniqueServers) {
+    public String getValidUserSelectionForPSKClient(List<String> uniqueServers) {
         if (uniqueServers.size() == 1) {
-            CONSOLE.info("Do you want to check the vulnerability of the server? (y/n):");
+            CONSOLE.info("Do you want to check the vulnerability of the Client? (y/n):");
             return getUserDecisionForOneServer();
         } else {
-            CONSOLE.info("Please select server numbers to check for vulnerability ");
+            CONSOLE.info("Please select a client number to check for vulnerability ");
             CONSOLE.info("Make Sure Client is Active");
             CONSOLE.info("Select Option: ");
             return getUserInputForMultipleServers(uniqueServers);

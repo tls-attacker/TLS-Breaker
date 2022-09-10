@@ -61,7 +61,7 @@ public class PskBruteForcerClientPcapFileHandler {
                 ConsoleInteractor consoleInteractor = new ConsoleInteractor();
                 consoleInteractor.displayClientWithServers(clientServers, uniqueClient);
 
-                String userOption = consoleInteractor.getValidUserSelectionForPSK(uniqueClient);
+                String userOption = consoleInteractor.getValidUserSelectionForPSKClient(uniqueClient);
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
@@ -93,8 +93,10 @@ public class PskBruteForcerClientPcapFileHandler {
                         } else if ("N".equals(userResponse)) {
                             CONSOLE.info("Execution of the attack cancelled.");
                         }
+                    } else if (Objects.equals(vulnerability, Boolean.FALSE)) {
+                        CONSOLE.info("Client " + source + " is not vulnerable.");
                     } else {
-                        CONSOLE.info("The Client " + host + " is not vulnerable.");
+                        CONSOLE.warn("Vulnerable: Uncertain");
                     }
                 }
             } else {
