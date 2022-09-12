@@ -21,6 +21,7 @@ import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
 import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,8 @@ public class PoodleCommandConfig extends AttackConfig {
     private CipherSuiteDelegate cipherSuiteDelegate;
     @ParametersDelegate
     private MitmDelegate mitmDelegate;
+    @ParametersDelegate
+    private AttackDelegate attackDelegate;
 
     /**
      *
@@ -52,9 +55,11 @@ public class PoodleCommandConfig extends AttackConfig {
         starttlsDelegate = new StarttlsDelegate();
         mitmDelegate = new MitmDelegate();
         cipherSuiteDelegate = new CipherSuiteDelegate();
+        attackDelegate = new AttackDelegate();
         addDelegate(starttlsDelegate);
         addDelegate(mitmDelegate);
         addDelegate(cipherSuiteDelegate);
+        addDelegate(attackDelegate);
     }
 
     /**
@@ -63,7 +68,7 @@ public class PoodleCommandConfig extends AttackConfig {
      */
     @Override
     public boolean isExecuteAttack() {
-        return true;
+        return attackDelegate.isExecuteAttack();
     }
 
     /**

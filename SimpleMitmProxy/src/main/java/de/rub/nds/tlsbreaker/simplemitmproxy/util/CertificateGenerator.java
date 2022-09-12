@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.simplemitmproxy.impl;
+package de.rub.nds.tlsbreaker.simplemitmproxy.util;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -37,9 +37,15 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
 // Based on https://github.com/misterpki/selfsignedcert/blob/master/src/main/java/com/misterpki/SelfSignedCertGenerator.java
 
 public class CertificateGenerator {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private CertificateGenerator() {
     }
