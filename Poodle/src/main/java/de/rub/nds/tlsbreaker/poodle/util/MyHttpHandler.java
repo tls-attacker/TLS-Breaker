@@ -20,13 +20,11 @@ public class MyHttpHandler implements HttpHandler {
 
     public boolean bytedecrypted = false;
 
-    public boolean paddingfound = false; 
+    public boolean paddingfound = false;
 
-    public int  paddingSize = 0;
+    public int paddingSize = 0;
 
-
-
-
+    public boolean block_decrypted = true;
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -64,17 +62,20 @@ public class MyHttpHandler implements HttpHandler {
         String path = httpExchange.getRequestURI().getPath();
 
         if (path.equals("/paddingfound")) {
-            stringResponse+=paddingfound;
+            stringResponse += paddingfound;
         } else if (path.equals("/paddingsize")) {
-            stringResponse+=paddingSize;
+            stringResponse += paddingSize;
         } else if (path.equals("/bytedecrypted")) {
-            stringResponse+=bytedecrypted;
+            stringResponse += bytedecrypted;
         } else if (path.equals("/gotonextbyte")) {
-            bytedecrypted=false;
+            bytedecrypted = false;
+        } else if (path.equals("/blockdecrypted")) {
+            stringResponse += block_decrypted;
+        } else if (path.equals("/gotonextblock")) {
+            block_decrypted = false;
         } else if (path.equals("/decryptioncomplete")) {
-            stringResponse+=decryptionComplete;
-        }
-        else {
+            stringResponse += decryptionComplete;
+        } else {
 
         }
 

@@ -11,15 +11,11 @@ public class PoodleHTTPServer {
 
     private MyHttpHandler httphandler;
 
-    public PoodleHTTPServer(MyHttpHandler httphandler){
+    public PoodleHTTPServer(MyHttpHandler httphandler) {
         this.httphandler = httphandler;
     }
 
-    
-
     public void startPoddleHTTPServer() {
-
-
 
         HttpServer server = null;
         try {
@@ -28,11 +24,13 @@ public class PoodleHTTPServer {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
-        
+
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         server.createContext("/padding", httphandler);
         server.createContext("/byte", httphandler);
         server.createContext("/gotonextbyte", httphandler);
+        server.createContext("/blockdecrypted", httphandler);
+        server.createContext("/gotonextblock", httphandler);
         server.createContext("/decryptioncomplete", httphandler);
 
         server.setExecutor(threadPoolExecutor);

