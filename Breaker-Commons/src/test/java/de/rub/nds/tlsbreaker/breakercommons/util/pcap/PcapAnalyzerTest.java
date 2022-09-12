@@ -286,6 +286,12 @@ public class PcapAnalyzerTest {
         Assert.assertEquals("NUMBER OF SESSION PRESENT IN THE FILE", sessions.size(), 4);
         for (i = 0; i < sessions.size(); i++) {
             byte[] pms = sessions.get(i).getPreMasterSecret();
+//            System.out.println(pms.length);
+//            System.out.println("#################");
+//            for (int j = 0; j < pms.length - 1; j++) {
+//                System.out.print(pms[j]);
+//                }
+//            System.out.println("#################");
             char[] pms_after_convert = Hex.encodeHex(pms);
 
             try {

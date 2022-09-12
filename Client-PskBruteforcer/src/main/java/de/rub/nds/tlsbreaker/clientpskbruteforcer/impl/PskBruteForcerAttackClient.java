@@ -117,6 +117,7 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
                 }
             } else {
                 LOGGER.warn("Could not find the EncryptedRecord - attack stopped");
+                CONSOLE.warn("Client does not support PSK");
             }
         } else {
             LOGGER.warn("Did not receive ClientHello - attack stopped");
@@ -139,7 +140,11 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
             }
         }
         tlsConfig.setEnforceSettings(true);
-        continueProtocolFlowToClient(state);
+        try {
+            continueProtocolFlowToClient(state);
+        } catch (Exception e) {
+            LOGGER.info("No PSK Cipher Supported");
+        }
         return state;
     }
 
@@ -180,8 +185,8 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
             for (CipherSuite cipherSuite : tlsContext.getClientSupportedCipherSuites()) {
                 if (cipherSuite.isPsk()) {
-                    CONSOLE.info("The Client uses Psk. If he uses a weak Password he is vulnerable.");
-                    return null;
+                    CONSOLE.info("The Client uses Psk. If it uses a weak key then it is vulnerable.");
+                    return true;
                 }
             }
             CONSOLE.info("The Client is not supporting Psk.");
@@ -241,15 +246,27 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         KeySet keySet = KeySetGenerator.generateKeySet(state.getTlsContext());
         RecordCipher recordCipher = RecordCipherFactory.getRecordCipher(state.getTlsContext(), keySet);
         RecordDecryptor dec = new RecordDecryptor(recordCipher, state.getTlsContext());
-        dec.decrypt(encryptedRecord);
-        byte[] receivedVrfyData = Arrays.copyOfRange(encryptedRecord.getComputations().getPlainRecordBytes().getValue(),
-            0, controlValue.length);
-        LOGGER.debug("Received Data " + ArrayConverter.bytesToHexString(receivedVrfyData));
-        LOGGER.debug("Control Data " + ArrayConverter.bytesToHexString(controlValue));
-        if (Arrays.equals(receivedVrfyData, controlValue)) {
-            CONSOLE.info("Found PSK: " + ArrayConverter.bytesToHexString(guessedPsk));
-            return true;
-        } else {
+        try {
+            dec.decrypt(encryptedRecord);
+        } catch (Exception e) {
+            CONSOLE.info("Error in decrypting the record");
+        }
+        try {
+            byte[] receivedVrfyData = Arrays.copyOfRange(
+                encryptedRecord.getComputations().getPlainRecordBytes().getValue(), 0, controlValue.length);
+            LOGGER.debug("Received Data " + ArrayConverter.bytesToHexString(receivedVrfyData));
+            LOGGER.debug("Control Data " + ArrayConverter.bytesToHexString(controlValue));
+            if (Arrays.equals(receivedVrfyData, controlValue)) {
+                CONSOLE.info("Found PSK: " + ArrayConverter.bytesToHexString(guessedPsk));
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IllegalArgumentException ie) {
+            CONSOLE.info("Not an Hex decimal value , Please provide correct value");
+            CONSOLE.info(ie);
+            return false;
+        } catch (Exception e) {
             return false;
         }
     }

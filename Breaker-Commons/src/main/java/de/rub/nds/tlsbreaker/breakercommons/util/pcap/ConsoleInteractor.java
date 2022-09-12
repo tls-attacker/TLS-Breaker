@@ -9,7 +9,6 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
-import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
@@ -19,6 +18,7 @@ import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -52,8 +52,12 @@ public class ConsoleInteractor {
         ServerNameIndicationExtensionMessage sniMessage =
             pcapSession.getClientHelloMessage().getExtension(ServerNameIndicationExtensionMessage.class);
         if (sniMessage != null) {
-            return ArrayConverter.bytesToHexString(sniMessage.getServerNameList().get(0).getServerName().getValue());
-            // new String(sniMessage.getServerNameList().get(0).getServerName())
+            try {
+                return new String(sniMessage.getServerNameList().get(0).getServerName().getValue(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return NO_DATA;
+            }
+            // return ArrayConverter.bytesToHexString(sniMessage.getServerNameList().get(0).getServerName().getValue());
         } else {
             return NO_DATA;
         }
@@ -255,6 +259,18 @@ public class ConsoleInteractor {
         }
     }
 
+    public String getValidUserSelectionForPSKClient(List<String> uniqueServers) {
+        if (uniqueServers.size() == 1) {
+            CONSOLE.info("Do you want to check the vulnerability of the Client? (y/n):");
+            return getUserDecisionForOneServer();
+        } else {
+            CONSOLE.info("Please select a client number to check for vulnerability ");
+            CONSOLE.info("Make Sure Client is Active");
+            CONSOLE.info("Select Option: ");
+            return getUserInputForMultipleServers(uniqueServers);
+        }
+    }
+
     public int getUserSelectedServer(List<String> uniqueServers) {
         Scanner sc = new Scanner(System.in);
         try {
@@ -299,5 +315,40 @@ public class ConsoleInteractor {
         Scanner sc = new Scanner(System.in);
         String userInputfile = trim(sc.nextLine());
         return userInputfile;
+    }
+
+    public void displayClients(List<String> uniqueServers) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Client Number", "Client Address");
+        table.addRule();
+        String previous_host = " ";
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+
+            String clientAddress = uniqueServers.get(i);
+            AT_Row row = table.addRow(i + 1, clientAddress);
+            row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
+    }
+
+    public void displayClientWithServers(List<String> uniqueServers, List<String> uniqueClient) {
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("Serial Number", "Client Address", "Host Address");
+        table.addRule();
+
+        for (int i = 0; i < uniqueServers.size(); i++) {
+            String hostAddress = uniqueServers.get(i);
+            String sourceAddress = uniqueClient.get(i);
+            AT_Row row = table.addRow(i + 1, sourceAddress, hostAddress);
+            row.getCells().get(0).getContext().setTextAlignment(TextAlignment.RIGHT);
+        }
+        table.addRule();
+        formatTable(table);
+        System.out.println(table.render());
     }
 }

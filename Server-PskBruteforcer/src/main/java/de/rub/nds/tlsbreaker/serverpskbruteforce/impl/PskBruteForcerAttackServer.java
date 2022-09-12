@@ -55,36 +55,37 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         CONSOLE.info("Connecting to the Server to find a PSK cipher suite he supports...");
         CipherSuite suite = getSupportedPskCipherSuite();
         if (suite == null) {
-            CONSOLE.info("Stopping attack");
-        }
-        CONSOLE.info("The server supports " + suite
-            + ". Trying to guess the PSK. This is an online Attack. Depending on the PSK this may take some time...");
-        guessProvider = GuessProviderFactory.createGuessProvider(config.getGuessProviderType(),
-            config.getGuessProviderInputStream());
-        boolean result = false;
-        int counter = 0;
-        long startTime = System.currentTimeMillis();
-        while (!result) {
-            byte[] guessedPsk = guessProvider.getGuess();
-            if (guessedPsk == null) {
-                CONSOLE.info("Could not find psk - attack stopped");
-                break;
-            }
-            if (guessedPsk.length == 0) {
-                continue;
-            }
-            counter++;
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Guessing: " + ArrayConverter.bytesToHexString(guessedPsk));
-            }
-            result = executeProtocolFlowToServer(suite, guessedPsk);
-            if (result) {
-                long stopTime = System.currentTimeMillis();
-                CONSOLE.info("Found the psk in "
-                    + String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime),
-                        TimeUnit.MILLISECONDS.toSeconds(stopTime - startTime)
-                            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime))));
-                CONSOLE.info("Guessed " + counter + " times");
+            CONSOLE.warn("Stopping attack");
+        } else {
+            CONSOLE.info("The server supports " + suite
+                + ". Trying to guess the PSK. This is an online Attack. Depending on the PSK this may take some time...");
+            guessProvider = GuessProviderFactory.createGuessProvider(config.getGuessProviderType(),
+                config.getGuessProviderInputStream());
+            boolean result = false;
+            int counter = 0;
+            long startTime = System.currentTimeMillis();
+            while (!result) {
+                byte[] guessedPsk = guessProvider.getGuess();
+                if (guessedPsk == null) {
+                    CONSOLE.info("Could not find psk - attack stopped");
+                    break;
+                }
+                if (guessedPsk.length == 0) {
+                    continue;
+                }
+                counter++;
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Guessing: " + ArrayConverter.bytesToHexString(guessedPsk));
+                }
+                result = executeProtocolFlowToServer(suite, guessedPsk);
+                if (result) {
+                    long stopTime = System.currentTimeMillis();
+                    CONSOLE.info("Found the psk in "
+                        + String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime),
+                            TimeUnit.MILLISECONDS.toSeconds(stopTime - startTime)
+                                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime))));
+                    CONSOLE.info("Guessed " + counter + " times");
+                }
             }
         }
     }
@@ -98,26 +99,13 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         CONSOLE.info("Connecting to the Server...");
         boolean supportsPsk = getSupportedPskCipherSuite() != null;
         if (supportsPsk) {
-            CONSOLE.info("Maybe vulnerable - server supports PSK");
+            CONSOLE.info("Server supports PSK");
             return true;
         } else {
             CONSOLE.info("Not Vulnerable - server does not support PSK");
             return false;
         }
     }
-//    ##########################    OLDER IMPLEMENTATION    #########
-//    public Boolean isVulnerable() {
-//        CONSOLE.info("Connecting to the Server...");
-//        boolean supportsPsk = getSupportedPskCipherSuite() != null;
-//        if (supportsPsk) {
-//            CONSOLE.info("Maybe vulnerable - server supports PSK");
-//            return null;
-//        } else {
-//            CONSOLE.info("Not Vulnerable - server does not support PSK");
-//            return false;
-//        }
-//    }
-//    ############################################################
 
     private CipherSuite getSupportedPskCipherSuite() {
         Config tlsConfig = getTlsConfig();

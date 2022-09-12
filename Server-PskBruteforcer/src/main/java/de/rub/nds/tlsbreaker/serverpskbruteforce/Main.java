@@ -21,11 +21,8 @@ import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerAttackServer
 import de.rub.nds.tlsbreaker.serverpskbruteforce.impl.PskBruteForcerPcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.util.Objects;
-
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-//import de.rub.nds.tlsbreaker.bleichenbacher;
 
 /**
  *
@@ -85,7 +82,7 @@ public class Main {
             try {
                 Boolean result = attacker.checkVulnerability();
                 if (Objects.equals(result, Boolean.TRUE)) {
-                    CONSOLE.error("Vulnerable:" + result.toString());
+                    CONSOLE.info("Vulnerable:" + result.toString());
                 } else if (Objects.equals(result, Boolean.FALSE)) {
                     CONSOLE.info("Vulnerable:" + result.toString());
                 } else {

@@ -15,8 +15,10 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerAttackClient;
+import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerClientPcapFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +54,29 @@ public class Main {
             return;
         }
 
+        pskBruteForcerAttackClientTest.setSkipConnectionCheck(true);
+
+        if (pskBruteForcerAttackClientTest.getPcapFileLocation() != null) {
+            if (FileUtils.isFileExists(pskBruteForcerAttackClientTest.getPcapFileLocation())) {
+                try {
+                    CONSOLE.info("Pcap file location = " + pskBruteForcerAttackClientTest.getPcapFileLocation());
+                    PskBruteForcerClientPcapFileHandler pcapFileHandler =
+                        new PskBruteForcerClientPcapFileHandler(pskBruteForcerAttackClientTest);
+                    pcapFileHandler.handlePcapFile();
+                } catch (UnsupportedOperationException e) {
+                    CONSOLE.error("Invalid option selected! Please run the jar file again.");
+                }
+            } else {
+                CONSOLE.error("Invalid File Path!");
+            }
+        } else {
+            checkVulnerabilityOrExecuteAttack(pskBruteForcerAttackClientTest);
+        }
+        System.exit(0);
+    }
+
+    private static void
+        checkVulnerabilityOrExecuteAttack(PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientTest) {
         Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(pskBruteForcerAttackClientTest,
             pskBruteForcerAttackClientTest.createConfig());
 
