@@ -96,11 +96,11 @@ public class PskBruteForcerClientPcapFileHandler {
                     } else if (Objects.equals(vulnerability, Boolean.FALSE)) {
                         CONSOLE.info("Client " + source + " is not vulnerable.");
                     } else {
-                        CONSOLE.warn("Vulnerable: Uncertain");
+                        CONSOLE.warn("Client " + source + " is not vulnerable.");
                     }
                 }
             } else {
-                CONSOLE.info("\nFound no potential Client for Psk Brute Force Attack.");
+                CONSOLE.info("\nFound no potential client for Psk Brute Force Attack.");
             }
         } else {
             CONSOLE.info("No TLS handshake message found.");

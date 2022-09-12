@@ -82,7 +82,7 @@ public class PskBruteForcerPcapFileHandler {
                     } else if (Objects.equals(vulnerability, Boolean.FALSE)) {
                         CONSOLE.info("Server " + host + " is not vulnerable.");
                     } else {
-                        CONSOLE.warn("Vulnerable: Uncertain");
+                        CONSOLE.warn("Server " + host + " is not vulnerable.");
                     }
                 }
             } else {

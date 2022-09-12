@@ -100,7 +100,8 @@ public class RealDirectMessageECOracle extends ECOracle {
 
         // byte[] explicitPMS = BigIntegers.asUnsignedByteArray(curve.getModulus().bitLength() / Bits.IN_A_BYTE,
         // secret);
-        // ADDED BELOW CODE BLOCK BECAUSE THERE WAS AN ISSUE bouncycastle IMPLEMENTATION WHEN PROCESSING BIGGER VALUES
+        // ADDED BELOW CODE BLOCK BECAUSE THERE WAS AN ISSUE in bouncycastle IMPLEMENTATION WHEN PROCESSING BIGGER
+        // VALUES
         // MAINLY IN THE CASE OF SECP521R1 POINTS.
         ModifiableByteArray pms = ModifiableVariableFactory.createByteArrayModifiableVariable();
         int elementLength = ArrayConverter.bigIntegerToByteArray(curve.getModulus()).length;
@@ -167,7 +168,7 @@ public class RealDirectMessageECOracle extends ECOracle {
             checkPoint = Point.createPoint(x, y, state.getTlsContext().getSelectedGroup());
             checkPMS = message.getComputations().getPremasterSecret().getValue();
         } catch (Exception e) {
-            LOGGER.warn("Failed due to Incorrect Curve Selection!!");
+            LOGGER.warn("Might have failed due to incorrect curve selection!!");
             System.exit(1);
         }
     }
