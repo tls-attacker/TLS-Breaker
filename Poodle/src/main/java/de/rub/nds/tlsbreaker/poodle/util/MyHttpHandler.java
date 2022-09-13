@@ -24,7 +24,7 @@ public class MyHttpHandler implements HttpHandler {
 
     public int paddingSize = 0;
 
-    public boolean block_decrypted = true;
+    public boolean block_decrypted = false;
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -47,9 +47,9 @@ public class MyHttpHandler implements HttpHandler {
 
         return httpExchange.
 
-                getRequestURI()
+            getRequestURI()
 
-                .toString();
+            .toString();
 
     }
 
