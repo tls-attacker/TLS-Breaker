@@ -40,7 +40,6 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.bouncycastle.util.BigIntegers;
-//################
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 
 /**
@@ -98,14 +97,8 @@ public class RealDirectMessageECOracle extends ECOracle {
 
         // set explicit premaster secret value (X value of the resulting point coordinate)
 
-        // byte[] explicitPMS = BigIntegers.asUnsignedByteArray(curve.getModulus().bitLength() / Bits.IN_A_BYTE,
-        // secret);
-        // ADDED BELOW CODE BLOCK BECAUSE THERE WAS AN ISSUE in bouncycastle IMPLEMENTATION WHEN PROCESSING BIGGER
-        // VALUES
-        // MAINLY IN THE CASE OF SECP521R1 POINTS.
         ModifiableByteArray pms = ModifiableVariableFactory.createByteArrayModifiableVariable();
         int elementLength = ArrayConverter.bigIntegerToByteArray(curve.getModulus()).length;
-        LOGGER.info("ELEMENT LENGTH" + elementLength);
         byte[] explicitPMS = ArrayConverter.bigIntegerToNullPaddedByteArray(secret, elementLength);
 
         pms.setModification(ByteArrayModificationFactory.explicitValue(explicitPMS));
