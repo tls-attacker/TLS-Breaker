@@ -12,6 +12,10 @@ package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import de.rub.nds.tlsattacker.core.constants.ChangeCipherSpecByteLength;
+import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.FinishedMessage;
+import de.rub.nds.tlsattacker.core.workflow.action.ReceivingAction;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProvider;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProviderFactory;
@@ -27,6 +31,8 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +46,7 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
     private static final Logger LOGGER = LogManager.getLogger();
 
     private GuessProvider guessProvider;
+    private Object FinishedMessage;
 
     /**
      *
@@ -142,7 +149,8 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         WorkflowExecutor workflowExecutor =
             WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
         workflowExecutor.executeWorkflow();
-        if (state.getWorkflowTrace().executedAsPlanned()) {
+        List<ReceivingAction> val = state.getWorkflowTrace().getReceivingActions();
+        if (val.get(1).getReceivedMessages().get(0).toString().contains("ChangeCipherSpecMessage:")) {
             CONSOLE.info("PSK " + ArrayConverter.bytesToHexString(pskGuess));
             return true;
         } else {
