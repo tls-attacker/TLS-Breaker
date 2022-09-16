@@ -43,10 +43,8 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
     private CertificateDelegate certificateDelegate;
 
     @Parameter(names = { "-noCert", "-no_cert" },
-        description = "Use the flag to signal that SimpleMitmProxy should skip the certificate"
-        +"generation process.")
+        description = "Use the flag to signal that SimpleMitmProxy should skip the certificate" + "generation process.")
     private boolean noCert = false;
-
 
     /**
      *
@@ -74,8 +72,6 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
         return true;
     }
 
-
-
     /**
      *
      * @return
@@ -85,7 +81,6 @@ public class SimpleMitmProxyCommandConfig extends AttackConfig {
         Config config = super.createConfig();
         return config;
     }
-
 
     public boolean isNoCert() {
         return this.noCert;

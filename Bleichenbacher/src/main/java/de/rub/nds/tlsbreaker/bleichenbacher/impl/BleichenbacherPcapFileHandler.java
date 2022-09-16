@@ -105,8 +105,12 @@ public class BleichenbacherPcapFileHandler {
         List<String> servers = new ArrayList<>();
         for (String server : uniqueServers) {
             bleichenbacherCommandConfig.getClientDelegate().setHost(server);
-            RSAPublicKey publicKeyOfPcapServer =
-                (RSAPublicKey) CertificateFetcher.fetchServerPublicKey(attacker.getTlsConfig());
+            RSAPublicKey publicKeyOfPcapServer = null;
+            try {
+                publicKeyOfPcapServer = (RSAPublicKey) CertificateFetcher.fetchServerPublicKey(attacker.getTlsConfig());
+            } catch (Exception e) {
+                LOGGER.warn("Public key could not be fetched for the server " + server);
+            }
             if (publicKey.equals(publicKeyOfPcapServer)) {
                 servers.add(server);
             }

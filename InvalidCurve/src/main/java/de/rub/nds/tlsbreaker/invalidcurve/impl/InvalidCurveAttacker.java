@@ -142,6 +142,7 @@ public class InvalidCurveAttacker extends Attacker<InvalidCurveAttackConfig> {
         receivedEcPublicKeys = new LinkedList<>();
         finishedKeys = new LinkedList<>();
         dirtyKeysWarning = false;
+        setBasePoints();
 
         EllipticCurve curve;
         Point point;
@@ -179,6 +180,63 @@ public class InvalidCurveAttacker extends Attacker<InvalidCurveAttackConfig> {
         }
         executor.bulkExecuteTasks(taskList);
         return evaluateExecutedTasks(taskList);
+    }
+
+    private void setBasePoints() {
+        if (config.getNamedGroup() == NamedGroup.SECP160K1) {
+            config.setPublicPointBaseX(new BigInteger("2E92424F6F5DCEB9445903D9790A060061B5385F", 16));
+            config.setPublicPointBaseY(new BigInteger("A70CABD03A14C31A9693F2A4B0B9644E512BC671", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP160R1) {
+            config.setPublicPointBaseX(new BigInteger("12352B91C125BEF7CF3F5675357130A71FA9FD09", 16));
+            config.setPublicPointBaseY(new BigInteger("BBDDDABFA042D3556964D7356ACE8B1E251F3615", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP160R2) {
+            config.setPublicPointBaseX(new BigInteger("343F691A0C2F9B528329D3902F0729E4F1019815", 16));
+            config.setPublicPointBaseY(new BigInteger("9F7DBEB407C61B93758FCAAF0242BC7DDE5C6387", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP192K1) {
+            config.setPublicPointBaseX(new BigInteger("BA64DE391455A01A0B879E42F2C5B260619ABD8807323AE6", 16));
+            config.setPublicPointBaseY(new BigInteger("3C4B31082E9362EF3C4AC5D1352AFF8EDBA87A791D407A74", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP192R1) {
+            config.setPublicPointBaseX(new BigInteger("6EF5DB952BE3D282A58A9CBD14F2B2CA5AE6A41205C35D5B", 16));
+            config.setPublicPointBaseY(new BigInteger("9D87E2B0764AC9662426ECDF9C3EC9A00F1FF33F46989CEB", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP224K1) {
+            config.setPublicPointBaseX(new BigInteger("F9345F9680736FACFA8BAC276194CE7B47EB83E53CE3D355AF190762", 16));
+            config.setPublicPointBaseY(new BigInteger("DA616B66C7C6B44241FCCA14CD60BA580E074FE424CA4D7CB95445D6", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP224R1) {
+            config.setPublicPointBaseX(new BigInteger("E5DEFEC40F18FDABAC7328AE1FC866D0B2C5D67CACF0241FA900143D", 16));
+            config.setPublicPointBaseY(new BigInteger("E6DBC78A6F02D0C560A0CF30BA8D78CBA637180E5040B10E43382F77", 16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP384R1) {
+            config.setPublicPointBaseX(new BigInteger(
+                "95013D50D4EB8165EBDCC5B6712490674FB152885F9B9BEE43A7C6DC8D7D35A3B917F7D24CC87442D652AB988ADD462F",
+                16));
+            config.setPublicPointBaseY(new BigInteger(
+                "98ACECC614611468E9E61A2D74928A3BA6A6854B406D5BB56A5ECE8121EC6E8938500F475C72A81110327495251314FD",
+                16));
+        } else if (config.getNamedGroup() == NamedGroup.SECP521R1) {
+            config.setPublicPointBaseX(new BigInteger(
+                "B3ED19D7DF62DCD6FF78A255B9ABECCFE1B7C79EBA3A270178463E098C003FECD530FA0EB7E2E9834332FE0FC66EB7D15174EF9134D037B8CE39BA9A9B08DE60DB",
+                16));
+            config.setPublicPointBaseY(new BigInteger(
+                "18AA48FC63A5F6F3FC5476F92365E8C28C23E7596AB963AEAD16128D1633A4849356190BA65D373C33CED6D54B635702670D415AF34A95D291F744537953B31331B",
+                16));
+        } else if (config.getNamedGroup() == NamedGroup.BRAINPOOLP256R1) {
+            config.setPublicPointBaseX(
+                new BigInteger("A687CC3F639ED6E82427C8F6DED934688AEAA3ECE0718CA96BAC6B16771A95D8", 16));
+            config.setPublicPointBaseY(
+                new BigInteger("259A64D19A3050394073C5D825CED3D4E173751407BDD2FEF0B570B01EE61DAC", 16));
+        } else if (config.getNamedGroup() == NamedGroup.BRAINPOOLP384R1) {
+            config.setPublicPointBaseX(new BigInteger(
+                "24D0DF7C9A0D59946007DCB6C44F6E57CAE92A4F54C4DDEB208F8C686E4457923E31D6CA452AB3BC9F62820358E79E21",
+                16));
+            config.setPublicPointBaseY(new BigInteger(
+                "4FF16328A76F0906BDF0DDB7DCD927D91BC1E46375AA1B71FE86DDE722B595B9C711C36CFD5FD8F76F7E1B6AEB60AFB", 16));
+        } else if (config.getNamedGroup() == NamedGroup.BRAINPOOLP512R1) {
+            config.setPublicPointBaseX(new BigInteger(
+                "106460CF2DB8AC1FC21CD7424F0E98A47DF2A53DEF18AC5D66C1EEC1ACC3ECB0F29A232B80AF38FAABEADE60F1DC3AE09FA166C0AB082A1756460B61391116AD",
+                16));
+            config.setPublicPointBaseY(new BigInteger(
+                "705608F9907581783E95618DBFE50F800782E96E193CB8F2721E641BD84CB5B6F95AAFCA053B71B336B1330F0D709F91EAE3483315EB69CF4EE1FF8794EB2A82",
+                16));
+        }
     }
 
     private void setPremasterSecret(EllipticCurve curve, int i, Point point) {

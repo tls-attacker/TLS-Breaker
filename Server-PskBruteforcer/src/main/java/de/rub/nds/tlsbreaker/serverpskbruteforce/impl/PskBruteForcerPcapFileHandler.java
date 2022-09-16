@@ -194,9 +194,8 @@ public class PskBruteForcerPcapFileHandler {
         CONSOLE.info("A: BRUTEFORCER    B: WORDLIST");
         String userchoiceforattack = consoleInteractor.getUserchoiceforpsk();
         if ("B".equals(userchoiceforattack)) {
-            CONSOLE.info("U have selected Wordlist");
+            CONSOLE.info("You have selected wordlist");
             pskBruteForcerAttackServerCommandConfig.setGuessProviderType(GuessProviderType.WORDLIST);
-            CONSOLE.info(pskBruteForcerAttackServerCommandConfig.getGuessProviderType());
             CONSOLE.info("Select the preferred wordlist type:");
             CONSOLE.info("A: DEFAULT FILE    B: PERSONAL FILE");
             String userchoiceforfile = consoleInteractor.getUserchoiceforpsk();
