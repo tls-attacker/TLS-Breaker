@@ -94,8 +94,8 @@ public class PcapAnalyzer {
 
     /**
      * Get a list PcapSessions that are extracted from the PcapFie
-     * 
-     * @see PcapSesession.java for the definition of a session.
+     *
+     * @see PcapSession for the definition of a session.
      */
     public List<PcapSession> getAllSessions() {
 
@@ -354,10 +354,10 @@ public class PcapAnalyzer {
 
     /**
      * Given that the record is of type Handshake, one can check which message type it contains
-     * 
+     *
      * @param  record
      *                The record which contains the handshake message.
-     * 
+     *
      * @return        The type of handshake message.
      */
     private HandshakeMessageType getRecordHandshakeMessageType(Record record) {

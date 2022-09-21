@@ -22,7 +22,7 @@ public class PcapSession {
     /**
      * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
      * change) and information from the TCP packet header like the source and destination of the package.
-     * 
+     *
      */
 
     private HashSet<String> pcapIdentifier = new HashSet<>();
