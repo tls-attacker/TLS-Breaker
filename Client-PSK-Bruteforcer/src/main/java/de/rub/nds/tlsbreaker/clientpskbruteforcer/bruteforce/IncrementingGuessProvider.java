@@ -9,6 +9,9 @@
 
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce;
 
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import de.rub.nds.tlsattacker.core.constants.Bits;
+
 /**
  * An IncrementingGuessProvider is a GuessProvider which tries all byte[] sequences in a growing order. Starting by an
  * empty byte[] and then continuing the sequence with th byte[] size increased by 1. It would then try 00, 01, 02, ...,
@@ -16,8 +19,7 @@ package de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce;
  */
 public class IncrementingGuessProvider extends GuessProvider {
 
-    private byte[] lastGuess = null;
-
+    private int ctr = 0;
     private int size = 0;
 
     /**
@@ -28,38 +30,22 @@ public class IncrementingGuessProvider extends GuessProvider {
     }
 
     /**
-     * Returns the last Guess incremented by 1.
-     *
-     * @return
+     * Returns the last guess incremented by 1 (or resets guess to 0 increments byte size by one).
      */
     @Override
     public byte[] getGuess() {
-        byte[] guess = getIncrementedGuess();
-        return guess;
-    }
-
-    private byte[] getIncrementedGuess() {
-        if (lastGuess == null) {
-            lastGuess = new byte[size];
+        if (ctr == 0 && size == 0) {
+            size = 1;
+            return new byte[0];
         } else {
-            lastGuess = createdIncrementedAtPosition(lastGuess, 0);
-            if (lastGuess == null) {
+            byte[] nextGuess = ArrayConverter.intToBytes(ctr, size);
+            ctr++;
+            if (ctr == 1 << (Bits.IN_A_BYTE * size)) {
+                // Iterated over all possible byte combinations of length <= size
+                ctr = 0;
                 size++;
-                lastGuess = new byte[size];
             }
-        }
-        return lastGuess;
-    }
-
-    private byte[] createdIncrementedAtPosition(byte[] array, int position) {
-        if (array.length > position) {
-            array[position] = (byte) (array[position] + 1);
-            if (array[position] == 0) {
-                return createdIncrementedAtPosition(array, position + 1);
-            }
-            return array;
-        } else {
-            return null;
+            return nextGuess;
         }
     }
 }
