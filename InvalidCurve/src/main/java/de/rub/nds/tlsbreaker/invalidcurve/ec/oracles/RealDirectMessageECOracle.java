@@ -30,7 +30,6 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 
-import java.io.Console;
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.logging.log4j.Level;

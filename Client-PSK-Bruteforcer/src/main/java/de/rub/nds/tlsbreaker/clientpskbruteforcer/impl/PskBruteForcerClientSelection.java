@@ -7,22 +7,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-//package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
-import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
-//import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ClientSelection;
-import de.vandermeer.asciitable.AT_Row;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 public class PskBruteForcerClientSelection extends ClientSelection {
 

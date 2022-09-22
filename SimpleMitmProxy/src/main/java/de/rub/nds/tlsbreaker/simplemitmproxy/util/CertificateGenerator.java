@@ -39,7 +39,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 // Based on https://github.com/misterpki/selfsignedcert/blob/master/src/main/java/com/misterpki/SelfSignedCertGenerator.java
 

@@ -11,10 +11,6 @@ package de.rub.nds.tlsbreaker.poodle.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.io.Console;
-import java.util.Arrays;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 public class ByteArrayReplace {
     private static final Logger LOGGER = LogManager.getLogger();
