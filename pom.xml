@@ -87,8 +87,8 @@
         <module>Bleichenbacher</module>
         <module>Drown</module>
         <module>Heartbleed</module>
-        <module>Client-PskBruteforcer</module>
-        <module>Server-PskBruteforcer</module>
+        <module>Client-PSK-Bruteforcer</module>
+        <module>Server-PSK-Bruteforcer</module>
         <module>InvalidCurve</module>
         <module>Lucky13</module>
         <module>Poodle</module>
@@ -98,7 +98,6 @@
         <module>EarlyCCS</module>
         <module>EarlyFinished</module>
         <module>SimpleMitmProxy</module>
-        <module>Attacks</module>
         <module>Breaker-Commons</module>
     </modules>
     <build>
