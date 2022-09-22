@@ -15,17 +15,17 @@ import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurveOverFp;
 import de.rub.nds.tlsattacker.core.crypto.ec.FieldElementFp;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
 import de.rub.nds.tlsattacker.core.crypto.ec.RFC7748Curve;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TwistedCurvePointTest {
-
-    public TwistedCurvePointTest() {
-    }
 
     @Test
     public void testSmallOrder() {
@@ -130,10 +130,8 @@ public class TwistedCurvePointTest {
             return false;
         } else if (invP2 != null && invP1.getOrder().compareTo(invP2.getOrder()) >= 0) {
             return false;
-        } else if (invP3 != null && invP2 != null && invP2.getOrder().compareTo(invP3.getOrder()) >= 0) {
-            return false;
-        }
-        return true;
+        } else
+            return invP3 == null || invP2 == null || invP2.getOrder().compareTo(invP3.getOrder()) < 0;
     }
 
 }

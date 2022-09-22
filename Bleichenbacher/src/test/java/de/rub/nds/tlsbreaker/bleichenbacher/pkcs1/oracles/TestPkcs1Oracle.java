@@ -14,10 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
 
-/**
- *
- *
- */
 public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
 
     private static final Logger LOGGER = LogManager.getLogger();

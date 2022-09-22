@@ -45,7 +45,7 @@ import de.rub.nds.tlsbreaker.poodle.util.MyHttpHandler;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleHTTPServer;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleUtils;
 
-/** 
+/**
  *
  */
 public class PoodleAttacker extends Attacker<PoodleCommandConfig> {

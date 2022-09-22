@@ -9,283 +9,85 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
+import de.rub.nds.tlsattacker.util.tests.TestCategories;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BleichenbacherServerSelectionTest {
 
-    private File FileLocation;
-
-    public BleichenbacherServerSelectionTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    public List<PcapSession> fetchsessions(File pcapFileLocation) {
-        PcapAnalyzer sample = new PcapAnalyzer(pcapFileLocation.getPath());
+    public List<PcapSession> fetchSessions(String pcapFile) {
+        PcapAnalyzer sample = new PcapAnalyzer(String.format("src/test/resources/pcap_files/%s", pcapFile));
         return sample.getAllSessions();
     }
 
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH USES DIFFIE HELLMAN HAS KEY EXCHANGE EXPECTED OUTPUT : 0
-     * SERVERS SINCE BLEICHENBACHER WON'T WORK ON DIFFIE HELLMAN KEY EXCHANGE
-     */
-    @Test
-    public void isServerDisplayedForDH() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "DH_RSA.pcapng" + File.separator);
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 0, uniqueServers.size());
+    public static Stream<Arguments> provideUniqueServerSelectionTestVectors() {
+        return Stream.of(Arguments.of("DH_RSA.pcapng", 0, List.of()),
+            Arguments.of("2nd_TLS_RSA_PSK_AES.pcapng", 1, List.of("127.0.0.1:4433")),
+            Arguments.of("SSLV3_pcap.pcap", 4,
+                List.of("207.46.113.78:5443", "65.54.186.19:5443", "65.54.186.19:443", "207.46.113.78:443")),
+            Arguments.of("psk_captured.pcapng", 1, List.of("127.0.0.1:4433")),
+            Arguments.of("Sample2.pcapng", 1, List.of("127.0.0.1:443")),
+            Arguments.of("TLS_RSA_WITH_ARIA_128_CBC_SHA256.pcapng", 4,
+                List.of("127.0.0.1:4433", "127.0.0.8:4433", "127.0.0.2:4433", "127.0.0.3:4433")));
     }
 
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH USES RSA KEY EXCHANGE EXPECTED OUTPUT : 1 SERVERS
-     * (127.0.0.1:4433)
-     *
-     */
-    @Test
-    public void isAllServerdisplayForRSA() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "2nd_TLS_RSA_PSK_AES.pcapng" + File.separator);
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
+    @ParameterizedTest
+    @MethodSource("provideUniqueServerSelectionTestVectors")
+    public void testUniqueServerSelection(String providedPcapFile, int expectedUniqueServerSessionCount,
+        List<String> expectedUniqueServerSessions) {
+        List<PcapSession> sessions = fetchSessions(providedPcapFile);
         BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
         Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
         List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
 
-        Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
-        Assert.assertEquals("Expected Destination server", "127.0.0.1:4433", uniqueServers.get(0));
-
-    }
-
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH USES RSA HAS KEY EXCHANGE WITH SSLV3 PROTOCOL EXPECTED OUTPUT :
-     * 4 SERVERS.
-     */
-    @Test
-    public void TestUniqueSSLV3Pcap() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "SSLV3_pcap.pcap" + File.separator);
-
-        List<String> HostAddress =
-            Arrays.asList("207.46.113.78:5443", "65.54.186.19:5443", "65.54.186.19:443", "207.46.113.78:443");
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 4, uniqueServers.size());
+        assertEquals(expectedUniqueServerSessionCount, uniqueServers.size(),
+            "Expected count of server displayed for user");
         for (int i = 0; i < uniqueServers.size(); i++) {
-            Assert.assertEquals("Expected Destination server", HostAddress.get(i), uniqueServers.get(i));
+            assertEquals(expectedUniqueServerSessions.get(i), uniqueServers.get(i), "Expected Destination server");
         }
-
     }
-
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH USES RSA KEY EXCHANGE EXPECTED OUTPUT : 1 SERVERS
-     * (127.0.0.1:4433)
-     */
-    @Test
-    public void testPcapWithExtraTlsDataInSessions() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "psk_captured.pcapng" + File.separator);
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
-        Assert.assertEquals("Expected Destination server", "127.0.0.1:4433", uniqueServers.get(0));
-
-    }
-
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH USES RSA KEY EXCHANGE EXPECTED OUTPUT : 10 SERVERS
-     */
-    @Test
-    public void testBigPcapWithMultipleServers() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "Sample4.pcap" + File.separator);
-
-        List<String> HostAddress = new ArrayList<String>(Arrays.asList("204.9.163.181:443", "65.54.186.19:5443",
-            "65.54.186.19:443", "72.14.213.120:443", "72.14.213.147:443", "72.14.213.132:443", "207.46.113.78:443",
-            "184.85.226.161:443", "67.215.65.132:443", "207.46.113.78:5443"));
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 10, uniqueServers.size());
-        for (String uniqueServer : uniqueServers) {
-
-            Assert.assertTrue("Displayed Server is not present in the Pcap file", HostAddress.contains(uniqueServer));
-            HostAddress.remove(uniqueServer);
-        }
-
-    }
-
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH HAS RSA AND ECDHE KEY EXCHANGE SESSIONS EXPECTED OUTPUT : 1
-     * SERVER (127.0.0.1:443)
-     */
-    @Test
-    public void TestRSAServerSelectionFromDHPcap() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "Sample2.pcapng" + File.separator);
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 1, uniqueServers.size());
-        Assert.assertEquals("Expected Destination server", "127.0.0.1:443", uniqueServers.get(0));
-
-    }
-
-    /*
-     * BLEICHENBACHER SERVER TEST TESTING THE PCAP WHICH HAS RSA AS KEY EXCHANGE FOR ALL TLS VERSIONS(EXCEPT TLS1.3)
-     * EXPECTED OUTPUT : 4 SERVERS
-     */
-    @Test
-    public void TestRSAServerDisplayForAllTLSVersions() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "TLS_RSA_WITH_ARIA_128_CBC_SHA256.pcapng" + File.separator);
-
-        List<String> HostAddress = new ArrayList<String>(
-            Arrays.asList("127.0.0.1:4433", "127.0.0.8:4433", "127.0.0.2:4433", "127.0.0.3:4433"));
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-
-        Assert.assertEquals("Expected count of server displayed for user", 4, uniqueServers.size());
-        for (String uniqueServer : uniqueServers) {
-
-            Assert.assertTrue("Displayed Server is not present in the Pcap file", HostAddress.contains(uniqueServer));
-            HostAddress.remove(uniqueServer);
-        }
-
-    }
-
-    /*
-     * BLEICHENBACHER SESSION COUNT TEST TESTING THE PCAP WHICH SSLV3 CONNECTIONS EXPECTED OUTPUT : 6 SESSIONS FROM 4
-     * SERVERS
-     */
-    @Test
-    public void TestRSASessionscount() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "SSLV3_pcap.pcap" + File.separator);
-
-        List<String> HostAddress = new ArrayList<String>(
-            Arrays.asList("207.46.113.78:5443", "65.54.186.19:5443", "65.54.186.19:443", "207.46.113.78:443"));
-        List<Integer> SessionCount = new ArrayList<Integer>(Arrays.asList(2, 1, 1, 2));
-        int numberOfSessions = 0;
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        // List<String> uniqueServers = new ArrayList(serverSessionsMap.keySet());
-        for (int i = 0; i < HostAddress.size(); i++) {
-            String hostAddress = HostAddress.get(i);
-            // System.out.println(hostAddress);
-
-            numberOfSessions = serverSessionsMap.get(hostAddress).size();
-            // System.out.println(numberOfSessions);
-
-            Assert.assertEquals("Session count of server : " + hostAddress,
-                Integer.parseInt(SessionCount.get(i).toString()), numberOfSessions);
-
-        }
-
-    }
-
-    /*
-     * BLEICHENBACHER SESSION COUNT TEST TESTING A PCAP WHICH CONTAINS MORE NUMBER OF SESSIONS BETWEEN 2 SYSTEMS
-     * EXPECTED OUTPUT : 2 SERVERS 1 WITH 36 SESSIONS AND ANOTHER HAS 12 SESSIONS.
-     */
 
     @Test
-    public void TestRSASessionsCountForBigFile() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "Sample5.pcapng" + File.separator);
-
-        List<String> HostAddress = new ArrayList<String>(Arrays.asList("127.0.0.4:4433", "127.0.0.3:4433"));
-        List<Integer> SessionCount = new ArrayList<Integer>(Arrays.asList(36, 12));
-        int numberOfSessions = 0;
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
-        BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
-        Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        // List<String> uniqueServers = new ArrayList(serverSessionsMap.keySet());
-        for (int i = 0; i < HostAddress.size(); i++) {
-            String hostAddress = HostAddress.get(i);
-            // System.out.println(hostAddress);
-
-            numberOfSessions = serverSessionsMap.get(hostAddress).size();
-            // System.out.println(numberOfSessions);
-
-            Assert.assertEquals("Session count of server : " + hostAddress,
-                Integer.parseInt(SessionCount.get(i).toString()), numberOfSessions);
-
-        }
-
+    @Tag(TestCategories.SLOW_TEST)
+    public void testUniqueServerSelectionSlow() {
+        testUniqueServerSelection("Sample4.pcap", 10,
+            Arrays.asList("207.46.113.78:5443", "204.9.163.181:443", "65.54.186.19:5443", "65.54.186.19:443",
+                "72.14.213.120:443", "72.14.213.147:443", "72.14.213.132:443", "207.46.113.78:443",
+                "184.85.226.161:443", "67.215.65.132:443"));
     }
 
-    // ############################################### NOT IMPLEMENTED #####################################
+    public static Stream<Arguments> provideRsaSessionCountTestVectors() {
+        return Stream.of(
+            Arguments.of("SSLV3_pcap.pcap",
+                List.of("207.46.113.78:5443", "65.54.186.19:5443", "65.54.186.19:443", "207.46.113.78:443"),
+                List.of(2, 1, 1, 2)),
+            Arguments.of("Sample5.pcapng", List.of("127.0.0.4:4433", "127.0.0.3:4433"), List.of(36, 12)));
+    }
 
-    /*
-     * BLEICHENBACHER SESSION COUNT TEST TESTING A PCAP WHICH CONTAINS ONLY ONE SESSION THIS FEATURE IS NOT YET
-     * IMPLEMENTED
-     */
-
-    // @Test
-    public void TestRSAsessionscount() {
-
-        FileLocation = new File("src" + File.separator + "test" + File.separator + "resources" + File.separator
-            + "pcap_files" + File.separator + "psk_captured.pcapng" + File.separator);
-
-        int numberOfSessions = 0;
-
-        List<PcapSession> sessions = fetchsessions(FileLocation);
+    @ParameterizedTest
+    @MethodSource("provideRsaSessionCountTestVectors")
+    public void testRsaSessionCount(String providedPcapFile, List<String> providedServers,
+        List<Integer> expectedSessionCount) {
+        List<PcapSession> sessions = fetchSessions(providedPcapFile);
         BleichenbacherServerSelection bleichenbacherServerSelection = new BleichenbacherServerSelection(sessions);
         Map<String, List<PcapSession>> serverSessionsMap = bleichenbacherServerSelection.getServerSessionsMap();
-        List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
-        for (String hostAddress : uniqueServers) {
-            numberOfSessions = serverSessionsMap.get(hostAddress).size();
+        for (int i = 0; i < providedServers.size(); i++) {
+            int numberOfSessions = serverSessionsMap.get(providedServers.get(i)).size();
+            assertEquals(expectedSessionCount.get(i), numberOfSessions,
+                String.format("Session count of server %s does not equal expectations", providedServers.get(i)));
         }
-
-        Assert.assertEquals("Session count of server", 1, numberOfSessions);
-
     }
 }

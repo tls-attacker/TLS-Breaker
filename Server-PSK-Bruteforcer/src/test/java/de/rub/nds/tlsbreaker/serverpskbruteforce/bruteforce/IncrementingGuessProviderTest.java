@@ -9,27 +9,12 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce;
 
-import org.junit.Before;
-import org.junit.Test;
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- *
- */
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 public class IncrementingGuessProviderTest {
-
-    /**
-     *
-     */
-    public IncrementingGuessProviderTest() {
-    }
-
-    /**
-     *
-     */
-    @Before
-    public void setUp() {
-    }
 
     /**
      * Test of getGuess method, of class IncrementingGuessProvider.
@@ -37,8 +22,18 @@ public class IncrementingGuessProviderTest {
     @Test
     public void testGetGuess() {
         IncrementingGuessProvider provider = new IncrementingGuessProvider();
+        int byteLength = 0;
         for (int i = 0; i < 2048; i++) {
-            provider.getGuess();
+            if (i == 1 << (8 * byteLength)) {
+                byteLength++;
+                i = 0;
+            }
+            byte[] expectedGuess = byteLength == 0 ? new byte[0] : ArrayConverter.intToBytes(i, byteLength);
+            byte[] actualGuess = provider.getGuess();
+            assertArrayEquals(expectedGuess, actualGuess,
+                String.format("Incrementing guess provider returned 0x%s, but next guess should be 0x%s",
+                    ArrayConverter.bytesToRawHexString(actualGuess),
+                    ArrayConverter.bytesToRawHexString(expectedGuess)));
         }
     }
 }
