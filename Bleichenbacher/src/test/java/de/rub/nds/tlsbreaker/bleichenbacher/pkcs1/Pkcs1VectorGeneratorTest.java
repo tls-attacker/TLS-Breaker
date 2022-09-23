@@ -28,6 +28,6 @@ public class Pkcs1VectorGeneratorTest {
         List<Pkcs1Vector> vectors = Pkcs1VectorGenerator.generatePlainPkcs1Vectors(2048,
             BleichenbacherCommandConfig.Type.FAST, ProtocolVersion.TLS12);
         assertNotNull(vectors);
-        assertEquals(12, vectors.size(), "11 PKCS#1 vectors should be generated");
+        assertEquals(12, vectors.size(), "Expected number of PKCS#1 vectors should be generated");
     }
 }
