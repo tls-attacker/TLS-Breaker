@@ -13,7 +13,6 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.*;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce.GuessProviderType;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
 
 public class PskBruteForcerClientPcapFileHandler {
 

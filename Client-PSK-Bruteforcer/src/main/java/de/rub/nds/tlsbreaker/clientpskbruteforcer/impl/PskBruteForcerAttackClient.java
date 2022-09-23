@@ -13,8 +13,8 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce.GuessProvider;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce.GuessProviderFactory;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProvider;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderFactory;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
