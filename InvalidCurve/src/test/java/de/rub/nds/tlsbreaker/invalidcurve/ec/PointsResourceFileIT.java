@@ -32,8 +32,7 @@ public class PointsResourceFileIT {
     private final List<String> pointsFileList = Arrays.asList();
 
     public static Stream<Arguments> provideCurvePointsFileList() {
-        return Stream.of("points_secp112r1.txt", "points_secp112r2.txt", "points_secp128r1.txt", "points_secp128r2.txt",
-            "points_secp160k1.txt", "points_secp160r1.txt", "points_secp160r1.txt", "points_secp192k1.txt",
+        return Stream.of("points_secp160k1.txt", "points_secp160r1.txt", "points_secp160r1.txt", "points_secp192k1.txt",
             "points_secp192r1.txt", "points_secp224k1.txt", "points_secp224r1.txt", "points_secp256r1.txt",
             "points_secp384r1.txt", "points_secp521r1.txt", "points_brainpoolp256r1.txt", "points_brainpoolp384r1.txt",
             "points_brainpoolp512r1.txt").map(Arguments::of);
