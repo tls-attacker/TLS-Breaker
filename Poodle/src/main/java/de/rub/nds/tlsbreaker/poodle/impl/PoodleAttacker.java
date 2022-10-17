@@ -19,8 +19,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.beust.jcommander.internal.Console;
-
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -45,7 +43,7 @@ import de.rub.nds.tlsbreaker.poodle.util.MyHttpHandler;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleHTTPServer;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleUtils;
 
-/** 
+/**
  *
  */
 public class PoodleAttacker extends Attacker<PoodleCommandConfig> {

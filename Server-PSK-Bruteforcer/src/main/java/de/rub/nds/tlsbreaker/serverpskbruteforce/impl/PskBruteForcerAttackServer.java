@@ -12,13 +12,10 @@ package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsattacker.core.constants.ChangeCipherSpecByteLength;
-import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.FinishedMessage;
 import de.rub.nds.tlsattacker.core.workflow.action.ReceivingAction;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProvider;
-import de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce.GuessProviderFactory;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProvider;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderFactory;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;

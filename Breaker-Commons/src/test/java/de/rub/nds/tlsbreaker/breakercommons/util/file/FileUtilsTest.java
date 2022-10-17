@@ -9,15 +9,20 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.util.file;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
-public class FileUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    public void testIsFileExists() {
-        File file = new File("./src/test/java/de/rub/nds/tlsbreaker/breakercommons/util/sample.pcapng");
+public class FileUtilsTest {
 
-        assertEquals(FileUtils.isFileExists(file.getAbsolutePath()), true);
+    @Test
+    public void testIsFileExists() throws IOException {
+        File file = new File("fileUtils.test.file");
+        assert file.exists() || file.createNewFile();
+        assertTrue(FileUtils.isFileExists(file.getAbsolutePath()));
+        assert file.delete();
     }
 }

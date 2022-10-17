@@ -9,7 +9,6 @@
 
 package de.rub.nds.tlsbreaker.simplemitmproxy;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.io.FileNotFoundException;

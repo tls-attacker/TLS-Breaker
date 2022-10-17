@@ -21,35 +21,30 @@ import java.security.Security;
 import javax.crypto.Cipher;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- *
- */
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 public class BleichenbacherAttackPlaintextTest {
 
     private static final int PREMASTER_SECRET_LENGTH = 48;
 
     private TlsContext context;
 
-    /**
-     *
-     */
-    @Before
+    @BeforeAll
+    public static void setUpClass() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    @BeforeEach
     public void setUp() {
         context = new TlsContext();
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Test
     public void testBleichenbacherAttack() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         context.getBadSecureRandom().setSeed(0);
         keyPairGenerator.initialize(2048, context.getBadSecureRandom());
@@ -75,7 +70,7 @@ public class BleichenbacherAttackPlaintextTest {
         attacker.attack();
         BigInteger solution = attacker.getSolution();
 
-        Assert.assertArrayEquals("The computed solution for Bleichenbacher must be equal to the original message",
-            message, solution.toByteArray());
+        assertArrayEquals(message, solution.toByteArray(),
+            "The computed solution for Bleichenbacher must be equal to the original message");
     }
 }

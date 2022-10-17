@@ -14,13 +14,15 @@ import de.rub.nds.tlsattacker.core.crypto.ec.CurveFactory;
 import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurve;
 import de.rub.nds.tlsattacker.core.crypto.ec.FieldElementFp;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InvalidCurvePointTest {
 
@@ -106,10 +108,8 @@ public class InvalidCurvePointTest {
             return false;
         } else if (invP2 != null && invP1.getOrder().compareTo(invP2.getOrder()) >= 0) {
             return false;
-        } else if (invP3 != null && invP2 != null && invP2.getOrder().compareTo(invP3.getOrder()) >= 0) {
-            return false;
-        }
-        return true;
+        } else
+            return invP3 == null || invP2 == null || invP2.getOrder().compareTo(invP3.getOrder()) < 0;
     }
 
 }

@@ -7,17 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-//package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsattacker.core.constants.CipherSuite;
-import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
-import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.*;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.bruteforce.GuessProviderType;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
 
 public class PskBruteForcerClientPcapFileHandler {
 

@@ -7,9 +7,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce;
+package de.rub.nds.tlsbreaker.breakercommons.psk;
 
-import de.rub.nds.tlsbreaker.breakercommons.psk.IncrementingGuessProvider;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import org.junit.jupiter.api.Test;
 

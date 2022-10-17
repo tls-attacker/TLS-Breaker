@@ -13,7 +13,6 @@ import java.io.EOFException;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Hex;
 import org.pcap4j.core.NotOpenException;
@@ -26,7 +25,6 @@ import org.pcap4j.packet.Packet;
 
 import org.pcap4j.packet.TcpPacket;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 
 @SuppressWarnings("javadoc")

@@ -20,9 +20,7 @@ import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
-import static de.rub.nds.tlsattacker.core.constants.CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

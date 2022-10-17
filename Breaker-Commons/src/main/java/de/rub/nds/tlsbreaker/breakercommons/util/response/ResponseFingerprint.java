@@ -18,9 +18,7 @@ import de.rub.nds.tlsattacker.core.protocol.message.TlsMessage;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.transport.socket.SocketState;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -194,7 +192,7 @@ public class ResponseFingerprint {
     /**
      * Overrides the built-in hashCode() function. toString().hashCode() assures same hashes for responses with
      * essentially the same content but differences in their record bytes.
-     * 
+     *
      * @return The hash of the string representation
      */
     @Override
@@ -204,7 +202,7 @@ public class ResponseFingerprint {
 
     /**
      * Returns whether two ResponseFingerprints are equal using the {@link FingerPrintChecker}.
-     * 
+     *
      * @param  obj
      *             ResponseFingerprint to compare this one to
      * @return     True, if both ResponseFingerprints are equal

@@ -12,7 +12,6 @@ package de.rub.nds.tlsbreaker.poodle.config;
 import com.beust.jcommander.ParametersDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.MitmDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;

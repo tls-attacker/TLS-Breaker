@@ -14,21 +14,11 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-/**
- *
- *
- */
 public class ICEPointReaderTest {
 
-    /**
-     * Test of readPoints method, of class ICEPointReader.
-     *
-     * @throws java.lang.Exception
-     */
     @Test
-    public void testReadPoints() throws Exception {
+    public void testReadPoints() {
         List<ICEPoint> result = ICEPointReader.readPoints(NamedGroup.SECP192R1);
         assertEquals(5, result.get(0).getOrder());
     }
-
 }

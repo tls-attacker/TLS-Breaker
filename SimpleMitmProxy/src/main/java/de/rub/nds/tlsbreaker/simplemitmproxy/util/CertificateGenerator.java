@@ -39,7 +39,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 // Based on https://github.com/misterpki/selfsignedcert/blob/master/src/main/java/com/misterpki/SelfSignedCertGenerator.java
 
@@ -60,9 +59,9 @@ public class CertificateGenerator {
         X500Name x500Name = new X500Name("CN=" + cn);
         X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(x500Name,
             BigInteger.valueOf(now.toEpochMilli()), notBefore, notAfter, x500Name, keyPair.getPublic())
-                .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
-                .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
-                .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
+            .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
+            .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 
         return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
             .getCertificate(certificateBuilder.build(contentSigner));
