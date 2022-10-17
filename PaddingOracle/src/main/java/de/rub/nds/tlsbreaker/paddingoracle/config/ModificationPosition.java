@@ -7,11 +7,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.general;
+package de.rub.nds.tlsbreaker.paddingoracle.config;
 
-public interface Vector {
-    @Override
-    public boolean equals(Object vector);
-
-    public String getName();
+/**
+ *
+ */
+public enum ModificationPosition {
+    MAC,
+    PADDING,
+    PLAIN
 }

@@ -10,7 +10,7 @@
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.general.Vector;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.Vector;
 
 import java.util.Arrays;
 

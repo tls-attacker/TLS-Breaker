@@ -9,9 +9,9 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles;
 
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowGenerator;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowType;
-import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;

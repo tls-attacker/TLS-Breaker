@@ -9,10 +9,9 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles;
 
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
 
 public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
 

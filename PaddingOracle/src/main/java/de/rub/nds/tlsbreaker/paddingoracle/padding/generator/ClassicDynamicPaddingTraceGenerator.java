@@ -7,12 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding;
+package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
 import java.util.LinkedList;
 
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
+import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingRecordGeneratorType;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
 import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;

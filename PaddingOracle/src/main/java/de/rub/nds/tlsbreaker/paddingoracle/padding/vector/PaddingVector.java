@@ -7,9 +7,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding.vector;
+package de.rub.nds.tlsbreaker.paddingoracle.padding.vector;
 
-import de.rub.nds.tlsbreaker.breakercommons.general.Vector;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.Vector;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.Record;

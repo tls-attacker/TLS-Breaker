@@ -7,12 +7,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.config;
+package de.rub.nds.tlsbreaker.paddingoracle.config;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingVectorGeneratorType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
@@ -23,6 +21,7 @@ import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
 import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import java.util.LinkedList;
 import java.util.List;
 

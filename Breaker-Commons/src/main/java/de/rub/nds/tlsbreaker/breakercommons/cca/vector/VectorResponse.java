@@ -7,9 +7,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding;
+package de.rub.nds.tlsbreaker.breakercommons.cca.vector;
 
-import de.rub.nds.tlsbreaker.breakercommons.general.Vector;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 
 public class VectorResponse {

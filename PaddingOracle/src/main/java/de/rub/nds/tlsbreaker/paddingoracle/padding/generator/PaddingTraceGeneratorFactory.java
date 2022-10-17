@@ -7,9 +7,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding;
+package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
-import de.rub.nds.tlsbreaker.breakercommons.config.PaddingOracleCommandConfig;
+import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
 
 /**
  *

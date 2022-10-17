@@ -7,11 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding;
+package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayExplicitValueModification;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.TripleVector;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.TripleVector;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;

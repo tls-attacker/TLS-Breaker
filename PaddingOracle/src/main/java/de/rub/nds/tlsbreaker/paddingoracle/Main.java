@@ -13,7 +13,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.config.PaddingOracleCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.paddingoracle.impl.PaddingOracleAttacker;
@@ -23,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Objects;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
 
 /**
  *

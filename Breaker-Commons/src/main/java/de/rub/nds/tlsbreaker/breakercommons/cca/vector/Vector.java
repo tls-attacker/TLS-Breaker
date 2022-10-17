@@ -7,13 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.constants;
+package de.rub.nds.tlsbreaker.breakercommons.cca.vector;
 
-/**
- *
- */
-public enum ModificationPosition {
-    MAC,
-    PADDING,
-    PLAIN
+public interface Vector {
+    @Override
+    public boolean equals(Object vector);
+
+    public String getName();
 }

@@ -7,34 +7,32 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.padding;
+package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
-import de.rub.nds.tlsbreaker.breakercommons.constants.PaddingRecordGeneratorType;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
+import java.util.LinkedList;
+
+import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingRecordGeneratorType;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
 import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.HeartbeatMessage;
-import de.rub.nds.tlsattacker.core.record.AbstractRecord;
-import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.action.GenericReceiveAction;
+import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 
-import java.util.LinkedList;
-
 /**
  *
  */
-public class HeartbeatPaddingTraceGenerator extends PaddingTraceGenerator {
+public class ClassicPaddingTraceGenerator extends PaddingTraceGenerator {
 
     /**
      *
      * @param recordGeneratorType
      */
-    public HeartbeatPaddingTraceGenerator(PaddingRecordGeneratorType recordGeneratorType) {
+    public ClassicPaddingTraceGenerator(PaddingRecordGeneratorType recordGeneratorType) {
         super(recordGeneratorType);
     }
 
@@ -45,14 +43,17 @@ public class HeartbeatPaddingTraceGenerator extends PaddingTraceGenerator {
      */
     @Override
     public WorkflowTrace getPaddingOracleWorkflowTrace(Config config, PaddingVector vector) {
-        WorkflowTrace trace = new WorkflowConfigurationFactory(config).createWorkflowTrace(WorkflowTraceType.HANDSHAKE,
-            RunningModeType.CLIENT);
+        RunningModeType runningMode = config.getDefaultRunningMode();
+        WorkflowTrace trace =
+            new WorkflowConfigurationFactory(config).createWorkflowTrace(WorkflowTraceType.HANDSHAKE, runningMode);
+        if (runningMode == RunningModeType.SERVER) {
+            // we assume that the client sends the first application message
+            trace.addTlsAction(new ReceiveAction(new ApplicationMessage(config)));
+        }
         ApplicationMessage applicationMessage = new ApplicationMessage(config);
-        HeartbeatMessage heartbeat = new HeartbeatMessage();
-        SendAction sendAction = new SendAction(applicationMessage, heartbeat);
-        sendAction.setRecords(new LinkedList<AbstractRecord>());
+        SendAction sendAction = new SendAction(applicationMessage);
+        sendAction.setRecords(new LinkedList<>());
         sendAction.getRecords().add(vector.createRecord());
-        sendAction.getRecords().add(new Record(config));
         trace.addTlsAction(sendAction);
         trace.addTlsAction(new GenericReceiveAction());
         return trace;
