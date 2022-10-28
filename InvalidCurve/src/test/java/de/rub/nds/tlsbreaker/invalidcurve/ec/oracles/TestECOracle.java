@@ -34,7 +34,7 @@ public class TestECOracle extends ECOracle {
         if (numberOfQueries % 100 == 0) {
             LOGGER.debug("Number of queries so far: {}", numberOfQueries);
         }
-        Point result = curve.mult(guessedSecret, ecPoint);
+        Point result = curve.mult(privateKey, ecPoint);
 
         if (result.isAtInfinity()) {
             return false;
