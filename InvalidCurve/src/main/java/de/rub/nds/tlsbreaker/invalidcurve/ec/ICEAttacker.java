@@ -160,7 +160,6 @@ public class ICEAttacker {
         int lastElementPointer = usedOracleEquations.length - 1;
         BigInteger result =
             bruteForceWithAdditionalOracleEquations(usedOracleEquations, congsArray, moduliArray, lastElementPointer);
-
         if (result != null) {
             LOGGER.info("Result found: {}", result);
             LOGGER.info("Number of server queries: {}", oracle.getNumberOfQueries());
@@ -193,7 +192,7 @@ public class ICEAttacker {
         for (int i = minValue; i < maxValue; i++) {
             eq[pointer] = i;
             if (pointer > 0) {
-                bruteForceWithAdditionalOracleEquations(eq, congs, modulis, (pointer - 1));
+                return bruteForceWithAdditionalOracleEquations(eq, congs, modulis, (pointer - 1));
             } else {
                 LOGGER.debug("Trying the following combination: {}", Arrays.toString(eq));
                 BigInteger sqrtResult = computeCRTFromCombination(usedOracleEquations, congs, modulis);
@@ -249,6 +248,7 @@ public class ICEAttacker {
         for (int i = 1; i < point.getOrder(); i++) {
             secretModOrder = secretModOrder.add(BigInteger.ONE);
             Point guess = curve.mult(secretModOrder, point);
+            LOGGER.info("Testing with value: " + secretModOrder);
             if (oracle.checkSecretCorrectness(point, guess.getFieldX().getData())) {
                 return secretModOrder;
             }
