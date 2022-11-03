@@ -9,25 +9,33 @@
 
 package de.rub.nds.tlsbreaker.heartbleed.config;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
+
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
-import de.rub.nds.tlsattacker.core.constants.*;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.ProtocolVersionDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
+import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
+import de.rub.nds.tlsattacker.core.constants.CipherSuite;
+import de.rub.nds.tlsattacker.core.constants.ECPointFormat;
+import de.rub.nds.tlsattacker.core.constants.HeartbeatMode;
+import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
+import de.rub.nds.tlsattacker.core.constants.NamedGroup;
+import de.rub.nds.tlsattacker.core.constants.SignatureAndHashAlgorithm;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
-
-import java.util.LinkedList;
-import java.util.List;
+import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 
 /**
  *
  */
-public class HeartbleedCommandConfig extends AttackConfig {
+public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackConfig {
 
     /**
      *

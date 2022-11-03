@@ -37,7 +37,7 @@ import de.rub.nds.tlsattacker.core.workflow.action.*;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.heartbleed.config.HeartbleedCommandConfig;
 import de.rub.nds.util.ByteArrayUtils;
 import org.apache.logging.log4j.LogManager;

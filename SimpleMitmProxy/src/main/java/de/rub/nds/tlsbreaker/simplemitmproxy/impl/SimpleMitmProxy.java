@@ -9,7 +9,7 @@
 
 package de.rub.nds.tlsbreaker.simplemitmproxy.impl;
 
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;

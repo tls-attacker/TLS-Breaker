@@ -10,8 +10,8 @@
 package de.rub.nds.tlsbreaker.earlyfinished.impl;
 
 import de.rub.nds.tlsbreaker.earlyfinished.config.EarlyFinishedCommandConfig;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.constants.EarlyFinishedVulnerabilityType;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.OutboundConnection;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;

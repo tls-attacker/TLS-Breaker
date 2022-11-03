@@ -12,7 +12,7 @@ package de.rub.nds.tlsbreaker.cve20162107.impl;
 import de.rub.nds.modifiablevariable.VariableModification;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.cve20162107.config.Cve20162107CommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.AlertDescription;

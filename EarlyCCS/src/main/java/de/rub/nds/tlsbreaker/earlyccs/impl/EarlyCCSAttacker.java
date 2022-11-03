@@ -13,8 +13,8 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.tlsbreaker.earlyccs.actions.EarlyCcsAction;
 import de.rub.nds.tlsbreaker.earlyccs.config.EarlyCCSCommandConfig;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.constants.EarlyCcsVulnerabilityType;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;

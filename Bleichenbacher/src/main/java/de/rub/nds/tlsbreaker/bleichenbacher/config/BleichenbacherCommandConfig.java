@@ -21,6 +21,7 @@ import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.KeyExchangeAlgorithm;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.BleichenbacherWorkflowType;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  *
  */
-public class BleichenbacherCommandConfig extends AttackConfig {
+public class BleichenbacherCommandConfig extends AttackConfig implements PcapAttackConfig {
 
     /**
      *

@@ -13,6 +13,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.exception.WordlistNotFoundException;
@@ -28,7 +29,7 @@ import java.io.InputStream;
 /**
  *
  */
-public class PskBruteForcerAttackClientCommandConfig extends AttackConfig {
+public class PskBruteForcerAttackClientCommandConfig extends AttackConfig implements PcapAttackConfig {
 
     /**
      *

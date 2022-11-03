@@ -37,7 +37,7 @@ import de.rub.nds.tlsattacker.core.workflow.action.executor.ReceiveMessageHelper
 import de.rub.nds.tlsattacker.core.workflow.action.executor.SendMessageHelper;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.poodle.config.PoodleCommandConfig;
 import de.rub.nds.tlsbreaker.poodle.util.MyHttpHandler;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleHTTPServer;

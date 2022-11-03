@@ -9,24 +9,30 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
+import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
-import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.*;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
-
-public class PskBruteForcerPcapFileHandler {
+public class PskBruteForcerPcapFileHandler implements PcapFileHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     PskBruteForcerAttackServerCommandConfig pskBruteForcerAttackServerCommandConfig;

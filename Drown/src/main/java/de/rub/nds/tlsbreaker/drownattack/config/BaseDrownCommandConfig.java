@@ -9,21 +9,22 @@
 
 package de.rub.nds.tlsbreaker.drownattack.config;
 
+import java.util.List;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
-import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsattacker.core.config.Config;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.layer.RecordLayerType;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 
-import java.util.List;
-
-public abstract class BaseDrownCommandConfig extends AttackConfig {
+public abstract class BaseDrownCommandConfig extends AttackConfig implements PcapAttackConfig {
 
     @ParametersDelegate
     ClientDelegate clientDelegate;

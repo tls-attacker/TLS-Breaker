@@ -9,9 +9,24 @@
 
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
@@ -19,17 +34,8 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 import de.rub.nds.tlsbreaker.drownattack.config.BaseDrownCommandConfig;
 import de.rub.nds.tlsbreaker.drownattack.config.GeneralDrownCommandConfig;
 import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.security.interfaces.RSAPublicKey;
-import java.util.*;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
-
-public class DrownPcapFileHandler {
+public class DrownPcapFileHandler implements PcapFileHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     BaseDrownCommandConfig baseDrownCommandConfig;

@@ -9,49 +9,35 @@
 
 package de.rub.nds.tlsbreaker.simplemitmproxy;
 
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.apache.commons.lang3.StringUtils.trim;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Objects;
 import java.util.Scanner;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.operator.OperatorCreationException;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.config.delegate.CertificateDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.simplemitmproxy.config.SimpleMitmProxyCommandConfig;
+import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
 import de.rub.nds.tlsbreaker.simplemitmproxy.util.CertificateGenerator;
 import de.rub.nds.tlsbreaker.simplemitmproxy.util.DerEncode;
-import de.rub.nds.tlsbreaker.simplemitmproxy.impl.SimpleMitmProxy;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
-/**
- *
- */
 public class Main {
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    /**
-     *
-     * @param  args
-     * @throws FileNotFoundException
-     */
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
         SimpleMitmProxyCommandConfig simpleMITMProxy = new SimpleMitmProxyCommandConfig(generalDelegate);
 
@@ -114,24 +100,7 @@ public class Main {
             }
         }
 
-        Attacker<? extends TLSDelegateConfig> attacker =
-            new SimpleMitmProxy(simpleMITMProxy, simpleMITMProxy.createConfig());
-
-        if (attacker.getConfig().isExecuteAttack()) {
-            attacker.attack();
-        } else {
-            try {
-                Boolean result = attacker.checkVulnerability();
-                if (Objects.equals(result, Boolean.TRUE)) {
-                    CONSOLE.error("Vulnerable:" + result.toString());
-                } else if (Objects.equals(result, Boolean.FALSE)) {
-                    CONSOLE.info("Vulnerable:" + result.toString());
-                } else {
-                    CONSOLE.warn("Vulnerable: Uncertain");
-                }
-            } catch (UnsupportedOperationException e) {
-                LOGGER.info("The selected attacker is currently not implemented");
-            }
-        }
+        Attacker<?> attacker = new SimpleMitmProxy(simpleMITMProxy, simpleMITMProxy.createConfig());
+        attacker.run();
     }
 }

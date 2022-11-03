@@ -7,44 +7,57 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.impl;
+package de.rub.nds.tlsbreaker.breakercommons.attacker;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
-import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
-import de.rub.nds.tlsbreaker.breakercommons.connectivity.ConnectivityChecker;
-import de.rub.nds.tlsattacker.core.config.Config;
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * @param <AttConfigT>
- */
+import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.connectivity.ConnectivityChecker;
+
 public abstract class Attacker<AttConfigT extends AttackConfig> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     *
-     */
     protected AttConfigT config;
 
     private final Config baseConfig;
 
-    /**
-     *
-     * @param config
-     * @param baseConfig
-     */
-    public Attacker(AttConfigT config, Config baseConfig) {
+    protected Attacker(AttConfigT config, Config baseConfig) {
         this.config = config;
         this.baseConfig = baseConfig;
     }
 
-    /**
-     *
-     */
+    public void run() throws IOException {
+        if (!config.isSkipConnectionCheck() && !canConnect()) {
+            CONSOLE.warn("Cannot reach Server. Is the server online?");
+            throw new IOException("Server unreachable");
+        }
+
+        if (config.isExecuteAttack()) {
+            LOGGER.debug("Attacking with: {}", this.getClass().getSimpleName());
+            executeAttack();
+        } else {
+            LOGGER.debug("Checking with: {}", this.getClass().getSimpleName());
+            Boolean res = isVulnerable();
+            if (res == null) {
+                LOGGER.info("Uncertain about Vulnerability status");
+            } else if (res) {
+                LOGGER.info("Vulnerability found");
+            } else {
+                LOGGER.info("No vulnerability found");
+            }
+        }
+    }
+
+    @Deprecated
     public void attack() {
+        // TODO replace more dryly using run or the internal executeAttack
         LOGGER.debug("Attacking with: " + this.getClass().getSimpleName());
         if (!config.isSkipConnectionCheck()) {
             if (!canConnect()) {
@@ -55,11 +68,9 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
         executeAttack();
     }
 
-    /**
-     *
-     * @return
-     */
+    @Deprecated
     public Boolean checkVulnerability() {
+        // TODO replace more dryly using run or the internal isVulnerable
         LOGGER.debug("Checking: " + this.getClass().getSimpleName());
         if (!config.isSkipConnectionCheck()) {
             if (!canConnect()) {
@@ -78,23 +89,16 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
     protected abstract void executeAttack();
 
     /**
+     * Checks whether a server is vulnerable without executing the full atatck.
      *
-     * @return
+     * @return true if the server is vulnerable
      */
     protected abstract Boolean isVulnerable();
 
-    /**
-     *
-     * @return
-     */
     public AttConfigT getConfig() {
         return config;
     }
 
-    /**
-     *
-     * @return
-     */
     public Config getTlsConfig() {
         if (!config.hasDifferentConfig() && baseConfig == null) {
             return config.createConfig();
@@ -103,19 +107,11 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public Config getBaseConfig() {
         return baseConfig.createCopy();
     }
 
-    /**
-     *
-     * @return
-     */
-    protected Boolean canConnect() {
+    protected boolean canConnect() {
         Config tlsConfig = config.createConfig();
         ConnectivityChecker checker = new ConnectivityChecker(tlsConfig.getDefaultClientConnection());
         return checker.isConnectable();

@@ -17,7 +17,7 @@ import de.rub.nds.tlsbreaker.invalidcurve.config.InvalidCurveAttackConfig;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.oracles.RealDirectMessageECOracle;
 import de.rub.nds.tlsbreaker.invalidcurve.task.InvalidCurveTask;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerprintSecretPair;
 import de.rub.nds.tlsattacker.core.certificate.PemUtil;
 import de.rub.nds.tlsattacker.core.config.Config;

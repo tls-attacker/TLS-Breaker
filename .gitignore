@@ -23,6 +23,7 @@ release.properties
 
 # VS Code
 .factorypath
+.vscode
 
 # Annotation processor generated files
 **/.apt_generated/

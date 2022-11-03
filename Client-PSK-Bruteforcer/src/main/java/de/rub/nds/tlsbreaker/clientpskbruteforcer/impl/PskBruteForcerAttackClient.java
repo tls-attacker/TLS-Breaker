@@ -12,7 +12,7 @@ package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProvider;
 import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderFactory;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
