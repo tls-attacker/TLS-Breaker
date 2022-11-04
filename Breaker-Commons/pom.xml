@@ -15,6 +15,7 @@
     </properties>
 
     <dependencies>
+        <!-- scope: compile -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -30,7 +31,6 @@
             <artifactId>pkts-core</artifactId>
             <version>3.0.10</version>
         </dependency>
-        <!-- scope: compile -->
         <dependency>
             <groupId>org.pcap4j</groupId>
             <artifactId>pcap4j-core</artifactId>
