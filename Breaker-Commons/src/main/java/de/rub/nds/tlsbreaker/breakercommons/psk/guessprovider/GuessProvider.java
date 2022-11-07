@@ -7,10 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.psk;
+package de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider;
 
 /**
- * A GuessProvider is responsible for the creation of byte[] sequences for brute force attacks. The guess provider
+ * A GuessProvider is responsible for the creation of byte[] sequences for brute
+ * force attacks. The guess provider
  * should minimize the number of guesses according to heuristics.
  */
 public abstract class GuessProvider {
@@ -23,12 +24,13 @@ public abstract class GuessProvider {
      * @param type
      *             Type of the GuessProvider
      */
-    public GuessProvider(GuessProviderType type) {
+    protected GuessProvider(GuessProviderType type) {
         this.type = type;
     }
 
     /**
-     * Returns the next guess for the attack. Guesses should not repeat, but it is not completely prohibited by this
+     * Returns the next guess for the attack. Guesses should not repeat, but it is
+     * not completely prohibited by this
      * API. Returns null if no more guesses are available.
      *
      * @return The next byte[] to be used in the brute force attack.

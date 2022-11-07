@@ -30,8 +30,8 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceivingAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProvider;
-import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderFactory;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProvider;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderFactory;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
 
 /**

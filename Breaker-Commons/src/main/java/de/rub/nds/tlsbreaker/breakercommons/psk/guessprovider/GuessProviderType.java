@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.psk;
+package de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider;
 
 /**
  * A Type of GuessProvider.
@@ -19,7 +19,8 @@ public enum GuessProviderType {
      */
     INCREMENTING,
     /**
-     * A WordListGuessProvider uses an InputSource to try all words from the InputSource
+     * A WordListGuessProvider uses an InputSource to try all words from the
+     * InputSource
      */
     WORDLIST
 }

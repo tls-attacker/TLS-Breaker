@@ -22,9 +22,6 @@ import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackCli
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerAttackClient;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.impl.PskBruteForcerClientPcapFileHandler;
 
-/**
- *
- */
 public class Main {
     public static void main(String[] args) throws IOException {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();

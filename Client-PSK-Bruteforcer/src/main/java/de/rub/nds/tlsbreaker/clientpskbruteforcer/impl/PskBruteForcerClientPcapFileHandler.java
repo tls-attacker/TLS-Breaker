@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
-import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderType;
 import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ClientSelection;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;

@@ -7,14 +7,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.breakercommons.psk;
+package de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.constants.Bits;
 
 /**
- * An IncrementingGuessProvider is a GuessProvider which tries all byte[] sequences in a growing order. Starting by an
- * empty byte[] and then continuing the sequence with th byte[] size increased by 1. It would then try 00, 01, 02, ...,
+ * An IncrementingGuessProvider is a GuessProvider which tries all byte[]
+ * sequences in a growing order. Starting by an
+ * empty byte[] and then continuing the sequence with th byte[] size increased
+ * by 1. It would then try 00, 01, 02, ...,
  * FF and continue with 00 00, 00 01, 00 02 , ... to FF, FF and so on.
  */
 public class IncrementingGuessProvider extends GuessProvider {
@@ -30,7 +32,8 @@ public class IncrementingGuessProvider extends GuessProvider {
     }
 
     /**
-     * Returns the last guess incremented by 1 (or resets guess to 0 increments byte size by one).
+     * Returns the last guess incremented by 1 (or resets guess to 0 increments byte
+     * size by one).
      */
     @Override
     public byte[] getGuess() {
