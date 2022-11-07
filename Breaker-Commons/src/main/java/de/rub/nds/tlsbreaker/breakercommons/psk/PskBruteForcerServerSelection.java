@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package de.rub.nds.tlsbreaker.serverpskbruteforce.impl;
+package de.rub.nds.tlsbreaker.breakercommons.psk;
 
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
@@ -32,7 +32,7 @@ public class PskBruteForcerServerSelection extends ServerSelection {
             ProtocolVersion selectedProtocol = ProtocolVersion.getProtocolVersion(shm.getProtocolVersion().getValue());
             CipherSuite selectedCipher = CipherSuite.getCipherSuite(shm.getSelectedCipherSuite().getValue());
             if ((selectedCipher.name().contains("TLS_RSA_PSK_") || selectedCipher.name().contains("TLS_PSK_")
-                || selectedCipher.name().contains("TLS_DHE_PSK_")) && !selectedProtocol.name().contains("TLS13")) {
+                    || selectedCipher.name().contains("TLS_DHE_PSK_")) && !selectedProtocol.name().contains("TLS13")) {
                 filteredServers.add(s);
             }
 
