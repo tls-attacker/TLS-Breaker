@@ -99,7 +99,6 @@
         <module>Lucky13</module>
         <module>Poodle</module>
         <module>TLSPoodle</module>
-        <module>Cve20162107</module>
         <module>PaddingOracle</module>
         <module>EarlyCCS</module>
         <module>EarlyFinished</module>
