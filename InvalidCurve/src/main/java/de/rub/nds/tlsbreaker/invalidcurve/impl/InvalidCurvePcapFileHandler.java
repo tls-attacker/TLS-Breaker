@@ -128,7 +128,7 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
                 new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -159,7 +159,7 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
             new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
         Boolean result = null;
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

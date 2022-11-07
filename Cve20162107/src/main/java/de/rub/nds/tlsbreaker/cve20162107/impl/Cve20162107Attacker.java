@@ -13,6 +13,7 @@ import de.rub.nds.modifiablevariable.VariableModification;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.cve20162107.config.Cve20162107CommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.AlertDescription;
@@ -185,7 +186,7 @@ public class Cve20162107Attacker extends Attacker<Cve20162107CommandConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         List<ProtocolVersion> versions = config.getVersions();
         Config tlsConfig = getTlsConfig();
         List<CipherSuite> ciphers = new LinkedList<>();
@@ -222,6 +223,6 @@ public class Cve20162107Attacker extends Attacker<Cve20162107CommandConfig> {
             LOGGER.debug("Last protocol message in the protocol flow");
             LOGGER.debug(pm.toString());
         }
-        return vulnerable;
+        return VulnerabilityType.fromBoolean(vulnerable);
     }
 }

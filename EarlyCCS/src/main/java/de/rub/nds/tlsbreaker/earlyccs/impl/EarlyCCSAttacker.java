@@ -14,6 +14,7 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import de.rub.nds.tlsbreaker.earlyccs.actions.EarlyCcsAction;
 import de.rub.nds.tlsbreaker.earlyccs.config.EarlyCCSCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.constants.EarlyCcsVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -82,18 +83,19 @@ public class EarlyCCSAttacker extends Attacker<EarlyCCSCommandConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         EarlyCcsVulnerabilityType earlyCcsVulnerabilityType = getEarlyCcsVulnerabilityType();
         switch (earlyCcsVulnerabilityType) {
             case VULN_EXPLOITABLE:
+                return VulnerabilityType.VULNERABLE;
             case VULN_NOT_EXPLOITABLE:
-                return true;
+                return VulnerabilityType.VULNERABLE_NOT_EXPLOITABLE;
             case NOT_VULNERABLE:
-                return false;
+                return VulnerabilityType.NOT_VULNERABLE;
             case UNKNOWN:
-                return null;
+                return VulnerabilityType.UNKNOWN;
             default:
-                return null;
+                return VulnerabilityType.ERROR;
         }
     }
 

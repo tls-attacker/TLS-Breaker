@@ -38,6 +38,7 @@ import de.rub.nds.tlsattacker.core.workflow.action.executor.SendMessageHelper;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.poodle.config.PoodleCommandConfig;
 import de.rub.nds.tlsbreaker.poodle.util.MyHttpHandler;
 import de.rub.nds.tlsbreaker.poodle.util.PoodleHTTPServer;
@@ -313,7 +314,7 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         Config tlsConfig = getTlsConfig();
         tlsConfig.setDefaultRunningMode(RunningModeType.CLIENT);
         tlsConfig.setHighestProtocolVersion(ProtocolVersion.SSL3);
@@ -322,7 +323,9 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
         State state = new State(tlsConfig);
         DefaultWorkflowExecutor executor = new DefaultWorkflowExecutor(state);
         executor.executeWorkflow();
-        return WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SERVER_HELLO, state.getWorkflowTrace());
+        boolean vulnerable = WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SERVER_HELLO,
+                state.getWorkflowTrace());
+        return VulnerabilityType.fromBoolean(vulnerable);
     }
 
     private List<CipherSuite> getCbcCiphers() {

@@ -30,6 +30,7 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceivingAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProvider;
 import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderFactory;
 import de.rub.nds.tlsbreaker.serverpskbruteforce.config.PskBruteForcerAttackServerCommandConfig;
@@ -57,7 +58,7 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         CONSOLE.info("Connecting to the Server to find a PSK cipher suite he supports...");
         CipherSuite suite = getSupportedPskCipherSuite();
         if (suite == null) {
-            CONSOLE.warn("Stopping attack");
+            CONSOLE.warn("Did not find a supported PSK ciphersuite; Stopping attack");
             return;
         }
 
@@ -69,12 +70,8 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         boolean result = false;
         int counter = 0;
         long startTime = System.currentTimeMillis();
-        while (!result) {
-            byte[] guessedPsk = guessProvider.getGuess();
-            if (guessedPsk == null) {
-                CONSOLE.info("Could not find psk - attack stopped");
-                break;
-            }
+        while (!result && guessProvider.hasNext()) {
+            byte[] guessedPsk = guessProvider.next();
             if (guessedPsk.length == 0) {
                 continue;
             }
@@ -90,20 +87,16 @@ public class PskBruteForcerAttackServer extends Attacker<PskBruteForcerAttackSer
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         CONSOLE.info("Connecting to the Server...");
         boolean supportsPsk = getSupportedPskCipherSuite() != null;
         if (supportsPsk) {
             CONSOLE.info("Server supports PSK");
-            return true;
+            return VulnerabilityType.VULNERABILITY_POSSIBLE;
         } else {
             CONSOLE.info("Not Vulnerable - server does not support PSK");
-            return false;
+            return VulnerabilityType.NOT_VULNERABLE;
         }
     }
 

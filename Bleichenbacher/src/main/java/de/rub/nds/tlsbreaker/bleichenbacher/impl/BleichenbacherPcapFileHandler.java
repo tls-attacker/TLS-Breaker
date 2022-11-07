@@ -29,6 +29,7 @@ import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
 import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
@@ -71,7 +72,7 @@ public class BleichenbacherPcapFileHandler implements PcapFileHandler {
         String overridingHost = bleichenbacherCommandConfig.getClientDelegate().getHost();
         Attacker<? extends TLSDelegateConfig> attacker =
             new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
-        Boolean result = attacker.checkVulnerability();
+        Boolean result = attacker.checkVulnerability().asBool();
         if (Objects.equals(result, Boolean.TRUE)) {
             CONSOLE.info("Vulnerable:" + result.toString());
             CONSOLE.info("Server " + overridingHost + " is vulnerable");
@@ -202,7 +203,7 @@ public class BleichenbacherPcapFileHandler implements PcapFileHandler {
                 new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -253,7 +254,7 @@ public class BleichenbacherPcapFileHandler implements PcapFileHandler {
             new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         Boolean result = null;
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

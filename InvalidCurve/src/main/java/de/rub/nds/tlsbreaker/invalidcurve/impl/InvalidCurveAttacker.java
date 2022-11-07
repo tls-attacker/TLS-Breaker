@@ -18,6 +18,7 @@ import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.oracles.RealDirectMessageECOracle;
 import de.rub.nds.tlsbreaker.invalidcurve.task.InvalidCurveTask;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerprintSecretPair;
 import de.rub.nds.tlsattacker.core.certificate.PemUtil;
 import de.rub.nds.tlsattacker.core.config.Config;
@@ -132,7 +133,7 @@ public class InvalidCurveAttacker extends Attacker<InvalidCurveAttackConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         if (!AlgorithmResolver.getKeyExchangeAlgorithm(getTlsConfig().getDefaultSelectedCipherSuite()).isEC()) {
             LOGGER.info("The CipherSuite that should be tested is not an Ec one:"
                 + getTlsConfig().getDefaultSelectedCipherSuite().name());
@@ -179,7 +180,7 @@ public class InvalidCurveAttacker extends Attacker<InvalidCurveAttackConfig> {
             taskList.add(taskToAdd);
         }
         executor.bulkExecuteTasks(taskList);
-        return evaluateExecutedTasks(taskList);
+        return VulnerabilityType.fromBoolean(evaluateExecutedTasks(taskList));
     }
 
     private void setBasePoints() {

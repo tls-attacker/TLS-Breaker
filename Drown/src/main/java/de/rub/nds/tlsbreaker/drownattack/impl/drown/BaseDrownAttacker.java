@@ -14,6 +14,7 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsbreaker.drownattack.config.BaseDrownCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
@@ -64,25 +65,25 @@ abstract class BaseDrownAttacker extends Attacker<BaseDrownCommandConfig> {
     }
 
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         DrownVulnerabilityType type = getDrownVulnerabilityType();
         switch (type) {
             case GENERAL:
                 CONSOLE.error("Server is vulnerable to the full General DROWN attack");
-                return true;
+                return VulnerabilityType.TRUE;
             case SPECIAL:
                 CONSOLE.error("Server is vulnerable to the full Special DROWN attack");
-                return true;
+                return VulnerabilityType.TRUE;
             case SSL2:
                 CONSOLE.warn("Server supports SSL2, but not any weak cipher suites, so is not vulnerable to DROWN");
-                return false;
+                return VulnerabilityType.FALSE;
             case NONE:
-                return false;
+                return VulnerabilityType.FALSE;
             case UNKNOWN:
                 CONSOLE.info("Could not execute Workflow, check previous messages or increase log level");
-                return null;
+                return VulnerabilityType.NULL;
             default:
-                return null;
+                return VulnerabilityType.NULL;
         }
     }
 

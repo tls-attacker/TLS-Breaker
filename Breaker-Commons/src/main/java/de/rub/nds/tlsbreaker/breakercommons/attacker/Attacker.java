@@ -44,13 +44,11 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
             executeAttack();
         } else {
             LOGGER.debug("Checking with: {}", this.getClass().getSimpleName());
-            Boolean res = isVulnerable();
+            VulnerabilityType res = isVulnerable();
             if (res == null) {
-                LOGGER.info("Uncertain about Vulnerability status");
-            } else if (res) {
-                LOGGER.info("Vulnerability found");
+                LOGGER.warn("Got no vulnerability status - this should not happen");
             } else {
-                LOGGER.info("No vulnerability found");
+                LOGGER.info("Vulnerability status: {}", res);
             }
         }
     }
@@ -69,7 +67,7 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
     }
 
     @Deprecated
-    public Boolean checkVulnerability() {
+    public VulnerabilityType checkVulnerability() {
         // TODO replace more dryly using run or the internal isVulnerable
         LOGGER.debug("Checking: " + this.getClass().getSimpleName());
         if (!config.isSkipConnectionCheck()) {
@@ -93,7 +91,7 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
      *
      * @return true if the server is vulnerable
      */
-    protected abstract Boolean isVulnerable();
+    protected abstract VulnerabilityType isVulnerable();
 
     public AttConfigT getConfig() {
         return config;

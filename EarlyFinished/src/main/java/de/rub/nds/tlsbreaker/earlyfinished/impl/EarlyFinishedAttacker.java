@@ -11,6 +11,7 @@ package de.rub.nds.tlsbreaker.earlyfinished.impl;
 
 import de.rub.nds.tlsbreaker.earlyfinished.config.EarlyFinishedCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.constants.EarlyFinishedVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.OutboundConnection;
@@ -49,18 +50,19 @@ public class EarlyFinishedAttacker extends Attacker<EarlyFinishedCommandConfig> 
     }
 
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         EarlyFinishedVulnerabilityType earlyFinVulnerabilityType = performCheck();
         switch (earlyFinVulnerabilityType) {
             case VULNERABLE:
-                return true;
+                return VulnerabilityType.VULNERABLE;
             case NOT_VULNERABLE_PROBABLY:
+                return VulnerabilityType.PROBABLY_NOT_VULNERABLE;
             case NOT_VULNERABLE:
-                return false;
+                return VulnerabilityType.NOT_VULNERABLE;
             case UNKNOWN:
-                return null;
+                return VulnerabilityType.UNKNOWN;
             default:
-                return null;
+                return VulnerabilityType.ERROR;
         }
     }
 

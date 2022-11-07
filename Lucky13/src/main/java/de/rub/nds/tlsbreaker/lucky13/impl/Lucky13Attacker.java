@@ -14,6 +14,7 @@ import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.lucky13.config.Lucky13CommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
@@ -161,7 +162,7 @@ public class Lucky13Attacker extends Attacker<Lucky13CommandConfig> {
     }
 
     @Override
-    protected Boolean isVulnerable() {
+    protected VulnerabilityType isVulnerable() {
         Boolean vulnerable = false;
         StringBuilder commands = new StringBuilder();
         List<CipherSuite> suites = tlsConfig.getDefaultClientSupportedCipherSuites();
@@ -222,6 +223,6 @@ public class Lucky13Attacker extends Attacker<Lucky13CommandConfig> {
         }
         LOGGER.info("All commands at once: \n{}", commands);
         LOGGER.warn("Vulnerability has to be tested using the mona timing lib.");
-        return vulnerable;
+        return VulnerabilityType.fromBoolean(vulnerable);
     }
 }

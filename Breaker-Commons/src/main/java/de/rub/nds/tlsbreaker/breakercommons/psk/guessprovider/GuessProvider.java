@@ -9,12 +9,15 @@
 
 package de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * A GuessProvider is responsible for the creation of byte[] sequences for brute
  * force attacks. The guess provider
  * should minimize the number of guesses according to heuristics.
  */
-public abstract class GuessProvider {
+public abstract class GuessProvider implements Iterator<byte[]> {
 
     private final GuessProviderType type;
 
@@ -44,5 +47,25 @@ public abstract class GuessProvider {
      */
     public GuessProviderType getType() {
         return type;
+    }
+
+    private boolean hasFetchedNext = false;
+    private byte[] fetchedNext = null;
+
+    @Override
+    public byte[] next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return fetchedNext;
+    }
+
+    @Override
+    public boolean hasNext() {
+        if (!hasFetchedNext) {
+            fetchedNext = getGuess();
+            hasFetchedNext = true;
+        }
+        return fetchedNext != null;
     }
 }

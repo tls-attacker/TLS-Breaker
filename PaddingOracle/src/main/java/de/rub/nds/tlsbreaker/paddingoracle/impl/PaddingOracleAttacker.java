@@ -25,6 +25,7 @@ import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.cca.vector.FingerprintTaskVectorPair;
 import de.rub.nds.tlsbreaker.breakercommons.cca.vector.VectorResponse;
 import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
@@ -100,7 +101,7 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         CONSOLE
             .info("A server is considered vulnerable to this attack if it responds differently to the test vectors.");
         CONSOLE.info("A server is considered secure if it always responds the same way.");
@@ -132,7 +133,7 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
         }
 
         resultError = referenceError;
-        return referenceError != EqualityError.NONE;
+        return VulnerabilityType.fromBoolean(referenceError != EqualityError.NONE);
     }
 
     /**

@@ -72,7 +72,7 @@ public class DrownPcapFileHandler implements PcapFileHandler {
     private void processServerOverride(List<String> uniqueServers, Map<String, List<PcapSession>> serverSessionsMap) {
         String overridingHost = baseDrownCommandConfig.getClientDelegate().getHost();
         Attacker<? extends TLSDelegateConfig> attacker = getAttacker(baseDrownCommandConfig);
-        Boolean result = attacker.checkVulnerability();
+        Boolean result = attacker.checkVulnerability().asBool();
         if (Objects.equals(result, Boolean.TRUE)) {
             CONSOLE.info("Vulnerable:" + result.toString());
             CONSOLE.info("Server " + overridingHost + " is vulnerable");
@@ -215,7 +215,7 @@ public class DrownPcapFileHandler implements PcapFileHandler {
             Attacker<? extends TLSDelegateConfig> attacker = getAttacker(baseDrownCommandConfig);
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -256,7 +256,7 @@ public class DrownPcapFileHandler implements PcapFileHandler {
         Attacker<? extends TLSDelegateConfig> attacker = getAttacker(baseDrownCommandConfig);
         Boolean result = null;
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

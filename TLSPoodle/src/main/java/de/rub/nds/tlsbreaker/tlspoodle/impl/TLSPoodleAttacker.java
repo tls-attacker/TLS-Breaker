@@ -13,6 +13,7 @@ import de.rub.nds.modifiablevariable.VariableModification;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.tlspoodle.config.TLSPoodleCommandConfig;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -61,7 +62,7 @@ public class TLSPoodleAttacker extends Attacker<TLSPoodleCommandConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         Config tlsConfig = getTlsConfig();
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
             .createWorkflowTrace(WorkflowTraceType.HANDSHAKE, RunningModeType.CLIENT);
@@ -98,13 +99,13 @@ public class TLSPoodleAttacker extends Attacker<TLSPoodleCommandConfig> {
         if (state.getTlsContext().isReceivedFatalAlert()) {
             LOGGER.info(
                 "NOT Vulnerable. The modified message padding was identified, the server correctly responds with an alert message");
-            return false;
+            return VulnerabilityType.NOT_VULNERABLE;
         } else if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, trace)) {
             LOGGER.info("Vulnerable (definitely), Finished message found");
-            return true;
+            return VulnerabilityType.VULNERABLE;
         } else {
             LOGGER.info("Not vulnerable (probably), no Finished message found, yet also no alert");
-            return false;
+            return VulnerabilityType.PROBABLY_NOT_VULNERABLE;
         }
     }
 

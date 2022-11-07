@@ -167,7 +167,7 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                 pskBruteForcerAttackClientCommandConfig, pskBruteForcerAttackClientCommandConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -207,7 +207,7 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
         }
 
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

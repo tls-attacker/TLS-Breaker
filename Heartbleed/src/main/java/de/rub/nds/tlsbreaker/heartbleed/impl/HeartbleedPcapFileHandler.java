@@ -125,7 +125,7 @@ public class HeartbleedPcapFileHandler implements PcapFileHandler {
                 new HeartbleedAttacker(heartbleedCommandConfig, heartbleedCommandConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -160,7 +160,7 @@ public class HeartbleedPcapFileHandler implements PcapFileHandler {
             new HeartbleedAttacker(heartbleedCommandConfig, heartbleedCommandConfig.createConfig());
         Boolean result = null;
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

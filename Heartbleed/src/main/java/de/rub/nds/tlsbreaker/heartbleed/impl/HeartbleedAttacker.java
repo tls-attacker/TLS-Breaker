@@ -38,6 +38,7 @@ import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.heartbleed.config.HeartbleedCommandConfig;
 import de.rub.nds.util.ByteArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -81,7 +82,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
 
     @Override
     public void executeAttack() {
-        if (!isVulnerable()) {
+        if (!isVulnerable().asBool()) {
             LOGGER.warn("The server is not vulnerable to the Heartbleed attack");
             return;
         }
@@ -263,7 +264,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         Config tlsConfig = getTlsConfig();
         WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
             .createWorkflowTrace(WorkflowTraceType.DYNAMIC_HELLO, RunningModeType.CLIENT);
@@ -296,13 +297,13 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
         if (WorkflowTraceUtil.didReceiveMessage(HEARTBEAT, trace)) {
             LOGGER.info(
                 "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
-            return true;
+            return VulnerabilityType.VULNERABLE;
         } else if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, trace)) {
-            return null;
+            return VulnerabilityType.ERROR;
         } else {
             LOGGER.info(
                 "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");
-            return false;
+            return VulnerabilityType.PROBABLY_NOT_VULNERABLE;
         }
     }
 
