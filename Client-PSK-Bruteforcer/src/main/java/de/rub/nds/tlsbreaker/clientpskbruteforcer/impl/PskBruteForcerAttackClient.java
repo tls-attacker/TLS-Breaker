@@ -55,20 +55,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- */
 public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackClientCommandConfig> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private GuessProvider guessProvider;
 
-    /**
-     *
-     * @param config
-     * @param baseConfig
-     */
     public PskBruteForcerAttackClient(PskBruteForcerAttackClientCommandConfig config, Config baseConfig) {
         super(config, baseConfig);
     }
@@ -186,7 +178,7 @@ public class PskBruteForcerAttackClient extends Attacker<PskBruteForcerAttackCli
 
         } else {
             CONSOLE.info("Did not receive a ClientHello Message - check the Debug output!");
-            return VulnerabilityType.ERROR;
+            return VulnerabilityType.TEST_FAILURE;
         }
     }
 

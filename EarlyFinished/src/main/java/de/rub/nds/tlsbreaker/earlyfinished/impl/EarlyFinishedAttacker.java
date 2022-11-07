@@ -62,7 +62,7 @@ public class EarlyFinishedAttacker extends Attacker<EarlyFinishedCommandConfig> 
             case UNKNOWN:
                 return VulnerabilityType.UNKNOWN;
             default:
-                return VulnerabilityType.ERROR;
+                return VulnerabilityType.TEST_FAILURE;
         }
     }
 

@@ -299,7 +299,7 @@ public class HeartbleedAttacker extends Attacker<HeartbleedCommandConfig> {
                 "Vulnerable. The server responds with a heartbeat message, although the client heartbeat message contains an invalid Length value");
             return VulnerabilityType.VULNERABLE;
         } else if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, trace)) {
-            return VulnerabilityType.ERROR;
+            return VulnerabilityType.TEST_FAILURE;
         } else {
             LOGGER.info(
                 "(Most probably) Not vulnerable. The server does not respond with a heartbeat message, it is not vulnerable");

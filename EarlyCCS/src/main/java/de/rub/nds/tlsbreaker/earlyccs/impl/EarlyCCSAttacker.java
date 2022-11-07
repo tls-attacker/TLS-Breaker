@@ -95,7 +95,7 @@ public class EarlyCCSAttacker extends Attacker<EarlyCCSCommandConfig> {
             case UNKNOWN:
                 return VulnerabilityType.UNKNOWN;
             default:
-                return VulnerabilityType.ERROR;
+                return VulnerabilityType.TEST_FAILURE;
         }
     }
 
