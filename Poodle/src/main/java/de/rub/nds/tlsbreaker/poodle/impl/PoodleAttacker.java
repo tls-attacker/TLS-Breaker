@@ -323,9 +323,12 @@ public class PoodleAttacker extends Attacker<PoodleCommandConfig> {
         State state = new State(tlsConfig);
         DefaultWorkflowExecutor executor = new DefaultWorkflowExecutor(state);
         executor.executeWorkflow();
-        boolean vulnerable = WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SERVER_HELLO,
-                state.getWorkflowTrace());
-        return VulnerabilityType.fromBoolean(vulnerable);
+        if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SERVER_HELLO,
+                state.getWorkflowTrace())) {
+            return VulnerabilityType.VULNERABILITY_POSSIBLE;
+        }
+        // not vulnerable to original POODLE, could still be vulnerable to TLSPoodle
+        return VulnerabilityType.NOT_VULNERABLE;
     }
 
     private List<CipherSuite> getCbcCiphers() {

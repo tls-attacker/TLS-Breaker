@@ -72,6 +72,9 @@ public class TLSPoodleAttacker extends Attacker<TLSPoodleCommandConfig> {
         // Some implementations only test the least significant bit of each
         // byte.
         // https://yngve.vivaldi.net/2015/07/14/there-are-more-poodles-in-the-forest/
+        // Update: 2022 - above link is down, use one of the following
+        // https://yngve.vivaldi.net/there-are-more-poodles-in-the-forest/
+        // https://web.archive.org/web/20200924084146/https://yngve.vivaldi.net/2015/07/14/there-are-more-poodles-in-the-forest/
         // 4800 servers test the last byte of the padding, but not the first.
         // 240 servers (which is much lower) check the first byte, but not the
         // last byte.
