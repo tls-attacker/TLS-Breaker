@@ -100,9 +100,6 @@
         <module>Poodle</module>
         <module>TLSPoodle</module>
         <module>PaddingOracle</module>
-        <module>EarlyCCS</module>
-        <module>EarlyFinished</module>
-        <module>SimpleMitmProxy</module>
     </modules>
 
     <dependencies>
