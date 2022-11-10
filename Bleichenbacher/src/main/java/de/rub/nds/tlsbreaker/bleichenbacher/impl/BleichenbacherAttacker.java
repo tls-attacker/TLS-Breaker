@@ -29,9 +29,10 @@ import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.Pkcs1VectorGenerator;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.RealDirectMessagePkcs1Oracle;
 import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
 import de.rub.nds.tlsbreaker.breakercommons.exception.OracleUnstableException;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.padding.VectorResponse;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.FingerprintTaskVectorPair;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.FingerprintTaskVectorPair;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.VectorResponse;
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
@@ -105,7 +106,7 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         CONSOLE
             .info("A server is considered vulnerable to this attack if it responds differently to the test vectors.");
         CONSOLE.info("A server is considered secure if it always responds the same way.");
@@ -137,7 +138,7 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
         }
 
         resultError = referenceError;
-        return referenceError != EqualityError.NONE;
+        return VulnerabilityType.fromBoolean(referenceError != EqualityError.NONE);
     }
 
     /**
@@ -233,7 +234,7 @@ public class BleichenbacherAttacker extends Attacker<BleichenbacherCommandConfig
     public void executeAttack() {
         LOGGER.info("Using the following oracle type: {}", config.getWorkflowType());
 
-        if (!isVulnerable()) {
+        if (!isVulnerable().asBool()) {
             LOGGER.warn("The server is not vulnerable to the Bleichenbacher attack");
             return;
         }

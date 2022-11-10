@@ -30,13 +30,11 @@ import org.apache.logging.log4j.LogManager;
 @SuppressWarnings("javadoc")
 public class ExtractPmsData {
 
-    // public ExtractPmsData()
     private static final int COUNT = 5;
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PCAP_FILE = "sample.pcapng";
 
-    // private ReadPacketFile() {}
     public String pmsDataExtracterFunction() throws PcapNativeException, NotOpenException {
 
         PcapHandle handle;
@@ -63,9 +61,6 @@ public class ExtractPmsData {
                     return new String(Hex.encodeHex(pms_data));
                 }
 
-//                System.out.println(packet);
-//                  dumppac.dump(packet);
-
             } catch (TimeoutException e) {
             } catch (EOFException e) {
                 System.out.println("EOF");
@@ -78,7 +73,4 @@ public class ExtractPmsData {
         return null;
     }
 
-    public static void main(String[] args) {
-
-    }
 }

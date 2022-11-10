@@ -9,65 +9,29 @@
 
 package de.rub.nds.tlsbreaker.poodle;
 
+import java.io.IOException;
+
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
+
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.CommonMain;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.GeneralAttackDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
 import de.rub.nds.tlsbreaker.poodle.config.PoodleCommandConfig;
 import de.rub.nds.tlsbreaker.poodle.impl.PoodleAttacker;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
-
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
-/**
- *
- */
 public class Main {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         GeneralDelegate generalDelegate = new GeneralAttackDelegate();
         PoodleCommandConfig poodle = new PoodleCommandConfig(generalDelegate);
 
         JCommander jc = JCommander.newBuilder().addObject(poodle).build();
-        try {
-            jc.parse(args);
-        } catch (ParameterException ex) {
-            ex.usage();
+        if (!CommonMain.parseConfig(args, jc, generalDelegate)) {
             return;
         }
 
-        if (generalDelegate.isHelp()) {
-            jc.usage();
-            return;
-        }
-
-        Attacker<? extends TLSDelegateConfig> attacker = new PoodleAttacker(poodle, poodle.createConfig());
-
-        if (attacker.getConfig().isExecuteAttack()) {
-            attacker.attack();
-        } else {
-            try {
-                Boolean result = attacker.checkVulnerability();
-                if (Objects.equals(result, Boolean.TRUE)) {
-                    CONSOLE.error("Vulnerable:" + result.toString());
-                } else if (Objects.equals(result, Boolean.FALSE)) {
-                    CONSOLE.info("Vulnerable:" + result.toString());
-                } else {
-                    CONSOLE.warn("Vulnerable: Uncertain");
-                }
-            } catch (UnsupportedOperationException e) {
-                LOGGER.info("The selected attacker is currently not implemented");
-            }
-        }
+        Attacker<?> attacker = new PoodleAttacker(poodle, poodle.createConfig());
+        attacker.run();
     }
 }

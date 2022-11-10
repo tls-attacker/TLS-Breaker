@@ -9,22 +9,31 @@
 
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
-import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.*;
-import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
+import de.rub.nds.tlsbreaker.breakercommons.psk.PskBruteForcerServerSelection;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderType;
+import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ClientSelection;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
+import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import de.rub.nds.tlsbreaker.breakercommons.psk.GuessProviderType;
-
-public class PskBruteForcerClientPcapFileHandler {
+public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig;
@@ -158,7 +167,7 @@ public class PskBruteForcerClientPcapFileHandler {
                 pskBruteForcerAttackClientCommandConfig, pskBruteForcerAttackClientCommandConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -198,7 +207,7 @@ public class PskBruteForcerClientPcapFileHandler {
         }
 
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

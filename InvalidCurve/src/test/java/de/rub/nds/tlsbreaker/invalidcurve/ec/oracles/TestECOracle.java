@@ -11,7 +11,9 @@ package de.rub.nds.tlsbreaker.invalidcurve.ec.oracles;
 
 import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import de.rub.nds.tlsattacker.core.crypto.ec.CurveFactory;
+import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurveOverFp;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
+import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEPoint;
 import java.math.BigInteger;
 import java.util.Random;
 import org.apache.logging.log4j.LogManager;
@@ -21,11 +23,12 @@ public class TestECOracle extends ECOracle {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final BigInteger privateKey;
+    private final SimpleDoubleAndAddComputer computer;
 
     public TestECOracle(NamedGroup namedCurve) {
         curve = CurveFactory.getCurve(namedCurve);
-        privateKey = new BigInteger(curve.getModulus().bitLength(), new Random());
+        BigInteger privateKey = new BigInteger(curve.getModulus().bitLength(), new Random());
+        computer = new SimpleDoubleAndAddComputer((EllipticCurveOverFp) curve, privateKey);
     }
 
     @Override
@@ -34,21 +37,36 @@ public class TestECOracle extends ECOracle {
         if (numberOfQueries % 100 == 0) {
             LOGGER.debug("Number of queries so far: {}", numberOfQueries);
         }
-        Point result = curve.mult(guessedSecret, ecPoint);
+
+        Point result;
+        try {
+            result = computer.mul(ecPoint, true);
+        } catch (ArithmeticException ex) {
+            result = new Point();
+        }
 
         if (result.isAtInfinity()) {
             return false;
         } else {
-            return (result.getFieldX().getData().compareTo(guessedSecret) == 0);
+            if (result.getFieldX().getData().compareTo(guessedSecret) == 0) {
+                int order = ((ICEPoint) ecPoint).getOrder();
+                BigInteger res = computer.getPrivateKey().mod(BigInteger.valueOf(order));
+                LOGGER.debug("Ground truth: x = +/- " + res + " mod " + order);
+                LOGGER.debug("Guessed x coordinate: " + guessedSecret);
+
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
     @Override
     public boolean isFinalSolutionCorrect(BigInteger guessedSecret) {
-        return guessedSecret.equals(privateKey);
+        return (guessedSecret.compareTo(computer.getPrivateKey()) == 0);
     }
 
     public BigInteger getPrivateKey() {
-        return privateKey;
+        return computer.getPrivateKey();
     }
 }

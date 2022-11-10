@@ -9,7 +9,7 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
-import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.StdPlainPkcs1Oracle;
 import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.TestPkcs1Oracle;
 import de.rub.nds.tlsattacker.core.state.TlsContext;

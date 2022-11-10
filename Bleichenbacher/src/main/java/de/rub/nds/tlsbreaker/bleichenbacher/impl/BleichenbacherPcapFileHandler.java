@@ -9,26 +9,33 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.impl;
 
-import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
-import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
-import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
-import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
+import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
+import static org.apache.commons.lang3.StringUtils.trim;
+
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.security.interfaces.RSAPublicKey;
-import java.util.*;
+import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
+import de.rub.nds.tlsattacker.core.util.CertificateFetcher;
+import de.rub.nds.tlsbreaker.bleichenbacher.config.BleichenbacherCommandConfig;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ConsoleInteractor;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
+import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 
-import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-import static org.apache.commons.lang3.StringUtils.trim;
-
-public class BleichenbacherPcapFileHandler {
+public class BleichenbacherPcapFileHandler implements PcapFileHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     BleichenbacherCommandConfig bleichenbacherCommandConfig;
@@ -65,7 +72,7 @@ public class BleichenbacherPcapFileHandler {
         String overridingHost = bleichenbacherCommandConfig.getClientDelegate().getHost();
         Attacker<? extends TLSDelegateConfig> attacker =
             new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
-        Boolean result = attacker.checkVulnerability();
+        Boolean result = attacker.checkVulnerability().asBool();
         if (Objects.equals(result, Boolean.TRUE)) {
             CONSOLE.info("Vulnerable:" + result.toString());
             CONSOLE.info("Server " + overridingHost + " is vulnerable");
@@ -196,7 +203,7 @@ public class BleichenbacherPcapFileHandler {
                 new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
 
             try {
-                Boolean result = attacker.checkVulnerability();
+                Boolean result = attacker.checkVulnerability().asBool();
                 if (Objects.equals(result, Boolean.TRUE)) {
                     CONSOLE.error("Vulnerable:" + result.toString());
                     vulnerableServers.add(server);
@@ -247,7 +254,7 @@ public class BleichenbacherPcapFileHandler {
             new BleichenbacherAttacker(bleichenbacherCommandConfig, bleichenbacherCommandConfig.createConfig());
         Boolean result = null;
         try {
-            result = attacker.checkVulnerability();
+            result = attacker.checkVulnerability().asBool();
             if (Objects.equals(result, Boolean.TRUE)) {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {

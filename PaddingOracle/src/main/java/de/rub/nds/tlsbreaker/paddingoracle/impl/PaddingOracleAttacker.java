@@ -11,16 +11,8 @@ package de.rub.nds.tlsbreaker.paddingoracle.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
-import de.rub.nds.tlsbreaker.breakercommons.config.PaddingOracleCommandConfig;
 import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
 import de.rub.nds.tlsbreaker.breakercommons.exception.OracleUnstableException;
-import de.rub.nds.tlsbreaker.breakercommons.impl.Attacker;
-import de.rub.nds.tlsbreaker.breakercommons.padding.PaddingTraceGenerator;
-import de.rub.nds.tlsbreaker.breakercommons.padding.PaddingTraceGeneratorFactory;
-import de.rub.nds.tlsbreaker.breakercommons.padding.PaddingVectorGenerator;
-import de.rub.nds.tlsbreaker.breakercommons.padding.VectorResponse;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.FingerprintTaskVectorPair;
-import de.rub.nds.tlsbreaker.breakercommons.padding.vector.PaddingVector;
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
 import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
@@ -32,6 +24,15 @@ import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
+import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.FingerprintTaskVectorPair;
+import de.rub.nds.tlsbreaker.breakercommons.cca.vector.VectorResponse;
+import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.generator.PaddingTraceGenerator;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.generator.PaddingTraceGeneratorFactory;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.generator.PaddingVectorGenerator;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.logging.log4j.Level;
@@ -100,7 +101,7 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
      * @return
      */
     @Override
-    public Boolean isVulnerable() {
+    public VulnerabilityType isVulnerable() {
         CONSOLE
             .info("A server is considered vulnerable to this attack if it responds differently to the test vectors.");
         CONSOLE.info("A server is considered secure if it always responds the same way.");
@@ -132,7 +133,7 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
         }
 
         resultError = referenceError;
-        return referenceError != EqualityError.NONE;
+        return VulnerabilityType.fromBoolean(referenceError != EqualityError.NONE);
     }
 
     /**

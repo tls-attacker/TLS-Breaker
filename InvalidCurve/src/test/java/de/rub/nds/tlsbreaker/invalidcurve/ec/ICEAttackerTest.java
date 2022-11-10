@@ -14,12 +14,9 @@ import de.rub.nds.tlsbreaker.invalidcurve.ec.oracles.TestECOracle;
 import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.math.BigInteger;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -28,19 +25,35 @@ public class ICEAttackerTest {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Test of attack method, of class ICEAttacker.
+     * Test attack using a faked JSSE server
      */
     @Test
     @Tag(TestCategories.SLOW_TEST)
-    @Disabled("To be fixed")
-    public void testAttack() {
-        CONSOLE.info("Starting ICEAttacker test... this may take some time");
+    @Tag(TestCategories.INTEGRATION_TEST)
+    public void testAttackOnOracleJSSE() {
+        CONSOLE.info("Starting ICEAttacker test against an Oracle/JSSE mockup target... this may take some time");
         TestECOracle oracle = new TestECOracle(NamedGroup.SECP256R1);
         ICEAttacker attacker = new ICEAttacker(oracle, ICEAttacker.ServerType.ORACLE, 4, NamedGroup.SECP256R1);
         BigInteger result = attacker.attack();
 
-        LOGGER.debug(result);
-        LOGGER.debug(oracle.getPrivateKey());
+        LOGGER.info("Private key computed in the attack: " + result);
+        LOGGER.info("Server private key: " + oracle.getPrivateKey());
+
+        assertEquals(oracle.getPrivateKey(), result);
+    }
+
+    /**
+     * Test attack using a normal server computation mistake.
+     */
+    @Test
+    public void testAttackNormal() {
+        CONSOLE.info("Starting ICEAttacker test against a Bouncy Castle mockup target... this may take some time");
+        TestECOracle oracle = new TestECOracle(NamedGroup.SECP256R1);
+        ICEAttacker attacker = new ICEAttacker(oracle, ICEAttacker.ServerType.NORMAL, 0, NamedGroup.SECP256R1);
+        BigInteger result = attacker.attack();
+
+        LOGGER.debug("Private key computed in the attack: " + result);
+        LOGGER.debug("Server private key: " + oracle.getPrivateKey());
 
         assertEquals(oracle.getPrivateKey(), result);
     }

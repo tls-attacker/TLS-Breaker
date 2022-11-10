@@ -9,13 +9,13 @@
 
 package de.rub.nds.tlsbreaker.invalidcurve.config;
 
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
-import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
-import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
-import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.converters.BigIntegerConverter;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
@@ -27,15 +27,16 @@ import de.rub.nds.tlsattacker.core.constants.ECPointFormat;
 import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurveOverFp;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
-
-import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
+import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
+import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
+import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
 
 /**
  *
  */
-public class InvalidCurveAttackConfig extends AttackConfig {
+public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttackConfig {
 
     /**
      *

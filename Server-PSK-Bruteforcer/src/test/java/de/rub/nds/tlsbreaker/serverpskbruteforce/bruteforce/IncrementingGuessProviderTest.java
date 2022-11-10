@@ -9,8 +9,9 @@
 
 package de.rub.nds.tlsbreaker.serverpskbruteforce.bruteforce;
 
-import de.rub.nds.tlsbreaker.breakercommons.psk.IncrementingGuessProvider;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
+import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.IncrementingGuessProvider;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

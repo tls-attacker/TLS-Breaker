@@ -9,8 +9,9 @@
 
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
+import de.rub.nds.tlsbreaker.breakercommons.cca.OracleException;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.pkcs1.oracles.Pkcs1Oracle;
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import de.rub.nds.tlsattacker.util.MathHelper;
 import java.math.BigInteger;
 import java.util.ArrayList;
