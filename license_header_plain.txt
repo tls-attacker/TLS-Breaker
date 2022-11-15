@@ -1,6 +1,8 @@
-${projectName} - ${description}
-
-Copyright ${startYear}-${year} ${owner}
-
-Licensed under ${licenseName}
-${licenseURL}
+/*
+ * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
+ *
+ * Copyright 2021-$YEAR Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
+ *
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ */
