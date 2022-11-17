@@ -126,22 +126,7 @@
             </dependency>
             <dependency>
                 <groupId>de.rub.nds.tls.breaker</groupId>
-                <artifactId>cve20162107</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.rub.nds.tls.breaker</groupId>
                 <artifactId>drown</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.rub.nds.tls.breaker</groupId>
-                <artifactId>earlyccs</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.rub.nds.tls.breaker</groupId>
-                <artifactId>earlyfinished</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -172,11 +157,6 @@
             <dependency>
                 <groupId>de.rub.nds.tls.breaker</groupId>
                 <artifactId>server-psk-bruteforcer</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.rub.nds.tls.breaker</groupId>
-                <artifactId>simplemitmproxy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
