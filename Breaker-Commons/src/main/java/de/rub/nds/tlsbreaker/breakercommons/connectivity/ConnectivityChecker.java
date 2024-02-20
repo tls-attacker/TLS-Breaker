@@ -1,20 +1,19 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.connectivity;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
+import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.HelloVerifyRequestMessage;
-import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.SSL2ServerHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloDoneMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
@@ -40,9 +39,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- */
+/** */
 public class ConnectivityChecker {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -50,7 +47,6 @@ public class ConnectivityChecker {
     private final Connection connection;
 
     /**
-     *
      * @param connection
      */
     public ConnectivityChecker(Connection connection) {
@@ -61,7 +57,6 @@ public class ConnectivityChecker {
     }
 
     /**
-     *
      * @return
      */
     public boolean isConnectable() {
@@ -92,21 +87,24 @@ public class ConnectivityChecker {
 
     public boolean speaksTls(Config config) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(config);
-        WorkflowTrace trace = factory.createWorkflowTrace(WorkflowTraceType.HELLO, RunningModeType.CLIENT);
+        WorkflowTrace trace =
+                factory.createWorkflowTrace(WorkflowTraceType.HELLO, RunningModeType.CLIENT);
         trace.removeTlsAction(trace.getTlsActions().size() - 1);
         ReceiveTillAction receiveTillAction = new ReceiveTillAction(new ServerHelloDoneMessage());
         trace.addTlsAction(receiveTillAction);
         State state = new State(config, trace);
         WorkflowExecutor executor =
-            WorkflowExecutorFactory.createWorkflowExecutor(state.getConfig().getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        state.getConfig().getWorkflowExecutorType(), state);
         executor.executeWorkflow();
         if (receiveTillAction.getRecords().size() > 0) {
             if (receiveTillAction.getRecords().get(0) instanceof Record) {
                 return true;
             } else {
                 for (ProtocolMessage message : receiveTillAction.getReceivedMessages()) {
-                    if (message instanceof ServerHelloMessage || message instanceof ServerHelloDoneMessage
-                        || message instanceof SSL2ServerHelloMessage) {
+                    if (message instanceof ServerHelloMessage
+                            || message instanceof ServerHelloDoneMessage
+                            || message instanceof SSL2ServerHelloMessage) {
                         return true;
                     }
                 }
@@ -119,20 +117,23 @@ public class ConnectivityChecker {
 
     public boolean speaksDTls(Config config) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(config);
-        WorkflowTrace trace = factory.createTlsEntryWorkflowTrace(config.getDefaultClientConnection());
+        WorkflowTrace trace =
+                factory.createTlsEntryWorkflowTrace(config.getDefaultClientConnection());
         trace.addTlsAction(new SendAction(new ClientHelloMessage(config)));
         ReceiveAction reveiceAction = new ReceiveAction(new HelloVerifyRequestMessage(config));
         trace.addTlsAction(reveiceAction);
         State state = new State(config, trace);
         WorkflowExecutor executor =
-            WorkflowExecutorFactory.createWorkflowExecutor(state.getConfig().getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        state.getConfig().getWorkflowExecutorType(), state);
         executor.executeWorkflow();
         if (reveiceAction.getRecords().size() > 0) {
             if (reveiceAction.getRecords().get(0) instanceof Record) {
                 return true;
             } else {
                 for (ProtocolMessage message : reveiceAction.getReceivedMessages()) {
-                    if (message instanceof HelloVerifyRequestMessage || message instanceof ServerHelloMessage) {
+                    if (message instanceof HelloVerifyRequestMessage
+                            || message instanceof ServerHelloMessage) {
                         return true;
                     }
                 }
@@ -145,16 +146,20 @@ public class ConnectivityChecker {
 
     public boolean speaksStartTls(Config config) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(config);
-        WorkflowTrace trace = factory.createTlsEntryWorkflowTrace(config.getDefaultClientConnection());
+        WorkflowTrace trace =
+                factory.createTlsEntryWorkflowTrace(config.getDefaultClientConnection());
         State state = new State(config, trace);
-        WorkflowExecutor executor = WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
+        WorkflowExecutor executor =
+                WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
         executor.executeWorkflow();
         if (trace.allActionsExecuted()) {
             for (TlsAction action : trace.getTlsActions()) {
                 if (action instanceof AsciiAction && !(action instanceof SendAsciiAction)) {
                     AsciiAction asciiAction = (AsciiAction) action;
                     if (asciiAction.getAsciiText() != null) {
-                        if (asciiAction.getAsciiText().contains(config.getStarttlsType().getNegotiatationString())) {
+                        if (asciiAction
+                                .getAsciiText()
+                                .contains(config.getStarttlsType().getNegotiatationString())) {
                             return true;
                         }
                     }

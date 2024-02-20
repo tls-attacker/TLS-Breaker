@@ -1,21 +1,15 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.invalidcurve.config;
-
-import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.converters.BigIntegerConverter;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
@@ -32,31 +26,32 @@ import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
 import de.rub.nds.tlsbreaker.invalidcurve.ec.ICEAttacker;
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
 
-/**
- *
- */
+/** */
 public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttackConfig {
 
-    /**
-     *
-     */
+    /** */
     public static final String ATTACK_COMMAND = "invalid_curve";
 
     @Parameter(names = "-named_curve", description = "Named curve to be used")
     private NamedGroup namedGroup = NamedGroup.SECP256R1;
 
-    @Parameter(names = "-additional_equations",
-        description = "Additional equations used when attacking Oracle JSSE server (needed because of a faulty JSSE implementation).")
+    @Parameter(
+            names = "-additional_equations",
+            description =
+                    "Additional equations used when attacking Oracle JSSE server (needed because of a faulty JSSE implementation).")
     private int additionalEquations = 3;
 
-    @Parameter(names = "-server_type",
-        description = "Allows to switch between a normal vulnerable server type and an Oracle server type (for oracle a slightly different algorithm is needed).")
+    @Parameter(
+            names = "-server_type",
+            description =
+                    "Allows to switch between a normal vulnerable server type and an Oracle server type (for oracle a slightly different algorithm is needed).")
     private ICEAttacker.ServerType serverType = ICEAttacker.ServerType.NORMAL;
 
-    /**
-     * EC field size, currently set to 32, works for curves with 256 bits!
-     */
+    /** EC field size, currently set to 32, works for curves with 256 bits! */
     @Parameter(names = "-curve_field_size", description = "Curve field size. 32 works for 256bits.")
     private int curveFieldSize = 32;
 
@@ -67,69 +62,76 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     private int keyOffset = 0;
 
     // These are for scanning only
-    @Parameter(names = "-premaster_secret",
-        description = "Premaster Secret String (use 0x at the beginning for a hex value)", hidden = true,
-        converter = BigIntegerConverter.class)
+    @Parameter(
+            names = "-premaster_secret",
+            description = "Premaster Secret String (use 0x at the beginning for a hex value)",
+            hidden = true,
+            converter = BigIntegerConverter.class)
     private BigInteger premasterSecret;
 
-    @Parameter(names = "-public_point_base_x", hidden = true,
-        description = "Public key point coordinate X sent to the server (use 0x at the beginning for a hex value)",
-        converter = BigIntegerConverter.class)
+    @Parameter(
+            names = "-public_point_base_x",
+            hidden = true,
+            description =
+                    "Public key point coordinate X sent to the server (use 0x at the beginning for a hex value)",
+            converter = BigIntegerConverter.class)
     private BigInteger publicPointBaseX =
-        new BigInteger("b70bf043c144935756f8f4578c369cf960ee510a5a0f90e93a373a21f0d1397f", 16);
+            new BigInteger("b70bf043c144935756f8f4578c369cf960ee510a5a0f90e93a373a21f0d1397f", 16);
 
-    @Parameter(names = "-public_point_base_y", hidden = true,
-        description = "Public key point coordinate Y sent to the server (use 0x at the beginning for a hex value)",
-        converter = BigIntegerConverter.class)
+    @Parameter(
+            names = "-public_point_base_y",
+            hidden = true,
+            description =
+                    "Public key point coordinate Y sent to the server (use 0x at the beginning for a hex value)",
+            converter = BigIntegerConverter.class)
     private BigInteger publicPointBaseY =
-        new BigInteger("4a2e0ded57a5156bb82eb4314c37fd4155395a7e51988af289cce531b9c17192", 16);
+            new BigInteger("4a2e0ded57a5156bb82eb4314c37fd4155395a7e51988af289cce531b9c17192", 16);
 
-    @Parameter(names = "-ephemeral",
-        description = "If set to true, the attack with ephemeral cipher suites (ECDHE) is attempted.")
+    @Parameter(
+            names = "-ephemeral",
+            description =
+                    "If set to true, the attack with ephemeral cipher suites (ECDHE) is attempted.")
     private boolean ephemeral = false;
 
-    @ParametersDelegate
-    private ClientDelegate clientDelegate;
+    @ParametersDelegate private ClientDelegate clientDelegate;
 
-    @ParametersDelegate
-    private CipherSuiteDelegate ciphersuiteDelegate;
+    @ParametersDelegate private CipherSuiteDelegate ciphersuiteDelegate;
 
-    @ParametersDelegate
-    private ProtocolVersionDelegate protocolVersionDelegate;
+    @ParametersDelegate private ProtocolVersionDelegate protocolVersionDelegate;
 
-    @ParametersDelegate
-    private AttackDelegate attackDelegate;
+    @ParametersDelegate private AttackDelegate attackDelegate;
 
-    @ParametersDelegate
-    private StarttlsDelegate starttlsDelegate;
+    @ParametersDelegate private StarttlsDelegate starttlsDelegate;
 
-    /**
-     * The twisted curve to simulate server's x-only ladder
-     */
+    /** The twisted curve to simulate server's x-only ladder */
     private EllipticCurveOverFp twistedCurve;
 
     private boolean curveTwistAttack = false;
 
-    @Parameter(names = "-curve_twist_d", hidden = true,
-        description = "Non quadratic residue used to obtain twisted curve", converter = BigIntegerConverter.class)
+    @Parameter(
+            names = "-curve_twist_d",
+            hidden = true,
+            description = "Non quadratic residue used to obtain twisted curve",
+            converter = BigIntegerConverter.class)
     private BigInteger curveTwistD;
 
-    /**
-     * Ignore server's preferences and use the specified PointFormat instead
-     */
+    /** Ignore server's preferences and use the specified PointFormat instead */
     @Parameter(names = "-point_format", description = "The format used for the public key")
     private ECPointFormat pointCompressionFormat = ECPointFormat.UNCOMPRESSED;
 
-    @Parameter(names = "-renegotiation",
-        description = "If set to true, the attack will be carried out in a renegotiation handshake")
+    @Parameter(
+            names = "-renegotiation",
+            description =
+                    "If set to true, the attack will be carried out in a renegotiation handshake")
     private boolean attackInRenegotiation = false;
 
-    @Parameter(names = "-pcap",
-        description = "Location of the pcap file that will be used for the Invalid Curve Attack.")
+    @Parameter(
+            names = "-pcap",
+            description =
+                    "Location of the pcap file that will be used for the Invalid Curve Attack.")
     private String pcapFileLocation;
 
     /**
-     *
      * @param delegate
      */
     public InvalidCurveAttackConfig(GeneralDelegate delegate) {
@@ -148,7 +150,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public BigInteger getPremasterSecret() {
@@ -156,7 +157,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param premasterSecret
      */
     public void setPremasterSecret(BigInteger premasterSecret) {
@@ -164,7 +164,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public BigInteger getPublicPointBaseX() {
@@ -172,7 +171,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param publicPointBaseX
      */
     public void setPublicPointBaseX(BigInteger publicPointBaseX) {
@@ -180,7 +178,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public BigInteger getPublicPointBaseY() {
@@ -188,7 +185,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param publicPointBaseY
      */
     public void setPublicPointBaseY(BigInteger publicPointBaseY) {
@@ -196,7 +192,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public NamedGroup getNamedGroup() {
@@ -204,7 +199,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param namedGroup
      */
     public void setNamedGroup(NamedGroup namedGroup) {
@@ -212,7 +206,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public int getCurveFieldSize() {
@@ -220,7 +213,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param curveFieldSize
      */
     public void setCurveFieldSize(int curveFieldSize) {
@@ -228,7 +220,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public int getProtocolFlows() {
@@ -236,7 +227,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param protocolFlows
      */
     public void setProtocolFlows(int protocolFlows) {
@@ -244,7 +234,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public int getAdditionalEquations() {
@@ -252,7 +241,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param additionalEquations
      */
     public void setAdditionalEquations(int additionalEquations) {
@@ -260,7 +248,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public ICEAttacker.ServerType getServerType() {
@@ -268,7 +255,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param serverType
      */
     public void setServerType(ICEAttacker.ServerType serverType) {
@@ -276,7 +262,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     public boolean isEphemeral() {
@@ -284,7 +269,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @param ephemeral
      */
     public void setEphemeral(boolean ephemeral) {
@@ -292,7 +276,6 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -308,8 +291,7 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     * @param curveTwistAttack
-     *                         the curveTwistAttack to set
+     * @param curveTwistAttack the curveTwistAttack to set
      */
     public void setCurveTwistAttack(boolean curveTwistAttack) {
         this.curveTwistAttack = curveTwistAttack;
@@ -323,15 +305,13 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     * @param twistedCurve
-     *                     the twistedCurve to set
+     * @param twistedCurve the twistedCurve to set
      */
     public void setTwistedCurve(EllipticCurveOverFp twistedCurve) {
         this.twistedCurve = twistedCurve;
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -388,8 +368,7 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     * @param curveTwistD
-     *                    the curveTwistD to set
+     * @param curveTwistD the curveTwistD to set
      */
     public void setCurveTwistD(BigInteger curveTwistD) {
         this.curveTwistD = curveTwistD;
@@ -403,8 +382,7 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     * @param pointCompressionFormat
-     *                               the pointCompressionFormat to set
+     * @param pointCompressionFormat the pointCompressionFormat to set
      */
     public void setPointCompressionFormat(ECPointFormat pointCompressionFormat) {
         this.pointCompressionFormat = pointCompressionFormat;
@@ -418,8 +396,7 @@ public class InvalidCurveAttackConfig extends AttackConfig implements PcapAttack
     }
 
     /**
-     * @param attackInRenegotiation
-     *                              the attackInRenegotiation to set
+     * @param attackInRenegotiation the attackInRenegotiation to set
      */
     public void setAttackInRenegotiation(boolean attackInRenegotiation) {
         this.attackInRenegotiation = attackInRenegotiation;

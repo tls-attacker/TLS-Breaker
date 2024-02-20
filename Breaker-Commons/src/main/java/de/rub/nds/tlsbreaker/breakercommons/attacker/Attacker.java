@@ -1,24 +1,21 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.attacker;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
-import java.io.IOException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.connectivity.ConnectivityChecker;
+import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class Attacker<AttConfigT extends AttackConfig> {
 
@@ -81,9 +78,7 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
         return isVulnerable();
     }
 
-    /**
-     * Executes a given attack.
-     */
+    /** Executes a given attack. */
     protected abstract void executeAttack();
 
     /**
@@ -111,7 +106,8 @@ public abstract class Attacker<AttConfigT extends AttackConfig> {
 
     protected boolean canConnect() {
         Config tlsConfig = config.createConfig();
-        ConnectivityChecker checker = new ConnectivityChecker(tlsConfig.getDefaultClientConnection());
+        ConnectivityChecker checker =
+                new ConnectivityChecker(tlsConfig.getDefaultClientConnection());
         return checker.isConnectable();
     }
 }

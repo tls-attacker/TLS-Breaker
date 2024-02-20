@@ -1,24 +1,14 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
@@ -32,6 +22,13 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
 
@@ -39,21 +36,26 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
     PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig;
 
     public PskBruteForcerClientPcapFileHandler(
-        PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
+            PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
         this.pskBruteForcerAttackClientCommandConfig = pskBruteForcerAttackClientCommandConfig;
     }
 
     public void handlePcapFile() {
-        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer(pskBruteForcerAttackClientCommandConfig.getPcapFileLocation());
+        PcapAnalyzer pcapAnalyzer =
+                new PcapAnalyzer(pskBruteForcerAttackClientCommandConfig.getPcapFileLocation());
         List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
 
         if (!sessions.isEmpty()) {
-            ClientSelection PskBruteForcerClientSelection = new PskBruteForcerClientSelection(sessions);
-            ServerSelection pskBruteForcerServerSelection = new PskBruteForcerServerSelection(sessions);
+            ClientSelection PskBruteForcerClientSelection =
+                    new PskBruteForcerClientSelection(sessions);
+            ServerSelection pskBruteForcerServerSelection =
+                    new PskBruteForcerServerSelection(sessions);
 
-            Map<String, List<PcapSession>> clientSessionsMap = PskBruteForcerClientSelection.getClientSessionsMap();
+            Map<String, List<PcapSession>> clientSessionsMap =
+                    PskBruteForcerClientSelection.getClientSessionsMap();
 
-            Map<String, List<PcapSession>> serverSessionsMap = pskBruteForcerServerSelection.getServerSessionsMap();
+            Map<String, List<PcapSession>> serverSessionsMap =
+                    pskBruteForcerServerSelection.getServerSessionsMap();
 
             List<String> uniqueClient = new ArrayList<>(clientSessionsMap.keySet());
 
@@ -65,7 +67,8 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                 ConsoleInteractor consoleInteractor = new ConsoleInteractor();
                 consoleInteractor.displayClientWithServers(clientServers, uniqueClient);
 
-                String userOption = consoleInteractor.getValidUserSelectionForPSKClient(uniqueClient);
+                String userOption =
+                        consoleInteractor.getValidUserSelectionForPSKClient(uniqueClient);
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
@@ -84,7 +87,8 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                     pskBruteForcerAttackClientCommandConfig.getServerDelegate().setPort(port);
                     pskBruteForcerAttackClientCommandConfig.setSkipConnectionCheck(true);
 
-                    Boolean vulnerability = checkVulnerability(pskBruteForcerAttackClientCommandConfig);
+                    Boolean vulnerability =
+                            checkVulnerability(pskBruteForcerAttackClientCommandConfig);
                     if (Objects.equals(vulnerability, Boolean.TRUE)) {
                         CONSOLE.info("Client " + source + " is vulnerable.");
                         CONSOLE.info("Do you want to execute the attack? (y/n):");
@@ -111,10 +115,12 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
         }
     }
 
-    private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueClient,
-        PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig,
-        ConsoleInteractor consoleInteractor) {
-        List<String> vulnerableServers = getVulnerableServers(uniqueClient, pskBruteForcerAttackClientCommandConfig);
+    private void checkVulnerabilityOfAllServersAndDisplay(
+            List<String> uniqueClient,
+            PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig,
+            ConsoleInteractor consoleInteractor) {
+        List<String> vulnerableServers =
+                getVulnerableServers(uniqueClient, pskBruteForcerAttackClientCommandConfig);
 
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable Client.");
         if (!vulnerableServers.isEmpty()) {
@@ -136,22 +142,19 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
             } else if ("N".equals(userResponse)) {
                 CONSOLE.info("Execution of the attack cancelled.");
             }
-        }
-
-        else if (vulnerableServers.size() > 1) {
+        } else if (vulnerableServers.size() > 1) {
             CONSOLE.info("Please select a Client number to execute an attack.");
             CONSOLE.info("Client number: ");
             int serverNumber = consoleInteractor.getUserSelectedServer(uniqueClient);
             String host = uniqueClient.get(serverNumber - 1);
             select_attack_method(consoleInteractor);
             executeAttack(host, pskBruteForcerAttackClientCommandConfig);
-
         }
-
     }
 
-    private List<String> getVulnerableServers(List<String> uniqueClient,
-        PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
+    private List<String> getVulnerableServers(
+            List<String> uniqueClient,
+            PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
 
         List<String> vulnerableServers = new ArrayList<>();
         for (String server : uniqueClient) {
@@ -163,8 +166,10 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
             LOGGER.info("Selected Client port: " + port);
             pskBruteForcerAttackClientCommandConfig.getServerDelegate().setPort(port);
 
-            Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(
-                pskBruteForcerAttackClientCommandConfig, pskBruteForcerAttackClientCommandConfig.createConfig());
+            Attacker<? extends TLSDelegateConfig> attacker =
+                    new PskBruteForcerAttackClient(
+                            pskBruteForcerAttackClientCommandConfig,
+                            pskBruteForcerAttackClientCommandConfig.createConfig());
 
             try {
                 Boolean result = attacker.checkVulnerability().asBool();
@@ -183,11 +188,14 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
         return vulnerableServers;
     }
 
-    private void executeAttack(String host,
-        PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
+    private void executeAttack(
+            String host,
+            PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
 
-        Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(
-            pskBruteForcerAttackClientCommandConfig, pskBruteForcerAttackClientCommandConfig.createConfig());
+        Attacker<? extends TLSDelegateConfig> attacker =
+                new PskBruteForcerAttackClient(
+                        pskBruteForcerAttackClientCommandConfig,
+                        pskBruteForcerAttackClientCommandConfig.createConfig());
         attacker.attack();
     }
 
@@ -195,10 +203,12 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
         return userOption.contains(",");
     }
 
-    private Boolean
-        checkVulnerability(PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
-        Attacker<? extends TLSDelegateConfig> attacker = new PskBruteForcerAttackClient(
-            pskBruteForcerAttackClientCommandConfig, pskBruteForcerAttackClientCommandConfig.createConfig());
+    private Boolean checkVulnerability(
+            PskBruteForcerAttackClientCommandConfig pskBruteForcerAttackClientCommandConfig) {
+        Attacker<? extends TLSDelegateConfig> attacker =
+                new PskBruteForcerAttackClient(
+                        pskBruteForcerAttackClientCommandConfig,
+                        pskBruteForcerAttackClientCommandConfig.createConfig());
         Boolean result = null;
         try {
             TimeUnit.SECONDS.sleep(2);
@@ -212,11 +222,8 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                 CONSOLE.error("Vulnerable:" + result.toString());
             } else if (Objects.equals(result, Boolean.FALSE)) {
                 CONSOLE.info("Vulnerable:" + result.toString());
-            }
-
-            else {
+            } else {
                 CONSOLE.warn("Vulnerable: Uncertain");
-
             }
         } catch (UnsupportedOperationException e) {
             LOGGER.info("The selected attacker is currently not implemented");
@@ -232,7 +239,8 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
         String userchoiceforattack = consoleInteractor.getUserchoiceforpsk();
         if ("B".equals(userchoiceforattack)) {
             CONSOLE.info("You have selected wordlist");
-            pskBruteForcerAttackClientCommandConfig.setGuessProviderType(GuessProviderType.WORDLIST);
+            pskBruteForcerAttackClientCommandConfig.setGuessProviderType(
+                    GuessProviderType.WORDLIST);
             CONSOLE.info("Select the preferred wordlist type:");
             CONSOLE.info("A: DEFAULT FILE    B: PERSONAL FILE");
             String userchoiceforfile = consoleInteractor.getUserchoiceforpsk();
@@ -240,9 +248,12 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                 String userprovidedfilepath = consoleInteractor.getUserfilepathinput();
                 if (FileUtils.isFileExists(userprovidedfilepath)) {
                     try {
-                        pskBruteForcerAttackClientCommandConfig.setGuessProviderInputFile(userprovidedfilepath);
-                        CONSOLE.info("WordList file location provided = "
-                            + pskBruteForcerAttackClientCommandConfig.getGuessProviderInputFile());
+                        pskBruteForcerAttackClientCommandConfig.setGuessProviderInputFile(
+                                userprovidedfilepath);
+                        CONSOLE.info(
+                                "WordList file location provided = "
+                                        + pskBruteForcerAttackClientCommandConfig
+                                                .getGuessProviderInputFile());
                     } catch (UnsupportedOperationException e) {
                         CONSOLE.error("Invalid option selected! Please run the jar file again.");
                     }
@@ -251,18 +262,17 @@ public class PskBruteForcerClientPcapFileHandler implements PcapFileHandler {
                 }
 
             } else {
-                CONSOLE.info("You have selected Default file: Started executing attack based on default wordlist");
+                CONSOLE.info(
+                        "You have selected Default file: Started executing attack based on default wordlist");
             }
         } else {
 
             CONSOLE.info("You have selected Bruteforce");
             CONSOLE.info("Starting INCREMENTAL Approach");
-            pskBruteForcerAttackClientCommandConfig.setGuessProviderType(GuessProviderType.INCREMENTING);
+            pskBruteForcerAttackClientCommandConfig.setGuessProviderType(
+                    GuessProviderType.INCREMENTING);
             CONSOLE.info(pskBruteForcerAttackClientCommandConfig.getGuessProviderType());
             pskBruteForcerAttackClientCommandConfig.setGuessProviderInputFile(null);
-
         }
-
     }
-
 }

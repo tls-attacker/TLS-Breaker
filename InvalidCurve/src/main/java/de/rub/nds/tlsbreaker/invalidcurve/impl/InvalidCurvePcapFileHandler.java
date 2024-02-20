@@ -1,25 +1,15 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.invalidcurve.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import static org.apache.commons.lang3.StringUtils.trim;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
@@ -29,6 +19,13 @@ import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapAnalyzer;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.PcapSession;
 import de.rub.nds.tlsbreaker.breakercommons.util.pcap.ServerSelection;
 import de.rub.nds.tlsbreaker.invalidcurve.config.InvalidCurveAttackConfig;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class InvalidCurvePcapFileHandler implements PcapFileHandler {
 
@@ -40,12 +37,14 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
     }
 
     public void handlePcapFile() {
-        PcapAnalyzer pcapAnalyzer = new PcapAnalyzer(invalidCurveAttackConfig.getPcapFileLocation());
+        PcapAnalyzer pcapAnalyzer =
+                new PcapAnalyzer(invalidCurveAttackConfig.getPcapFileLocation());
         List<PcapSession> sessions = pcapAnalyzer.getAllSessions();
 
         if (!sessions.isEmpty()) {
             ServerSelection invalidCurveServerSelection = new InvalidCurveServerSelection(sessions);
-            Map<String, List<PcapSession>> serverSessionsMap = invalidCurveServerSelection.getServerSessionsMap();
+            Map<String, List<PcapSession>> serverSessionsMap =
+                    invalidCurveServerSelection.getServerSessionsMap();
             List<String> uniqueServers = new ArrayList<>(serverSessionsMap.keySet());
             if (!uniqueServers.isEmpty()) {
                 CONSOLE.info("Found " + uniqueServers.size() + " servers from the pcap file.");
@@ -55,15 +54,23 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
                 if ("N".equals(userOption)) {
                     CONSOLE.info("Execution of the attack cancelled.");
                 } else if ("a".equals(userOption)) {
-                    checkVulnerabilityOfAllServersAndDisplay(uniqueServers, invalidCurveAttackConfig, consoleInteractor,
-                        serverSessionsMap);
+                    checkVulnerabilityOfAllServersAndDisplay(
+                            uniqueServers,
+                            invalidCurveAttackConfig,
+                            consoleInteractor,
+                            serverSessionsMap);
                 } else if (isCommaSeparatedList(userOption)) {
                     List<String> hosts = new ArrayList<>();
-                    Arrays.stream(userOption.split(",")).forEach(
-                        serverNumber -> hosts.add(uniqueServers.get(Integer.parseInt(trim(serverNumber)) - 1)));
+                    Arrays.stream(userOption.split(","))
+                            .forEach(
+                                    serverNumber ->
+                                            hosts.add(
+                                                    uniqueServers.get(
+                                                            Integer.parseInt(trim(serverNumber))
+                                                                    - 1)));
 
-                    checkVulnerabilityOfAllServersAndDisplay(hosts, invalidCurveAttackConfig, consoleInteractor,
-                        serverSessionsMap);
+                    checkVulnerabilityOfAllServersAndDisplay(
+                            hosts, invalidCurveAttackConfig, consoleInteractor, serverSessionsMap);
                 } else {
                     String host = uniqueServers.get(Integer.parseInt(userOption) - 1);
                     LOGGER.info("Selected server: " + host);
@@ -90,10 +97,13 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
         }
     }
 
-    private void checkVulnerabilityOfAllServersAndDisplay(List<String> uniqueServers,
-        InvalidCurveAttackConfig invalidCurveAttackConfig, ConsoleInteractor consoleInteractor,
-        Map<String, List<PcapSession>> serverSessionsMap) {
-        List<String> vulnerableServers = getVulnerableServers(uniqueServers, invalidCurveAttackConfig);
+    private void checkVulnerabilityOfAllServersAndDisplay(
+            List<String> uniqueServers,
+            InvalidCurveAttackConfig invalidCurveAttackConfig,
+            ConsoleInteractor consoleInteractor,
+            Map<String, List<PcapSession>> serverSessionsMap) {
+        List<String> vulnerableServers =
+                getVulnerableServers(uniqueServers, invalidCurveAttackConfig);
         CONSOLE.info("Found " + vulnerableServers.size() + "  vulnerable server.");
         if (!vulnerableServers.isEmpty()) {
             consoleInteractor.displayServers(vulnerableServers, serverSessionsMap);
@@ -114,18 +124,18 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
             String host = uniqueServers.get(serverNumber - 1);
             executeAttack(host, invalidCurveAttackConfig);
         }
-
     }
 
-    private List<String> getVulnerableServers(List<String> uniqueServers,
-        InvalidCurveAttackConfig invalidCurveAttackConfig) {
+    private List<String> getVulnerableServers(
+            List<String> uniqueServers, InvalidCurveAttackConfig invalidCurveAttackConfig) {
 
         List<String> vulnerableServers = new ArrayList<>();
         for (String server : uniqueServers) {
             invalidCurveAttackConfig.getClientDelegate().setHost(server);
 
             Attacker<? extends TLSDelegateConfig> attacker =
-                new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+                    new InvalidCurveAttacker(
+                            invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
 
             try {
                 Boolean result = attacker.checkVulnerability().asBool();
@@ -146,7 +156,8 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
         LOGGER.info("host=" + invalidCurveAttackConfig.getClientDelegate().getHost());
 
         Attacker<? extends TLSDelegateConfig> attacker =
-            new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+                new InvalidCurveAttacker(
+                        invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
         attacker.attack();
     }
 
@@ -156,7 +167,8 @@ public class InvalidCurvePcapFileHandler implements PcapFileHandler {
 
     private Boolean checkVulnerability(InvalidCurveAttackConfig invalidCurveAttackConfig) {
         Attacker<? extends TLSDelegateConfig> attacker =
-            new InvalidCurveAttacker(invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
+                new InvalidCurveAttacker(
+                        invalidCurveAttackConfig, invalidCurveAttackConfig.createConfig());
         Boolean result = null;
         try {
             result = attacker.checkVulnerability().asBool();

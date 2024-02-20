@@ -1,37 +1,32 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.invalidcurve.ec;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.rub.nds.tlsattacker.core.constants.NamedGroup;
 import de.rub.nds.tlsattacker.core.crypto.ec.CurveFactory;
 import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurve;
 import de.rub.nds.tlsattacker.core.crypto.ec.FieldElementFp;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class InvalidCurvePointTest {
 
-    public InvalidCurvePointTest() {
-    }
+    public InvalidCurvePointTest() {}
 
-    /**
-     * Test points of small order.
-     */
+    /** Test points of small order. */
     @Test
     public void testSmallOrder() {
         List<NamedGroup> knownGroups = new ArrayList<>(Arrays.asList(NamedGroup.values()));
@@ -45,9 +40,7 @@ public class InvalidCurvePointTest {
         }
     }
 
-    /**
-     * Test points of alternative order.
-     */
+    /** Test points of alternative order. */
     @Test
     public void testAlternativeOrder() {
         List<NamedGroup> knownGroups = new ArrayList<>(Arrays.asList(NamedGroup.values()));
@@ -61,9 +54,7 @@ public class InvalidCurvePointTest {
         }
     }
 
-    /**
-     * Test points of large order.
-     */
+    /** Test points of large order. */
     @Test
     public void testLargeOrder() {
         List<NamedGroup> knownGroups = new ArrayList<>(Arrays.asList(NamedGroup.values()));
@@ -109,7 +100,8 @@ public class InvalidCurvePointTest {
         } else if (invP2 != null && invP1.getOrder().compareTo(invP2.getOrder()) >= 0) {
             return false;
         } else
-            return invP3 == null || invP2 == null || invP2.getOrder().compareTo(invP3.getOrder()) < 0;
+            return invP3 == null
+                    || invP2 == null
+                    || invP2.getOrder().compareTo(invP3.getOrder()) < 0;
     }
-
 }

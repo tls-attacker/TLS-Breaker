@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.cca;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
@@ -30,13 +29,12 @@ public class CcaCertificateGenerator {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     *
-     * @param  ccaCertificateManager
-     * @param  ccaCertificateType
+     * @param ccaCertificateManager
+     * @param ccaCertificateType
      * @return
      */
-    public static CertificateMessage generateCertificate(CcaCertificateManager ccaCertificateManager,
-        CcaCertificateType ccaCertificateType) {
+    public static CertificateMessage generateCertificate(
+            CcaCertificateManager ccaCertificateManager, CcaCertificateType ccaCertificateType) {
         CertificateMessage certificateMessage = new CertificateMessage();
         if (ccaCertificateType != null) {
             switch (ccaCertificateType) {
@@ -44,15 +42,17 @@ public class CcaCertificateGenerator {
                     List<CertificatePair> certificatePairsList = new LinkedList<>();
 
                     CcaCertificateChain ccaCertificateChain =
-                        ccaCertificateManager.getCertificateChain(ccaCertificateType);
+                            ccaCertificateManager.getCertificateChain(ccaCertificateType);
                     if (ccaCertificateChain != null) {
                         CertificatePair certificatePair =
-                            new CertificatePair(ccaCertificateChain.getEncodedCertificates().get(0));
+                                new CertificatePair(
+                                        ccaCertificateChain.getEncodedCertificates().get(0));
                         certificatePairsList.add(certificatePair);
                         certificateMessage.setCertificatesList(certificatePairsList);
                         break;
                     }
-                    LOGGER.warn("Tried to fetch undefined client certificate - falling back to empty certificate");
+                    LOGGER.warn(
+                            "Tried to fetch undefined client certificate - falling back to empty certificate");
                 case EMPTY:
                     certificateMessage.setCertificatesListBytes(Modifiable.explicit(new byte[0]));
                     break;
@@ -121,11 +121,16 @@ public class CcaCertificateGenerator {
                 case DSAROOTv3_CAv3_LEAF_DHv3:
                 case ROOTv3_CAv3_LEAFv3_nLEAF_RSAv3:
                     if (ccaCertificateManager.getCertificateChain(ccaCertificateType) != null) {
-                        certificateMessage = generateCertificateMessage(ccaCertificateManager, ccaCertificateType);
+                        certificateMessage =
+                                generateCertificateMessage(
+                                        ccaCertificateManager, ccaCertificateType);
                     } else {
-                        LOGGER.warn("Tried to fetch certificate for type " + ccaCertificateType
-                            + " that has not been generated - falling back to empty certificate");
-                        certificateMessage.setCertificatesListBytes(Modifiable.explicit(new byte[0]));
+                        LOGGER.warn(
+                                "Tried to fetch certificate for type "
+                                        + ccaCertificateType
+                                        + " that has not been generated - falling back to empty certificate");
+                        certificateMessage.setCertificatesListBytes(
+                                Modifiable.explicit(new byte[0]));
                     }
                     break;
                 default:
@@ -135,8 +140,8 @@ public class CcaCertificateGenerator {
         return certificateMessage;
     }
 
-    private static CertificateMessage generateCertificateMessage(CcaCertificateManager ccaCertificateManager,
-        CcaCertificateType ccaCertificateType) {
+    private static CertificateMessage generateCertificateMessage(
+            CcaCertificateManager ccaCertificateManager, CcaCertificateType ccaCertificateType) {
 
         CertificateMessage certificateMessage = new CertificateMessage();
         List<CertificatePair> certificatePairList = new LinkedList<>();
@@ -144,7 +149,8 @@ public class CcaCertificateGenerator {
         byte[] encodedLeafCertificate;
         CertificateKeyPair certificateKeyPair;
 
-        CcaCertificateChain ccaCertificateChain = ccaCertificateManager.getCertificateChain(ccaCertificateType);
+        CcaCertificateChain ccaCertificateChain =
+                ccaCertificateManager.getCertificateChain(ccaCertificateType);
 
         encodedLeafCertificate = ccaCertificateChain.getEncodedCertificates().get(0);
 
@@ -157,22 +163,26 @@ public class CcaCertificateGenerator {
 
         certificateMessage.setCertificatesList(certificatePairList);
         // Parse leaf certificate for CertificateKeyPair
-        Certificate certificate = parseCertificate(encodedLeafCertificate.length, encodedLeafCertificate);
+        Certificate certificate =
+                parseCertificate(encodedLeafCertificate.length, encodedLeafCertificate);
 
         if (certificate != null) {
             try {
                 certificateKeyPair =
-                    new CertificateKeyPair(certificate, (PrivateKey) ccaCertificateChain.getLeafCertificatePrivateKey(),
-                        (PublicKey) ccaCertificateChain.getLeafCertificatePublicKey());
+                        new CertificateKeyPair(
+                                certificate,
+                                (PrivateKey) ccaCertificateChain.getLeafCertificatePrivateKey(),
+                                (PublicKey) ccaCertificateChain.getLeafCertificatePublicKey());
             } catch (IOException ioe) {
                 LOGGER.error("IOE while creating CertificateKeyPair");
                 return null;
             }
         } else {
-            certificateKeyPair = new CertificateKeyPair(encodedLeafCertificate,
-                (PrivateKey) ccaCertificateChain.getLeafCertificatePrivateKey(),
-                (PublicKey) ccaCertificateChain.getLeafCertificatePublicKey());
-
+            certificateKeyPair =
+                    new CertificateKeyPair(
+                            encodedLeafCertificate,
+                            (PrivateKey) ccaCertificateChain.getLeafCertificatePrivateKey(),
+                            (PublicKey) ccaCertificateChain.getLeafCertificatePublicKey());
         }
         certificateMessage.setCertificateKeyPair(certificateKeyPair);
 
@@ -181,14 +191,18 @@ public class CcaCertificateGenerator {
 
     private static Certificate parseCertificate(int lengthBytes, byte[] bytesToParse) {
         try {
-            ByteArrayInputStream stream = new ByteArrayInputStream(ArrayConverter.concatenate(
-                ArrayConverter.intToBytes(lengthBytes + HandshakeByteLength.CERTIFICATES_LENGTH,
-                    HandshakeByteLength.CERTIFICATES_LENGTH),
-                ArrayConverter.intToBytes(lengthBytes, HandshakeByteLength.CERTIFICATES_LENGTH), bytesToParse));
+            ByteArrayInputStream stream =
+                    new ByteArrayInputStream(
+                            ArrayConverter.concatenate(
+                                    ArrayConverter.intToBytes(
+                                            lengthBytes + HandshakeByteLength.CERTIFICATES_LENGTH,
+                                            HandshakeByteLength.CERTIFICATES_LENGTH),
+                                    ArrayConverter.intToBytes(
+                                            lengthBytes, HandshakeByteLength.CERTIFICATES_LENGTH),
+                                    bytesToParse));
             return Certificate.parse(stream);
         } catch (Exception e) {
             return null;
         }
     }
-
 }

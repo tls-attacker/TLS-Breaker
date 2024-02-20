@@ -1,23 +1,15 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
-import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
-import de.rub.nds.tlsbreaker.breakercommons.exception.OracleUnstableException;
-import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
@@ -28,6 +20,13 @@ import de.rub.nds.tlsbreaker.breakercommons.attacker.Attacker;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.cca.vector.FingerprintTaskVectorPair;
 import de.rub.nds.tlsbreaker.breakercommons.cca.vector.VectorResponse;
+import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
+import de.rub.nds.tlsbreaker.breakercommons.exception.OracleUnstableException;
+import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityError;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.EqualityErrorTranslator;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.FingerPrintChecker;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
 import de.rub.nds.tlsbreaker.paddingoracle.padding.generator.PaddingTraceGenerator;
 import de.rub.nds.tlsbreaker.paddingoracle.padding.generator.PaddingTraceGeneratorFactory;
@@ -40,7 +39,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Executes a padding oracle attack check. It logs an error in case the tested server is vulnerable to poodle.
+ * Executes a padding oracle attack check. It logs an error in case the tested server is vulnerable
+ * to poodle.
  */
 public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> {
 
@@ -68,24 +68,25 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     private boolean erroneousScans = false;
 
     /**
-     *
      * @param paddingOracleConfig
      * @param baseConfig
      */
-    public PaddingOracleAttacker(PaddingOracleCommandConfig paddingOracleConfig, Config baseConfig) {
+    public PaddingOracleAttacker(
+            PaddingOracleCommandConfig paddingOracleConfig, Config baseConfig) {
         super(paddingOracleConfig, baseConfig);
         tlsConfig = getTlsConfig();
         executor = new ParallelExecutor(1, 3);
     }
 
     /**
-     *
      * @param paddingOracleConfig
      * @param baseConfig
      * @param executor
      */
-    public PaddingOracleAttacker(PaddingOracleCommandConfig paddingOracleConfig, Config baseConfig,
-        ParallelExecutor executor) {
+    public PaddingOracleAttacker(
+            PaddingOracleCommandConfig paddingOracleConfig,
+            Config baseConfig,
+            ParallelExecutor executor) {
         super(paddingOracleConfig, baseConfig);
         tlsConfig = getTlsConfig();
         this.executor = executor;
@@ -97,13 +98,12 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
      * @return
      */
     @Override
     public VulnerabilityType isVulnerable() {
-        CONSOLE
-            .info("A server is considered vulnerable to this attack if it responds differently to the test vectors.");
+        CONSOLE.info(
+                "A server is considered vulnerable to this attack if it responds differently to the test vectors.");
         CONSOLE.info("A server is considered secure if it always responds the same way.");
         EqualityError referenceError = null;
         fullResponseMap = new LinkedList<>();
@@ -118,14 +118,16 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
         }
         referenceError = getEqualityError(fullResponseMap);
         if (referenceError != EqualityError.NONE) {
-            CONSOLE.info("Found a behavior difference within the responses. The server could be vulnerable.");
+            CONSOLE.info(
+                    "Found a behavior difference within the responses. The server could be vulnerable.");
         } else {
-            CONSOLE
-                .info("Found no behavior difference within the responses. The server is very likely not vulnerable.");
+            CONSOLE.info(
+                    "Found no behavior difference within the responses. The server is very likely not vulnerable.");
         }
 
         CONSOLE.info(EqualityErrorTranslator.translation(referenceError, null, null));
-        if (referenceError != EqualityError.NONE || LOGGER.getLevel().isMoreSpecificThan(Level.INFO)) {
+        if (referenceError != EqualityError.NONE
+                || LOGGER.getLevel().isMoreSpecificThan(Level.INFO)) {
             LOGGER.debug("-------------(Not Grouped)-----------------");
             for (VectorResponse vectorResponse : fullResponseMap) {
                 LOGGER.debug(vectorResponse.toString());
@@ -137,16 +139,17 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
-     * @param  responseVectorListOne
-     * @param  responseVectorListTwo
+     * @param responseVectorListOne
+     * @param responseVectorListTwo
      * @return
      */
-    public boolean lookEqual(List<VectorResponse> responseVectorListOne, List<VectorResponse> responseVectorListTwo) {
+    public boolean lookEqual(
+            List<VectorResponse> responseVectorListOne,
+            List<VectorResponse> responseVectorListTwo) {
         boolean result = true;
         if (responseVectorListOne.size() != responseVectorListTwo.size()) {
             throw new OracleUnstableException(
-                "The padding oracle seems to be unstable - there is something going terrible wrong. We recommend manual analysis");
+                    "The padding oracle seems to be unstable - there is something going terrible wrong. We recommend manual analysis");
         }
 
         for (VectorResponse vectorResponseOne : responseVectorListOne) {
@@ -159,7 +162,8 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
                 }
             }
             if (vectorResponseOne.getFingerprint() == null) {
-                LOGGER.error("First vector has no fingerprint:" + testedSuite + " - " + testedVersion);
+                LOGGER.error(
+                        "First vector has no fingerprint:" + testedSuite + " - " + testedVersion);
                 result = false;
                 continue;
             }
@@ -169,15 +173,26 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
                 continue;
             }
             if (equivalentVector.getFingerprint() == null) {
-                LOGGER.warn("Equivalent vector has no fingerprint:" + testedSuite + " - " + testedVersion);
+                LOGGER.warn(
+                        "Equivalent vector has no fingerprint:"
+                                + testedSuite
+                                + " - "
+                                + testedVersion);
                 result = false;
                 continue;
             }
 
             EqualityError error =
-                FingerPrintChecker.checkEquality(vectorResponseOne.getFingerprint(), equivalentVector.getFingerprint());
+                    FingerPrintChecker.checkEquality(
+                            vectorResponseOne.getFingerprint(), equivalentVector.getFingerprint());
             if (error != EqualityError.NONE) {
-                LOGGER.warn("There is an error between rescan:" + error + " - " + testedSuite + " - " + testedVersion);
+                LOGGER.warn(
+                        "There is an error between rescan:"
+                                + error
+                                + " - "
+                                + testedSuite
+                                + " - "
+                                + testedVersion);
                 result = false;
             }
         }
@@ -185,19 +200,28 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
      * @return
      */
     public List<VectorResponse> createVectorResponseList() {
-        PaddingTraceGenerator generator = PaddingTraceGeneratorFactory.getPaddingTraceGenerator(config);
+        PaddingTraceGenerator generator =
+                PaddingTraceGeneratorFactory.getPaddingTraceGenerator(config);
         PaddingVectorGenerator vectorGenerator = generator.getVectorGenerator();
         List<TlsTask> taskList = new LinkedList<>();
         List<FingerprintTaskVectorPair> stateVectorPairList = new LinkedList<>();
-        for (PaddingVector vector : vectorGenerator.getVectors(tlsConfig.getDefaultSelectedCipherSuite(),
-            tlsConfig.getDefaultHighestClientProtocolVersion())) {
-            State state = new State(tlsConfig, generator.getPaddingOracleWorkflowTrace(tlsConfig, vector));
-            FingerPrintTask fingerPrintTask = new FingerPrintTask(state, additionalTimeout, increasingTimeout,
-                executor.getReexecutions(), additionalTcpTimeout);
+        for (PaddingVector vector :
+                vectorGenerator.getVectors(
+                        tlsConfig.getDefaultSelectedCipherSuite(),
+                        tlsConfig.getDefaultHighestClientProtocolVersion())) {
+            State state =
+                    new State(
+                            tlsConfig, generator.getPaddingOracleWorkflowTrace(tlsConfig, vector));
+            FingerPrintTask fingerPrintTask =
+                    new FingerPrintTask(
+                            state,
+                            additionalTimeout,
+                            increasingTimeout,
+                            executor.getReexecutions(),
+                            additionalTcpTimeout);
             taskList.add(fingerPrintTask);
             stateVectorPairList.add(new FingerprintTaskVectorPair(fingerPrintTask, vector));
         }
@@ -209,8 +233,16 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
                 erroneousScans = true;
                 LOGGER.warn("Could not extract fingerprint for " + pair.toString());
             } else {
-                testedSuite = pair.getFingerPrintTask().getState().getTlsContext().getSelectedCipherSuite();
-                testedVersion = pair.getFingerPrintTask().getState().getTlsContext().getSelectedProtocolVersion();
+                testedSuite =
+                        pair.getFingerPrintTask()
+                                .getState()
+                                .getTlsContext()
+                                .getSelectedCipherSuite();
+                testedVersion =
+                        pair.getFingerPrintTask()
+                                .getState()
+                                .getTlsContext()
+                                .getSelectedProtocolVersion();
                 if (testedSuite == null || testedVersion == null) {
                     LOGGER.fatal("Could not find ServerHello after successful extraction");
                     throw new OracleUnstableException("Fatal Extraction error");
@@ -225,7 +257,7 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     /**
      * This assumes that the responseVectorList only contains comparable vectors
      *
-     * @param  responseVectorList
+     * @param responseVectorList
      * @return
      */
     public EqualityError getEqualityError(List<VectorResponse> responseVectorList) {
@@ -236,14 +268,14 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
                     continue;
                 }
                 EqualityError error =
-                    FingerPrintChecker.checkEquality(responseOne.getFingerprint(), responseTwo.getFingerprint());
+                        FingerPrintChecker.checkEquality(
+                                responseOne.getFingerprint(), responseTwo.getFingerprint());
                 if (error != EqualityError.NONE) {
                     CONSOLE.info("Found an EqualityError: " + error);
                     LOGGER.debug("Fingerprint1: " + responseOne.getFingerprint().toString());
                     LOGGER.debug("Fingerprint2: " + responseTwo.getFingerprint().toString());
                     return error;
                 }
-
             }
         }
         return EqualityError.NONE;
@@ -258,7 +290,6 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
      * @return
      */
     public CipherSuite getTestedSuite() {
@@ -266,7 +297,6 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
      * @return
      */
     public ProtocolVersion getTestedVersion() {
@@ -274,7 +304,6 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     }
 
     /**
-     *
      * @return
      */
     public boolean isShakyScans() {
@@ -308,5 +337,4 @@ public class PaddingOracleAttacker extends Attacker<PaddingOracleCommandConfig> 
     public void setAdditionalTcpTimeout(long additionalTcpTimeout) {
         this.additionalTcpTimeout = additionalTcpTimeout;
     }
-
 }

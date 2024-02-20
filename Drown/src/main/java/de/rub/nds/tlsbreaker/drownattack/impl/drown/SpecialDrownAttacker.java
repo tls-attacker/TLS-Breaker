@@ -1,20 +1,17 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.Modifiable;
-import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
@@ -32,6 +29,8 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,7 +42,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,7 +88,8 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
             }
 
             if (!specialConfig.isGenCheckData() && !specialConfig.isAnalyzeCheckData()) {
-                throw new ConfigurationException("Specify whether to generate or analyze check data");
+                throw new ConfigurationException(
+                        "Specify whether to generate or analyze check data");
             }
             if (specialConfig.isGenCheckData()) {
                 vulnerabilityType = genLeakyExportCheckData(dataFilePath);
@@ -104,12 +103,11 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
     }
 
     /**
-     * Connects to a target host and writes a file to disk which will allow checkForLeakyExport() to check whether the
-     * server is affected by the "leaky export" oracle bug (CVE-2016-0704).
+     * Connects to a target host and writes a file to disk which will allow checkForLeakyExport() to
+     * check whether the server is affected by the "leaky export" oracle bug (CVE-2016-0704).
      *
-     * @param  dataFilePath
-     *                      Name of the data dump file for checkForLeakyExport().
-     * @return              Information whether the server is vulnerable, if already known
+     * @param dataFilePath Name of the data dump file for checkForLeakyExport().
+     * @return Information whether the server is vulnerable, if already known
      */
     private DrownVulnerabilityType genLeakyExportCheckData(String dataFilePath) {
         Config tlsConfig = getTlsConfig();
@@ -129,25 +127,30 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
         // The Premaster Secret is SECRET-KEY-DATA for SSLv2
         clientMasterKeyMessage.getComputations().setPremasterSecret(secretKeyData);
 
-        WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
-            .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(tlsConfig)
+                        .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
         trace.addTlsAction(new SendAction(clientMasterKeyMessage));
         trace.addTlsAction(new ReceiveAction(new SSL2ServerVerifyMessage()));
         State state = new State(tlsConfig, trace);
 
         WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        tlsConfig.getWorkflowExecutorType(), state);
         workflowExecutor.executeWorkflow();
 
         if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SSL2_SERVER_HELLO, trace)) {
             return DrownVulnerabilityType.NONE;
         }
 
-        SSL2ServerVerifyMessage serverVerifyMessage = (SSL2ServerVerifyMessage) WorkflowTraceUtil
-            .getFirstReceivedMessage(HandshakeMessageType.SSL2_SERVER_VERIFY, trace);
+        SSL2ServerVerifyMessage serverVerifyMessage =
+                (SSL2ServerVerifyMessage)
+                        WorkflowTraceUtil.getFirstReceivedMessage(
+                                HandshakeMessageType.SSL2_SERVER_VERIFY, trace);
         CONSOLE.info("Completed server connection");
         LeakyExportCheckData checkData =
-            new LeakyExportCheckData(state.getTlsContext(), clientMasterKeyMessage, serverVerifyMessage);
+                new LeakyExportCheckData(
+                        state.getTlsContext(), clientMasterKeyMessage, serverVerifyMessage);
 
         try {
             FileOutputStream fileStream = new FileOutputStream(dataFilePath);
@@ -164,15 +167,14 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
     }
 
     /**
-     * Checks whether the server is affected by the "leaky export" oracle bug (CVE-2016-0704) based on data from
-     * genLeakyExportCheckData(). The bug allows to distinguish between an invalid ENCRYPTED-KEY-DATA ciphertext and a
-     * valid ciphertext decrypting to a message of the wrong length. This method performs brute-force computations and
-     * may take some time to run. It does not connect ot any remote hosts and can run completely offline.
+     * Checks whether the server is affected by the "leaky export" oracle bug (CVE-2016-0704) based
+     * on data from genLeakyExportCheckData(). The bug allows to distinguish between an invalid
+     * ENCRYPTED-KEY-DATA ciphertext and a valid ciphertext decrypting to a message of the wrong
+     * length. This method performs brute-force computations and may take some time to run. It does
+     * not connect ot any remote hosts and can run completely offline.
      *
-     * @param  dataFilePath
-     *                      Name of the data dump file from genLeakyExportCheckData().
-     *
-     * @return              Indication whether the server is vulnerable to the "leaky export" oracle attack
+     * @param dataFilePath Name of the data dump file from genLeakyExportCheckData().
+     * @return Indication whether the server is vulnerable to the "leaky export" oracle attack
      */
     private DrownVulnerabilityType checkForLeakyExport(String dataFilePath) {
         LeakyExportCheckData checkData;
@@ -185,7 +187,10 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        CONSOLE.info("Check data read from " + dataFilePath + ", now trying to brute-force server randomness");
+        CONSOLE.info(
+                "Check data read from "
+                        + dataFilePath
+                        + ", now trying to brute-force server randomness");
 
         int threadNumber = Runtime.getRuntime().availableProcessors();
         CONSOLE.info("Using " + threadNumber + " threads");
@@ -204,7 +209,8 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
                 firstByteTo = firstByteFrom + firstBytesPerThread;
             }
 
-            LeakyExportCheckCallable callable = new LeakyExportCheckCallable(firstByteFrom, firstByteTo, checkData);
+            LeakyExportCheckCallable callable =
+                    new LeakyExportCheckCallable(firstByteFrom, firstByteTo, checkData);
             allCallables.add(callable);
             allResults.add(executor.submit(callable));
         }
@@ -215,7 +221,8 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
         // and more accurate progress indicator than processing the first bytes
         int processedSecondBytes;
 
-        outer: do {
+        outer:
+        do {
             processedSecondBytes = 0;
             for (LeakyExportCheckCallable callable : allCallables) {
                 processedSecondBytes += callable.getProcessedSecondBytes();
@@ -255,10 +262,10 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
     }
 
     /**
-     * Provides an estimate for how long it would take to do brute-force for Special DROWN with the "leaky export"
-     * oracle on the current hardware. MD5 hashing and symmetric encryption are performed, as required for "leaky
-     * export". This was originally implemented to get a feeling for the numbers during development, but might also be
-     * useful in other situations.
+     * Provides an estimate for how long it would take to do brute-force for Special DROWN with the
+     * "leaky export" oracle on the current hardware. MD5 hashing and symmetric encryption are
+     * performed, as required for "leaky export". This was originally implemented to get a feeling
+     * for the numbers during development, but might also be useful in other situations.
      */
     private void leakyExportBenchmark() {
         long startTime = System.currentTimeMillis();
@@ -273,7 +280,10 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
         byte[] challenge = new byte[16];
         context.getRandom().nextBytes(challenge);
         byte[] sessionId = context.getChooser().getServerSessionId();
-        byte[] baseMasterKey = new byte[cipherSuite.getClearKeyByteNumber() + cipherSuite.getSecretKeyByteNumber()];
+        byte[] baseMasterKey =
+                new byte
+                        [cipherSuite.getClearKeyByteNumber()
+                                + cipherSuite.getSecretKeyByteNumber()];
         context.getRandom().nextBytes(baseMasterKey);
 
         int threadNumber = Runtime.getRuntime().availableProcessors();
@@ -291,7 +301,7 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
             }
 
             LeakyExportBenchmarkRunnable runnable =
-                new LeakyExportBenchmarkRunnable(cipherSuite, firstByteFrom, firstByteTo);
+                    new LeakyExportBenchmarkRunnable(cipherSuite, firstByteFrom, firstByteTo);
             runnable.init(encrypted, baseMasterKey, challenge, sessionId, iv);
             executor.execute(runnable);
         }
@@ -310,10 +320,14 @@ public class SpecialDrownAttacker extends BaseDrownAttacker {
         int durationSecs = (int) durationMillis / 1000;
         CONSOLE.info("Time for brute-forcing 3 bytes: " + durationSecs + " seconds");
         long completeMills = durationMillis * 256 * 256;
-        String completeStr = DurationFormatUtils.formatDuration(completeMills, "d 'days', H 'hours', m 'minutes'");
+        String completeStr =
+                DurationFormatUtils.formatDuration(
+                        completeMills, "d 'days', H 'hours', m 'minutes'");
         CONSOLE.info("Estimated time to completely brute-force 5 bytes: " + completeStr);
         long expectedMillis = completeMills / 2;
-        String expectedStr = DurationFormatUtils.formatDuration(expectedMillis, "d 'days', H 'hours', m 'minutes'");
+        String expectedStr =
+                DurationFormatUtils.formatDuration(
+                        expectedMillis, "d 'days', H 'hours', m 'minutes'");
         CONSOLE.info("Estimated average time spent brute-forcing 5 bytes: " + expectedStr);
     }
 }

@@ -1,20 +1,19 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.task;
 
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,8 +31,12 @@ public class FingerPrintTask extends TlsTask {
         this.state = state;
     }
 
-    public FingerPrintTask(State state, long additionalTimeout, boolean increasingTimeout, int reexecutions,
-        long additionalTcpTimeout) {
+    public FingerPrintTask(
+            State state,
+            long additionalTimeout,
+            boolean increasingTimeout,
+            int reexecutions,
+            long additionalTcpTimeout) {
         super(reexecutions, additionalTimeout, increasingTimeout, additionalTcpTimeout);
         this.state = state;
     }
@@ -42,7 +45,8 @@ public class FingerPrintTask extends TlsTask {
     public boolean execute() {
         try {
             WorkflowExecutor executor =
-                WorkflowExecutorFactory.createWorkflowExecutor(state.getConfig().getWorkflowExecutorType(), state);
+                    WorkflowExecutorFactory.createWorkflowExecutor(
+                            state.getConfig().getWorkflowExecutorType(), state);
             executor.executeWorkflow();
 
             if (!state.getWorkflowTrace().executedAsPlanned()) {

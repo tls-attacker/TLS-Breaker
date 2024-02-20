@@ -1,20 +1,15 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.heartbleed.config;
-
-import java.util.LinkedList;
-import java.util.List;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
@@ -31,42 +26,45 @@ import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.ClientDelegate;
+import java.util.LinkedList;
+import java.util.List;
 
-/**
- *
- */
+/** */
 public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackConfig {
 
-    /**
-     *
-     */
+    /** */
     public static final String ATTACK_COMMAND = "heartbleed";
 
-    @Parameter(names = "-payload_length", description = "Payload length sent in the client heartbeat message")
+    @Parameter(
+            names = "-payload_length",
+            description = "Payload length sent in the client heartbeat message")
     private Integer payloadLength = 65535;
 
-    @ParametersDelegate
-    private ClientDelegate clientDelegate;
-    @ParametersDelegate
-    private AttackDelegate attackDelegate;
-    @ParametersDelegate
-    private CipherSuiteDelegate ciphersuiteDelegate;
-    @ParametersDelegate
-    private ProtocolVersionDelegate protocolVersionDelegate;
-    @ParametersDelegate
-    private StarttlsDelegate starttlsDelegate;
-    @Parameter(names = "-pcap", description = "Location of the pcap file that will be used for the Attack.")
+    @ParametersDelegate private ClientDelegate clientDelegate;
+    @ParametersDelegate private AttackDelegate attackDelegate;
+    @ParametersDelegate private CipherSuiteDelegate ciphersuiteDelegate;
+    @ParametersDelegate private ProtocolVersionDelegate protocolVersionDelegate;
+    @ParametersDelegate private StarttlsDelegate starttlsDelegate;
+
+    @Parameter(
+            names = "-pcap",
+            description = "Location of the pcap file that will be used for the Attack.")
     private String pcapFileLocation;
+
     @Parameter(names = "-heartbeats", description = "Number of heartbeat messages to be sent.")
     private Integer heartbeatCount = 5;
+
     @Parameter(names = "-dump", description = "Dumps the raw server data to the specified file.")
     private String outputDumpFileLocation;
-    @Parameter(names = "-process_dump",
-        description = "Location of the text file (memory dump) that will be used " + "to search for the private key.")
+
+    @Parameter(
+            names = "-process_dump",
+            description =
+                    "Location of the text file (memory dump) that will be used "
+                            + "to search for the private key.")
     private String inputDumpFileLocation;
 
     /**
-     *
      * @param delegate
      */
     public HeartbleedCommandConfig(GeneralDelegate delegate) {
@@ -84,7 +82,6 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
     }
 
     /**
-     *
      * @return
      */
     public Integer getPayloadLength() {
@@ -92,7 +89,6 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
     }
 
     /**
-     *
      * @param payloadLength
      */
     public void setPayloadLength(Integer payloadLength) {
@@ -100,7 +96,6 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -109,7 +104,6 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -119,12 +113,17 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
         config.setDefaultClientNamedGroups(getNamedGroups());
         config.setDefaultClientSupportedPointFormats(getPointFormats());
         config.setDefaultClientSupportedSignatureAndHashAlgorithms(getSignatureAndHashAlgorithm());
-        config.setDefaultPaddingExtensionBytes(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        config.setDefaultPaddingExtensionBytes(
+                new byte[] {
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0
+                });
         config.setAddEllipticCurveExtension(true);
         config.setAddSessionTicketTLSExtension(true);
         config.setAddHeartbeatExtension(true);
@@ -140,8 +139,10 @@ public class HeartbleedCommandConfig extends AttackConfig implements PcapAttackC
         config.setEarlyStop(true);
         boolean containsEc = false;
         for (CipherSuite suite : config.getDefaultClientSupportedCipherSuites()) {
-            KeyExchangeAlgorithm keyExchangeAlgorithm = AlgorithmResolver.getKeyExchangeAlgorithm(suite);
-            if (keyExchangeAlgorithm != null && keyExchangeAlgorithm.name().toUpperCase().contains("EC")) {
+            KeyExchangeAlgorithm keyExchangeAlgorithm =
+                    AlgorithmResolver.getKeyExchangeAlgorithm(suite);
+            if (keyExchangeAlgorithm != null
+                    && keyExchangeAlgorithm.name().toUpperCase().contains("EC")) {
                 containsEc = true;
                 break;
             }

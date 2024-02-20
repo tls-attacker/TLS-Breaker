@@ -1,27 +1,20 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.exception;
 
-/**
- *
- */
+/** */
 public class WordlistNotFoundException extends RuntimeException {
 
-    /**
-     *
-     */
-    public WordlistNotFoundException() {
-    }
+    /** */
+    public WordlistNotFoundException() {}
 
     /**
-     *
      * @param string
      */
     public WordlistNotFoundException(String string) {
@@ -29,7 +22,6 @@ public class WordlistNotFoundException extends RuntimeException {
     }
 
     /**
-     *
      * @param string
      * @param throwable
      */
@@ -38,7 +30,6 @@ public class WordlistNotFoundException extends RuntimeException {
     }
 
     /**
-     *
      * @param throwable
      */
     public WordlistNotFoundException(Throwable throwable) {
@@ -46,14 +37,13 @@ public class WordlistNotFoundException extends RuntimeException {
     }
 
     /**
-     *
      * @param string
      * @param throwable
      * @param bln
      * @param bln1
      */
-    public WordlistNotFoundException(String string, Throwable throwable, boolean bln, boolean bln1) {
+    public WordlistNotFoundException(
+            String string, Throwable throwable, boolean bln, boolean bln1) {
         super(string, throwable, bln, bln1);
     }
-
 }

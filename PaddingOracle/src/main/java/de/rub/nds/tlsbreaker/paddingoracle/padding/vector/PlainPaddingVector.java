@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.padding.vector;
 
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayExplicitValueModification;
@@ -14,17 +13,15 @@ import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.Record;
-
 import java.util.Objects;
 
-/**
- *
- */
+/** */
 public class PlainPaddingVector extends PaddingVector {
 
     private final ByteArrayExplicitValueModification modification;
 
-    public PlainPaddingVector(String name, String identifier, ByteArrayExplicitValueModification modification) {
+    public PlainPaddingVector(
+            String name, String identifier, ByteArrayExplicitValueModification modification) {
         super(name, identifier);
         this.modification = modification;
     }
@@ -74,7 +71,8 @@ public class PlainPaddingVector extends PaddingVector {
     }
 
     @Override
-    public int getRecordLength(CipherSuite testedSuite, ProtocolVersion testedVersion, int appDataLength) {
+    public int getRecordLength(
+            CipherSuite testedSuite, ProtocolVersion testedVersion, int appDataLength) {
         Record r = createRecord();
         r.getComputations().setPlainRecordBytes(new byte[appDataLength]);
         int size = r.getComputations().getPlainRecordBytes().getValue().length;

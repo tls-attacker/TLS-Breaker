@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import java.math.BigInteger;
@@ -26,7 +25,7 @@ class SimpleCoprimePairGenerator extends CoprimePairGenerator {
         // TODO: Intuitively, neighboring number should always be coprime, but
         // is that really the case?
         long t = nextU + 1;
-        BigInteger[] pair = { BigInteger.valueOf(nextU), BigInteger.valueOf(t) };
+        BigInteger[] pair = {BigInteger.valueOf(nextU), BigInteger.valueOf(t)};
 
         numberOfQueries++;
         nextU += 2;
@@ -38,5 +37,4 @@ class SimpleCoprimePairGenerator extends CoprimePairGenerator {
     public boolean hasNext() {
         return numberOfQueries < maxQueries;
     }
-
 }
