@@ -1,29 +1,27 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayExplicitValueModification;
-import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
-import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.TripleVector;
 import de.rub.nds.tlsattacker.core.constants.AlgorithmResolver;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.PaddingVector;
+import de.rub.nds.tlsbreaker.paddingoracle.padding.vector.TripleVector;
 import java.util.LinkedList;
 import java.util.List;
 
 public class LongRecordPaddingGenerator extends PaddingVectorGenerator {
 
     /**
-     *
-     * @param  suite
-     * @param  version
+     * @param suite
+     * @param version
      * @return
      */
     @Override
@@ -33,17 +31,30 @@ public class LongRecordPaddingGenerator extends PaddingVectorGenerator {
         List<PaddingVector> vectorList = new LinkedList<>();
         int blockSize = AlgorithmResolver.getCipher(suite).getBlocksize();
         int macSize = AlgorithmResolver.getMacAlgorithm(version, suite).getSize();
-        vectorList.add(new TripleVector("ValidPlainData", "ValidPlainData",
-            new ByteArrayExplicitValueModification(new byte[16384]),
-            new ByteArrayExplicitValueModification(
-                new byte[AlgorithmResolver.getMacAlgorithm(version, suite).getSize()]),
-            new ByteArrayExplicitValueModification(createPaddingBytes(calculateValidPaddingSize(blockSize, macSize)))));
-        vectorList.add(new TripleVector("InvalidPlainData", "InvalidPlainData",
-            new ByteArrayExplicitValueModification(new byte[16385]),
-            new ByteArrayExplicitValueModification(
-                new byte[AlgorithmResolver.getMacAlgorithm(version, suite).getSize()]),
-            new ByteArrayExplicitValueModification(
-                createPaddingBytes(calculateInvalidPaddingSize(blockSize, macSize)))));
+        vectorList.add(
+                new TripleVector(
+                        "ValidPlainData",
+                        "ValidPlainData",
+                        new ByteArrayExplicitValueModification(new byte[16384]),
+                        new ByteArrayExplicitValueModification(
+                                new byte
+                                        [AlgorithmResolver.getMacAlgorithm(version, suite)
+                                                .getSize()]),
+                        new ByteArrayExplicitValueModification(
+                                createPaddingBytes(
+                                        calculateValidPaddingSize(blockSize, macSize)))));
+        vectorList.add(
+                new TripleVector(
+                        "InvalidPlainData",
+                        "InvalidPlainData",
+                        new ByteArrayExplicitValueModification(new byte[16385]),
+                        new ByteArrayExplicitValueModification(
+                                new byte
+                                        [AlgorithmResolver.getMacAlgorithm(version, suite)
+                                                .getSize()]),
+                        new ByteArrayExplicitValueModification(
+                                createPaddingBytes(
+                                        calculateInvalidPaddingSize(blockSize, macSize)))));
         return vectorList;
     }
 
@@ -54,5 +65,4 @@ public class LongRecordPaddingGenerator extends PaddingVectorGenerator {
     private int calculateInvalidPaddingSize(int blocksize, int macSize) {
         return (blocksize - (macSize % blocksize)) - 1;
     }
-
 }

@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
 
 import java.util.*;
@@ -21,14 +20,16 @@ public abstract class ServerSelection {
 
     private void initializeServerSessionsMap(List<PcapSession> sessions) {
         List<PcapSession> filteredServers = filterServers(sessions);
-        filteredServers.forEach(pcapSession -> {
-            String destinationHost = pcapSession.getDestinationHost();
-            if (serverSessionsMap.containsKey(destinationHost)) {
-                serverSessionsMap.get(destinationHost).add(pcapSession);
-            } else {
-                serverSessionsMap.put(destinationHost, new ArrayList<>(Arrays.asList(pcapSession)));
-            }
-        });
+        filteredServers.forEach(
+                pcapSession -> {
+                    String destinationHost = pcapSession.getDestinationHost();
+                    if (serverSessionsMap.containsKey(destinationHost)) {
+                        serverSessionsMap.get(destinationHost).add(pcapSession);
+                    } else {
+                        serverSessionsMap.put(
+                                destinationHost, new ArrayList<>(Arrays.asList(pcapSession)));
+                    }
+                });
     }
 
     public Map<String, List<PcapSession>> getServerSessionsMap() {

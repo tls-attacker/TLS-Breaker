@@ -396,9 +396,6 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <configuration>
                     <java>
-                        <!-- Introduce spotless using ratchetFrom to format files gradually on change.
-                             Also avoid merge conflicts when merging into main due to one large format commit. -->
-                        <ratchetFrom>origin/main</ratchetFrom>
                         <lineEndings>GIT_ATTRIBUTES</lineEndings>
                         <trimTrailingWhitespace />
                         <endWithNewline />

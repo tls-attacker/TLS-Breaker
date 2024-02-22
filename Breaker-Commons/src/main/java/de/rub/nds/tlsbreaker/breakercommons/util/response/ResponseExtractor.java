@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.util.response;
 
 import de.rub.nds.tlsattacker.core.constants.ProtocolMessageType;
@@ -22,18 +21,14 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- *
- */
+/** */
 public class ResponseExtractor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     *
-     * @param  state
-     * @param  action
+     * @param state
+     * @param action
      * @return
      */
     public static ResponseFingerprint getFingerprint(State state, ReceivingAction action) {
@@ -44,8 +39,7 @@ public class ResponseExtractor {
     }
 
     /**
-     *
-     * @param  state
+     * @param state
      * @return
      */
     public static ResponseFingerprint getFingerprint(State state) {
@@ -56,7 +50,8 @@ public class ResponseExtractor {
     private static SocketState extractSocketState(State state) {
         if (state.getTlsContext().getTransportHandler() instanceof ClientTcpTransportHandler) {
             SocketState socketState =
-                (((ClientTcpTransportHandler) (state.getTlsContext().getTransportHandler())).getSocketState());
+                    (((ClientTcpTransportHandler) (state.getTlsContext().getTransportHandler()))
+                            .getSocketState());
             return socketState;
         } else {
             return null;
@@ -99,6 +94,5 @@ public class ResponseExtractor {
         return false;
     }
 
-    private ResponseExtractor() {
-    }
+    private ResponseExtractor() {}
 }

@@ -1,21 +1,19 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * A GuessProvider is responsible for the creation of byte[] sequences for brute
- * force attacks. The guess provider
- * should minimize the number of guesses according to heuristics.
+ * A GuessProvider is responsible for the creation of byte[] sequences for brute force attacks. The
+ * guess provider should minimize the number of guesses according to heuristics.
  */
 public abstract class GuessProvider implements Iterator<byte[]> {
 
@@ -24,17 +22,15 @@ public abstract class GuessProvider implements Iterator<byte[]> {
     /**
      * Constructor
      *
-     * @param type
-     *             Type of the GuessProvider
+     * @param type Type of the GuessProvider
      */
     protected GuessProvider(GuessProviderType type) {
         this.type = type;
     }
 
     /**
-     * Returns the next guess for the attack. Guesses should not repeat, but it is
-     * not completely prohibited by this
-     * API. Returns null if no more guesses are available.
+     * Returns the next guess for the attack. Guesses should not repeat, but it is not completely
+     * prohibited by this API. Returns null if no more guesses are available.
      *
      * @return The next byte[] to be used in the brute force attack.
      */

@@ -1,28 +1,24 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.padding.generator;
 
 import de.rub.nds.tlsbreaker.paddingoracle.config.PaddingOracleCommandConfig;
 
-/**
- *
- *
- */
+/** */
 public class PaddingTraceGeneratorFactory {
 
     /**
-     *
-     * @param  config
+     * @param config
      * @return
      */
-    public static PaddingTraceGenerator getPaddingTraceGenerator(PaddingOracleCommandConfig config) {
+    public static PaddingTraceGenerator getPaddingTraceGenerator(
+            PaddingOracleCommandConfig config) {
         switch (config.getVectorGeneratorType()) {
             case CLASSIC:
                 return new ClassicPaddingTraceGenerator(config.getRecordGeneratorType());
@@ -37,10 +33,10 @@ public class PaddingTraceGeneratorFactory {
             case HEARTBEAT:
                 return new HeartbeatPaddingTraceGenerator(config.getRecordGeneratorType());
             default:
-                throw new IllegalArgumentException("Unknown PaddingTraceGenerator: " + config.getVectorGeneratorType());
+                throw new IllegalArgumentException(
+                        "Unknown PaddingTraceGenerator: " + config.getVectorGeneratorType());
         }
     }
 
-    private PaddingTraceGeneratorFactory() {
-    }
+    private PaddingTraceGeneratorFactory() {}
 }

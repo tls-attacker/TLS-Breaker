@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.invalidcurve.ec.oracles;
 
 import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurveOverFp;
@@ -14,24 +13,21 @@ import de.rub.nds.tlsattacker.core.crypto.ec.Point;
 import java.math.BigInteger;
 
 /**
- * Simple EC computer with the double and add method and with the checks for infinity problems. The reason it is
- * included here is that the current EC computation in our TLS-core behaves similarly as in JSSE and its optimizations
- * return wrong results when working with invalid points with a small order.
+ * Simple EC computer with the double and add method and with the checks for infinity problems. The
+ * reason it is included here is that the current EC computation in our TLS-core behaves similarly
+ * as in JSSE and its optimizations return wrong results when working with invalid points with a
+ * small order.
  *
- * This EC computer should present a simple computation of the double and add method as was assumed in the original
- * paper of Jager et al.
+ * <p>This EC computer should present a simple computation of the double and add method as was
+ * assumed in the original paper of Jager et al.
  */
 public class SimpleDoubleAndAddComputer {
 
     private static final BigInteger TWO = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
-    /**
-     * curve with its parameters
-     */
+    /** curve with its parameters */
     private final EllipticCurveOverFp curve;
-    /**
-     * secret we use to multiply a given point
-     */
+    /** secret we use to multiply a given point */
     private final BigInteger privateKey;
 
     public SimpleDoubleAndAddComputer(EllipticCurveOverFp c, BigInteger privateKey) {
@@ -42,9 +38,8 @@ public class SimpleDoubleAndAddComputer {
     /**
      * Doubles point, does not check for infinity
      *
-     * @param  p
-     *           The point to double
-     * @return   The doubled point
+     * @param p The point to double
+     * @return The doubled point
      */
     public Point dbl(Point p) throws ArithmeticException {
 
@@ -68,11 +63,9 @@ public class SimpleDoubleAndAddComputer {
     /**
      * Doubles point, checks for infinity if checkInfinity set
      *
-     * @param  p
-     *                       The point to double
-     * @param  checkInfinity
-     *                       If we should check for infinity
-     * @return               the Doubled point
+     * @param p The point to double
+     * @param checkInfinity If we should check for infinity
+     * @return the Doubled point
      */
     public Point dbl(Point p, boolean checkInfinity) throws ArithmeticException {
         if (checkInfinity) {
@@ -89,11 +82,9 @@ public class SimpleDoubleAndAddComputer {
     /**
      * Provides point addition, without infinity check
      *
-     * @param  p
-     *           The point p to add
-     * @param  q
-     *           The point q to add
-     * @return   The result of the addition
+     * @param p The point p to add
+     * @param q The point q to add
+     * @return The result of the addition
      */
     public Point add(Point p, Point q) throws ArithmeticException {
         BigInteger xp = p.getFieldX().getData();
@@ -106,7 +97,8 @@ public class SimpleDoubleAndAddComputer {
         }
 
         BigInteger l =
-            ((yq.subtract(yp)).multiply((xq.subtract(xp)).modInverse(curve.getModulus()))).mod(curve.getModulus());
+                ((yq.subtract(yp)).multiply((xq.subtract(xp)).modInverse(curve.getModulus())))
+                        .mod(curve.getModulus());
         BigInteger xr = l.pow(2).subtract(xp).subtract(xq).mod(curve.getModulus());
         BigInteger yr = (l.multiply(xp.subtract(xr))).subtract(yp).mod(curve.getModulus());
         Point ret = curve.getPoint(xr, yr);
@@ -116,13 +108,10 @@ public class SimpleDoubleAndAddComputer {
     /**
      * Provides point addition, checks for infinity in case checkInfinity is set
      *
-     * @param  p
-     *                       The point p to add
-     * @param  q
-     *                       The point q to add
-     * @param  checkInfinity
-     *                       If we should check for infinity
-     * @return               The result of the addition
+     * @param p The point p to add
+     * @param q The point q to add
+     * @param checkInfinity If we should check for infinity
+     * @return The result of the addition
      */
     public Point add(Point p, Point q, boolean checkInfinity) {
         if (checkInfinity) {
@@ -147,11 +136,9 @@ public class SimpleDoubleAndAddComputer {
     /**
      * Simple point multiplication
      *
-     * @param  p
-     *                       The Point p to multiply
-     * @param  checkInfinity
-     *                       If we should check for infinity
-     * @return               The result of the multiplication
+     * @param p The Point p to multiply
+     * @param checkInfinity If we should check for infinity
+     * @return The result of the multiplication
      */
     public Point mul(Point p, boolean checkInfinity) {
 

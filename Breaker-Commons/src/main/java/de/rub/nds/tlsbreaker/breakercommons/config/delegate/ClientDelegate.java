@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.config.delegate;
 
 import com.beust.jcommander.Parameter;
@@ -15,9 +14,8 @@ import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.Delegate;
 import de.rub.nds.tlsattacker.core.connection.OutboundConnection;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
-import org.bouncycastle.util.IPAddress;
-
 import java.net.*;
+import org.bouncycastle.util.IPAddress;
 
 public class ClientDelegate extends Delegate {
 
@@ -33,8 +31,7 @@ public class ClientDelegate extends Delegate {
 
     private int extractedPort;
 
-    public ClientDelegate() {
-    }
+    public ClientDelegate() {}
 
     public String getHost() {
         return host;

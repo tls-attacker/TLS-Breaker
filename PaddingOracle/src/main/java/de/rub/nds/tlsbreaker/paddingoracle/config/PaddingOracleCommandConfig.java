@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.config;
 
 import com.beust.jcommander.Parameter;
@@ -25,43 +24,34 @@ import de.rub.nds.tlsbreaker.breakercommons.config.AttackConfig;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- */
+/** */
 public class PaddingOracleCommandConfig extends AttackConfig {
 
-    /**
-     *
-     */
+    /** */
     public static final String ATTACK_COMMAND = "padding_oracle";
 
-    @Parameter(names = { "-recordEngine", "-record_engine" },
-        description = "The record generator used for the PaddingOracle")
+    @Parameter(
+            names = {"-recordEngine", "-record_engine"},
+            description = "The record generator used for the PaddingOracle")
     private PaddingRecordGeneratorType recordGeneratorType = PaddingRecordGeneratorType.SHORT;
 
-    @Parameter(names = { "-vectorEngine", "-vector_engine" },
-        description = "The vector generator used for the PaddingOracle")
+    @Parameter(
+            names = {"-vectorEngine", "-vector_engine"},
+            description = "The vector generator used for the PaddingOracle")
     private PaddingVectorGeneratorType vectorGeneratorType = PaddingVectorGeneratorType.CLASSIC;
 
-    @ParametersDelegate
-    private ClientDelegate clientDelegate;
+    @ParametersDelegate private ClientDelegate clientDelegate;
 
-    @ParametersDelegate
-    private CipherSuiteDelegate ciphersuiteDelegate;
+    @ParametersDelegate private CipherSuiteDelegate ciphersuiteDelegate;
 
-    @ParametersDelegate
-    private ProtocolVersionDelegate protocolVersionDelegate;
+    @ParametersDelegate private ProtocolVersionDelegate protocolVersionDelegate;
 
-    @ParametersDelegate
-    private StarttlsDelegate starttlsDelegate;
+    @ParametersDelegate private StarttlsDelegate starttlsDelegate;
 
-    /**
-     * How many rescans should be done
-     */
+    /** How many rescans should be done */
     private int numberOfIterations = 3;
 
     /**
-     *
      * @param delegate
      */
     public PaddingOracleCommandConfig(GeneralDelegate delegate) {
@@ -77,7 +67,6 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     public PaddingRecordGeneratorType getRecordGeneratorType() {
@@ -85,7 +74,6 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @param recordGeneratorType
      */
     public void setRecordGeneratorType(PaddingRecordGeneratorType recordGeneratorType) {
@@ -93,7 +81,6 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     public PaddingVectorGeneratorType getVectorGeneratorType() {
@@ -101,7 +88,6 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @param vectorGeneratorType
      */
     public void setVectorGeneratorType(PaddingVectorGeneratorType vectorGeneratorType) {
@@ -109,7 +95,6 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -123,8 +108,7 @@ public class PaddingOracleCommandConfig extends AttackConfig {
     }
 
     /**
-     *
-     * @param  config
+     * @param config
      * @return
      */
     @Override
@@ -154,8 +138,10 @@ public class PaddingOracleCommandConfig extends AttackConfig {
         config.setWorkflowExecutorShouldClose(false);
         boolean containsEc = false;
         for (CipherSuite suite : config.getDefaultClientSupportedCipherSuites()) {
-            KeyExchangeAlgorithm keyExchangeAlgorithm = AlgorithmResolver.getKeyExchangeAlgorithm(suite);
-            if (keyExchangeAlgorithm != null && keyExchangeAlgorithm.name().toUpperCase().contains("EC")) {
+            KeyExchangeAlgorithm keyExchangeAlgorithm =
+                    AlgorithmResolver.getKeyExchangeAlgorithm(suite);
+            if (keyExchangeAlgorithm != null
+                    && keyExchangeAlgorithm.name().toUpperCase().contains("EC")) {
                 containsEc = true;
                 break;
             }

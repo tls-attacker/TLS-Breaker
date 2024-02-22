@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
@@ -16,54 +15,34 @@ import java.security.interfaces.RSAPublicKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- *
- */
+/** */
 public class Pkcs1Attack {
 
-    /**
-     * Initialize the log4j LOGGER.
-     */
+    /** Initialize the log4j LOGGER. */
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     *
-     */
+    /** */
     protected final Pkcs1Oracle oracle;
 
-    /**
-     *
-     */
+    /** */
     protected final byte[] encryptedMsg;
 
-    /**
-     *
-     */
+    /** */
     protected final RSAPublicKey publicKey;
 
-    /**
-     *
-     */
+    /** */
     protected BigInteger c0;
 
-    /**
-     *
-     */
+    /** */
     protected final int blockSize;
 
-    /**
-     *
-     */
+    /** */
     protected BigInteger solution;
 
-    /**
-     *
-     */
+    /** */
     protected BigInteger bigB;
 
     /**
-     *
      * @param msg
      * @param pkcsOracle
      */
@@ -76,11 +55,9 @@ public class Pkcs1Attack {
     }
 
     /**
-     * @param  m
-     *            original message to be changed
-     * @param  si
-     *            factor
-     * @return    (m*si) mod N, or (m*si^e) mod N, depending on the oracle type, in a byte array
+     * @param m original message to be changed
+     * @param si factor
+     * @return (m*si) mod N, or (m*si^e) mod N, depending on the oracle type, in a byte array
      */
     protected byte[] prepareMsg(BigInteger m, BigInteger si) {
         byte[] msg;
@@ -90,11 +67,9 @@ public class Pkcs1Attack {
     }
 
     /**
-     * @param  m
-     *            original message to be changed
-     * @param  si
-     *            factor
-     * @return    (m*si) mod N, or (m*si^e) mod N, depending on the oracle type
+     * @param m original message to be changed
+     * @param si factor
+     * @return (m*si) mod N, or (m*si^e) mod N, depending on the oracle type
      */
     protected BigInteger multiply(BigInteger m, BigInteger si) {
         BigInteger tmp;
@@ -113,9 +88,8 @@ public class Pkcs1Attack {
     }
 
     /**
-     *
-     * @param  message
-     * @param  si
+     * @param message
+     * @param si
      * @return
      */
     protected boolean queryOracle(BigInteger message, BigInteger si) {
@@ -125,8 +99,7 @@ public class Pkcs1Attack {
     }
 
     /**
-     *
-     * @param  message
+     * @param message
      * @return
      */
     protected boolean queryOracle(BigInteger message) {
@@ -135,11 +108,9 @@ public class Pkcs1Attack {
     }
 
     /**
-     *
      * @return
      */
     public BigInteger getSolution() {
         return solution;
     }
-
 }

@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.invalidcurve.ec.oracles;
 
 import de.rub.nds.modifiablevariable.ModifiableVariableFactory;
@@ -14,6 +13,7 @@ import de.rub.nds.modifiablevariable.biginteger.BigIntegerModificationFactory;
 import de.rub.nds.modifiablevariable.biginteger.ModifiableBigInteger;
 import de.rub.nds.modifiablevariable.bytearray.ByteArrayModificationFactory;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.Bits;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -29,7 +29,6 @@ import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTraceUtil;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.logging.log4j.Level;
@@ -39,12 +38,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.bouncycastle.util.BigIntegers;
-import de.rub.nds.modifiablevariable.util.ArrayConverter;
 
-/**
- *
- *
- */
+/** */
 public class RealDirectMessageECOracle extends ECOracle {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -58,7 +53,6 @@ public class RealDirectMessageECOracle extends ECOracle {
     byte[] explicitPMS = new byte[100];
 
     /**
-     *
      * @param config
      * @param curve
      */
@@ -77,21 +71,26 @@ public class RealDirectMessageECOracle extends ECOracle {
     @Override
     public boolean checkSecretCorrectness(Point ecPoint, BigInteger secret) {
 
-        WorkflowTrace trace = new WorkflowConfigurationFactory(config).createWorkflowTrace(WorkflowTraceType.HANDSHAKE,
-            RunningModeType.CLIENT);
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(config)
+                        .createWorkflowTrace(WorkflowTraceType.HANDSHAKE, RunningModeType.CLIENT);
 
-        ECDHClientKeyExchangeMessage message = (ECDHClientKeyExchangeMessage) WorkflowTraceUtil
-            .getFirstSendMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
+        ECDHClientKeyExchangeMessage message =
+                (ECDHClientKeyExchangeMessage)
+                        WorkflowTraceUtil.getFirstSendMessage(
+                                HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
         message.prepareComputations();
 
         // modify public point base X coordinate
         ModifiableBigInteger x = ModifiableVariableFactory.createBigIntegerModifiableVariable();
-        x.setModification(BigIntegerModificationFactory.explicitValue(ecPoint.getFieldX().getData()));
+        x.setModification(
+                BigIntegerModificationFactory.explicitValue(ecPoint.getFieldX().getData()));
         message.getComputations().setPublicKeyX(x);
 
         // modify public point base Y coordinate
         ModifiableBigInteger y = ModifiableVariableFactory.createBigIntegerModifiableVariable();
-        y.setModification(BigIntegerModificationFactory.explicitValue(ecPoint.getFieldY().getData()));
+        y.setModification(
+                BigIntegerModificationFactory.explicitValue(ecPoint.getFieldY().getData()));
         message.getComputations().setPublicKeyY(y);
 
         // set explicit premaster secret value (X value of the resulting point coordinate)
@@ -109,7 +108,8 @@ public class RealDirectMessageECOracle extends ECOracle {
 
         State state = new State(config, trace);
         WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(config.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        config.getWorkflowExecutorType(), state);
 
         boolean valid = true;
         try {
@@ -132,25 +132,30 @@ public class RealDirectMessageECOracle extends ECOracle {
     public boolean isFinalSolutionCorrect(BigInteger guessedSecret) {
         Point p = curve.mult(guessedSecret, checkPoint);
         byte[] pms =
-            BigIntegers.asUnsignedByteArray(curve.getModulus().bitLength() / Bits.IN_A_BYTE, p.getFieldX().getData());
+                BigIntegers.asUnsignedByteArray(
+                        curve.getModulus().bitLength() / Bits.IN_A_BYTE, p.getFieldX().getData());
         return Arrays.equals(checkPMS, pms);
     }
 
     /**
-     * Executes a valid workflow with valid points etc. and saves the values for further validation purposes.
+     * Executes a valid workflow with valid points etc. and saves the values for further validation
+     * purposes.
      */
     private void executeValidWorkflowAndExtractCheckValues() {
         State state = new State(config);
 
         WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(config.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        config.getWorkflowExecutorType(), state);
 
         WorkflowTrace trace = state.getWorkflowTrace();
 
         workflowExecutor.executeWorkflow();
 
-        ECDHClientKeyExchangeMessage message = (ECDHClientKeyExchangeMessage) WorkflowTraceUtil
-            .getFirstSendMessage(HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
+        ECDHClientKeyExchangeMessage message =
+                (ECDHClientKeyExchangeMessage)
+                        WorkflowTraceUtil.getFirstSendMessage(
+                                HandshakeMessageType.CLIENT_KEY_EXCHANGE, trace);
         // TODO Those values can be retrieved from the context
         // get public point base X and Y coordinates
         try {

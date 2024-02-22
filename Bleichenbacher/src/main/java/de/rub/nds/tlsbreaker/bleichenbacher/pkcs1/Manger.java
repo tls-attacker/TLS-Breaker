@@ -1,25 +1,24 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
-import de.rub.nds.tlsbreaker.breakercommons.cca.OracleException;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import de.rub.nds.tlsattacker.util.MathHelper;
+import de.rub.nds.tlsbreaker.breakercommons.cca.OracleException;
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
 import java.math.BigInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Manger algorithm according to https://www.iacr.org/archive/crypto2001/21390229.pdf Original Python code written by
- * Tibor Jager
+ * Manger algorithm according to https://www.iacr.org/archive/crypto2001/21390229.pdf Original
+ * Python code written by Tibor Jager
  *
  * @version 0.1
  */
@@ -27,15 +26,12 @@ public class Manger extends Pkcs1Attack {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     *
-     */
+    /** */
     protected Interval result;
 
     private volatile boolean interrupted = false;
 
     /**
-     *
      * @param msg
      * @param pkcsOracle
      */
@@ -50,7 +46,6 @@ public class Manger extends Pkcs1Attack {
     }
 
     /**
-     *
      * @throws OracleException
      */
     public void attack() throws OracleException {
@@ -72,7 +67,8 @@ public class Manger extends Pkcs1Attack {
             }
         }
 
-        LOGGER.debug("Ciphertext after step 0: {}", ArrayConverter.bytesToHexString(c0.toByteArray()));
+        LOGGER.debug(
+                "Ciphertext after step 0: {}", ArrayConverter.bytesToHexString(c0.toByteArray()));
 
         LOGGER.debug("Step 1");
         BigInteger f1 = new BigInteger("2");
@@ -122,8 +118,9 @@ public class Manger extends Pkcs1Attack {
         }
 
         if (!interrupted) {
-            LOGGER.debug("Manger's attack solution (before inverse computation, if any): {}",
-                ArrayConverter.bytesToHexString(mmin.toByteArray()));
+            LOGGER.debug(
+                    "Manger's attack solution (before inverse computation, if any): {}",
+                    ArrayConverter.bytesToHexString(mmin.toByteArray()));
 
             if (fx.equals(BigInteger.ONE)) {
                 solution = mmin;
@@ -131,13 +128,13 @@ public class Manger extends Pkcs1Attack {
                 BigInteger inverse = fx.modInverse(publicKey.getModulus());
                 solution = mmin.multiply(inverse).mod(publicKey.getModulus());
             }
-            LOGGER.debug("Manger's attack solution (after inverse computation, if any): {}",
-                ArrayConverter.bytesToHexString(solution.toByteArray()));
+            LOGGER.debug(
+                    "Manger's attack solution (after inverse computation, if any): {}",
+                    ArrayConverter.bytesToHexString(solution.toByteArray()));
         }
     }
 
     /**
-     *
      * @return
      */
     public boolean isInterrupted() {
@@ -145,7 +142,6 @@ public class Manger extends Pkcs1Attack {
     }
 
     /**
-     *
      * @param interrupted
      */
     public void setInterrupted(boolean interrupted) {

@@ -1,31 +1,26 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.util.response;
 
 import java.io.EOFException;
-
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
-
 import org.apache.commons.codec.binary.Hex;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
-
 import org.pcap4j.packet.Packet;
-
 import org.pcap4j.packet.TcpPacket;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 @SuppressWarnings("javadoc")
 public class ExtractPmsData {
@@ -66,11 +61,9 @@ public class ExtractPmsData {
                 System.out.println("EOF");
                 break;
             }
-
         }
 
         handle.close();
         return null;
     }
-
 }
