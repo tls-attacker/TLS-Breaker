@@ -87,25 +87,7 @@ public class Lucky13Attacker extends Attacker<Lucky13CommandConfig> {
                 .getDefaultClientConnection()
                 .setTransportHandlerType(TransportHandlerType.TCP_PROXY_TIMING);
         tlsConfig.setWorkflowExecutorShouldClose(true);
-
-        WorkflowTrace trace =
-                new WorkflowConfigurationFactory(tlsConfig)
-                        .createWorkflowTrace(WorkflowTraceType.FULL, RunningModeType.CLIENT);
-
-        SendAction sendAction = (SendAction) trace.getLastSendingAction();
-        LinkedList<AbstractRecord> records = new LinkedList<>();
-        records.add(record);
-        sendAction.setRecords(records);
-
-        ReceiveAction action = new ReceiveAction();
-
-        AlertMessage alertMessage = new AlertMessage(tlsConfig);
-        List<ProtocolMessage> messages = new LinkedList<>();
-        messages.add(alertMessage);
-        action.setExpectedMessages(messages);
-        trace.addTlsAction(action);
-
-        State state = new State(tlsConfig, trace);
+        State state = buildAttackState(record);
         WorkflowExecutor workflowExecutor =
                 WorkflowExecutorFactory.createWorkflowExecutor(
                         tlsConfig.getWorkflowExecutorType(), state);
@@ -131,7 +113,25 @@ public class Lucky13Attacker extends Attacker<Lucky13CommandConfig> {
         }
     }
 
-    private Record createRecordWithPadding(int p, CipherSuite suite) {
+    public State buildAttackState(Record record) {
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(tlsConfig)
+                        .createWorkflowTrace(WorkflowTraceType.FULL, RunningModeType.CLIENT);
+        SendAction sendAction = (SendAction) trace.getLastSendingAction();
+        LinkedList<AbstractRecord> records = new LinkedList<>();
+        records.add(record);
+        sendAction.setRecords(records);
+        ReceiveAction action = new ReceiveAction();
+        AlertMessage alertMessage = new AlertMessage(tlsConfig);
+        List<ProtocolMessage> messages = new LinkedList<>();
+        messages.add(alertMessage);
+        action.setExpectedMessages(messages);
+        trace.addTlsAction(action);
+        State state = new State(tlsConfig, trace);
+        return state;
+    }
+
+    public Record createRecordWithPadding(int p, CipherSuite suite) {
         byte[] padding = createPaddingBytes(p);
         int recordLength = AlgorithmResolver.getCipher(suite).getBlocksize() * config.getBlocks();
         if (recordLength < padding.length) {

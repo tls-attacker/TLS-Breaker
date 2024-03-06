@@ -76,4 +76,12 @@ public class ProxyDelegate extends Delegate {
         }
         return port;
     }
+
+    public void setProxyData(String proxyData) {
+        this.proxyData = proxyData;
+    }
+
+    public void setProxyControl(String proxyControl) {
+        this.proxyControl = proxyControl;
+    }
 }
