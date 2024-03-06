@@ -1,22 +1,19 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.cca.vector;
 
-import de.rub.nds.tlsbreaker.breakercommons.cca.CcaCertificateType;
-import de.rub.nds.tlsbreaker.breakercommons.cca.CcaWorkflowType;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaCertificateType;
+import de.rub.nds.tlsbreaker.breakercommons.cca.CcaWorkflowType;
 
-/**
- *
- */
+/** */
 public class CcaVector {
 
     private final ProtocolVersion protocolVersion;
@@ -24,8 +21,11 @@ public class CcaVector {
     private final CcaWorkflowType ccaWorkflowType;
     private final CcaCertificateType ccaCertificateType;
 
-    public CcaVector(ProtocolVersion protocolVersion, CipherSuite cipherSuite, CcaWorkflowType ccaWorkflowType,
-        CcaCertificateType ccaCertificateType) {
+    public CcaVector(
+            ProtocolVersion protocolVersion,
+            CipherSuite cipherSuite,
+            CcaWorkflowType ccaWorkflowType,
+            CcaCertificateType ccaCertificateType) {
         this.protocolVersion = protocolVersion;
         this.cipherSuite = cipherSuite;
         this.ccaWorkflowType = ccaWorkflowType;
@@ -50,8 +50,14 @@ public class CcaVector {
 
     @Override
     public String toString() {
-        return "CcaTask{protocolVersion=" + protocolVersion + ", cipherSuite=" + cipherSuite + ", workflowType="
-            + ccaWorkflowType + ", certificateType=" + ccaCertificateType + "}";
+        return "CcaTask{protocolVersion="
+                + protocolVersion
+                + ", cipherSuite="
+                + cipherSuite
+                + ", workflowType="
+                + ccaWorkflowType
+                + ", certificateType="
+                + ccaCertificateType
+                + "}";
     }
-
 }

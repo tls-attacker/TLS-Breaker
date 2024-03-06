@@ -1,17 +1,15 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.cca;
 
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,46 +20,34 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class Pkcs1Oracle {
 
-    /**
-     * logger
-     */
+    /** logger */
     private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * number of queries issued to oracle
      */
-    /**
-     *
-     */
+    /** */
     protected long numberOfQueries;
     /*
      * block size of the encryption algorithm
      */
 
-    /**
-     *
-     */
+    /** */
     protected int blockSize;
     /*
      * public key of the oracle
      */
 
-    /**
-     *
-     */
+    /** */
     protected RSAPublicKey publicKey;
     /*
      * a boolean value indicating if the oracle is a plaintext oracle (oracle used for testing purposes) or a real
      * oracle needing to decrypt each ciphertext.
      */
 
-    /**
-     *
-     */
+    /** */
     protected boolean isPlaintextOracle = false;
-    /**
-     * oracle type according to the Crypto'12 paper
-     */
+    /** oracle type according to the Crypto'12 paper */
     protected OracleType oracleType = null;
 
     /**
@@ -94,9 +80,8 @@ public abstract class Pkcs1Oracle {
     /**
      * Checks for PKCS conformity - 00 02 padding 00 pms
      *
-     * @param  msg
-     *             Encrypted message to check for conformity
-     * @return     True if PKCS conforming, else false
+     * @param msg Encrypted message to check for conformity
+     * @return True if PKCS conforming, else false
      */
     public abstract boolean checkPKCSConformity(final byte[] msg) throws OracleException;
 
@@ -118,9 +103,7 @@ public abstract class Pkcs1Oracle {
         return oracleType;
     }
 
-    /**
-     *
-     */
+    /** */
     public void resetNumberOfQueries() {
         this.numberOfQueries = 0;
     }
@@ -128,59 +111,39 @@ public abstract class Pkcs1Oracle {
     /**
      * Oracle types defined in the Crypto'12 paper + specific oracles found during our research
      *
-     * TTT checks only 0x00 0x02 ...
+     * <p>TTT checks only 0x00 0x02 ...
      *
-     * FFF checks 0x00 0x02 on the beginning, the first 8 bytes cannot include 0x00 and the 0x00 byte has to be set on a
-     * correct position
+     * <p>FFF checks 0x00 0x02 on the beginning, the first 8 bytes cannot include 0x00 and the 0x00
+     * byte has to be set on a correct position
      *
-     * XMLENC checks if the key has a correct length (16, 24, or 32 bytes)
+     * <p>XMLENC checks if the key has a correct length (16, 24, or 32 bytes)
      *
-     * BigIP checks only the second byte 0x02 (the first 0x00 byte is not checked at all)
+     * <p>BigIP checks only the second byte 0x02 (the first 0x00 byte is not checked at all)
      *
-     * MANGER_0x00 checks only the first byte is equal to 0x00
+     * <p>MANGER_0x00 checks only the first byte is equal to 0x00
      */
     public enum OracleType {
 
-        /**
-         *
-         */
+        /** */
         TTT,
-        /**
-         *
-         */
+        /** */
         TFT,
-        /**
-         *
-         */
+        /** */
         FTT,
-        /**
-         *
-         */
+        /** */
         FFT,
-        /**
-         *
-         */
+        /** */
         FFF,
-        /**
-         *
-         */
+        /** */
         JSSE,
-        /**
-         *
-         */
+        /** */
         XMLENC,
-        /**
-         *
-         */
+        /** */
         BigIP,
-        /**
-         *
-         */
+        /** */
         MANGER_0x00,
 
-        /**
-         * Special DROWN "extra clear" oracle
-         */
+        /** Special DROWN "extra clear" oracle */
         DROWN_EXTRA_CLEAR
     }
 }

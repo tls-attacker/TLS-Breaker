@@ -1,15 +1,15 @@
+/*
+ * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
+ *
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
+ *
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ */
 package de.rub.nds.tlsbreaker.breakercommons.psk.config;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.delegate.CipherSuiteDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
@@ -20,25 +20,35 @@ import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
 import de.rub.nds.tlsbreaker.breakercommons.config.delegate.AttackDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.exception.WordlistNotFoundException;
 import de.rub.nds.tlsbreaker.breakercommons.psk.guessprovider.GuessProviderType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
-public abstract class PskBruteForcerAttackCommonCommandConfig extends AttackConfig implements PcapAttackConfig {
+public abstract class PskBruteForcerAttackCommonCommandConfig extends AttackConfig
+        implements PcapAttackConfig {
 
-    @ParametersDelegate
-    private CipherSuiteDelegate ciphersuiteDelegate;
-    @ParametersDelegate
-    private ProtocolVersionDelegate protocolVersionDelegate;
-    @ParametersDelegate
-    private AttackDelegate attackDelegate;
+    @ParametersDelegate private CipherSuiteDelegate ciphersuiteDelegate;
+    @ParametersDelegate private ProtocolVersionDelegate protocolVersionDelegate;
+    @ParametersDelegate private AttackDelegate attackDelegate;
 
-    @Parameter(names = { "-guessProviderType",
-            "-guess_provider_type" }, description = "Chooses how the BruteForcer will choose the keys to guess")
+    @Parameter(
+            names = {"-guessProviderType", "-guess_provider_type"},
+            description = "Chooses how the BruteForcer will choose the keys to guess")
     private GuessProviderType guessProviderType = GuessProviderType.INCREMENTING;
 
-    @Parameter(names = { "-guessProviderInputFile",
-            "-guess_provider_input_file" }, description = "Set the path to an input file which can be used in the guess provider eg. a path to a wordlist")
+    @Parameter(
+            names = {"-guessProviderInputFile", "-guess_provider_input_file"},
+            description =
+                    "Set the path to an input file which can be used in the guess provider eg. a path to a wordlist")
     private String guessProviderInputFile = null;
 
-    @Parameter(names = "-pcap", description = "Location of the pcap file that will be used for the Invalid Curve Attack.")
+    @Parameter(
+            names = "-pcap",
+            description =
+                    "Location of the pcap file that will be used for the Invalid Curve Attack.")
     private String pcapFileLocation;
 
     protected PskBruteForcerAttackCommonCommandConfig(GeneralDelegate generalDelegate) {
@@ -72,7 +82,8 @@ public abstract class PskBruteForcerAttackCommonCommandConfig extends AttackConf
     public InputStream getGuessProviderInputStream() {
         if (guessProviderInputFile == null) {
             if (guessProviderType == GuessProviderType.WORDLIST) {
-                return (PskBruteForcerAttackCommonCommandConfig.class.getClassLoader()
+                return (PskBruteForcerAttackCommonCommandConfig.class
+                        .getClassLoader()
                         .getResourceAsStream("psk_common_passwords.txt"));
             } else {
                 return System.in;
@@ -82,7 +93,8 @@ public abstract class PskBruteForcerAttackCommonCommandConfig extends AttackConf
             try {
                 return new FileInputStream(file);
             } catch (FileNotFoundException ex) {
-                throw new WordlistNotFoundException("Wordlist not found: " + file.getAbsolutePath(), ex);
+                throw new WordlistNotFoundException(
+                        "Wordlist not found: " + file.getAbsolutePath(), ex);
             }
         }
     }

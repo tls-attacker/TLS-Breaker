@@ -1,30 +1,27 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.util.pcap;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientHelloMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ClientKeyExchangeMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class PcapSession {
     /**
-     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages it contains may
-     * change) and information from the TCP packet header like the source and destination of the package.
-     *
+     * A PcapSession holds messages of TLS handshake (depending on implementation phase the messages
+     * it contains may change) and information from the TCP packet header like the source and
+     * destination of the package.
      */
-
     private HashSet<String> pcapIdentifier = new HashSet<>();
 
     private String packetSource;
@@ -61,10 +58,10 @@ public class PcapSession {
         return total_size;
     }
 
-    public PcapSession() {
-    }
+    public PcapSession() {}
 
-    public PcapSession(String source, String destination, String packetPortSrc, String PackerPortDst) {
+    public PcapSession(
+            String source, String destination, String packetPortSrc, String PackerPortDst) {
         packetSource = source;
         packetDestination = destination;
         packetPortSource = packetPortSrc;
@@ -151,7 +148,5 @@ public class PcapSession {
         if (serverHelloMessage != null) {
             this.serverHelloMessage = serverHelloMessage;
         }
-
     }
-
 }

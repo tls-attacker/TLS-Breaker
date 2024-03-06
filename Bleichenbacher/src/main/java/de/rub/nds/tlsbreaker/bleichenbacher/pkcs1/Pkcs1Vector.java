@@ -1,23 +1,18 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsbreaker.breakercommons.cca.vector.Vector;
-
 import java.util.Arrays;
 
-/**
- *
- *
- */
+/** */
 public class Pkcs1Vector implements Vector {
 
     private String name;
@@ -26,11 +21,9 @@ public class Pkcs1Vector implements Vector {
 
     private byte[] encryptedValue;
 
-    private Pkcs1Vector() {
-    }
+    private Pkcs1Vector() {}
 
     /**
-     *
      * @param name
      * @param value
      */
@@ -44,7 +37,6 @@ public class Pkcs1Vector implements Vector {
     }
 
     /**
-     *
      * @return
      */
     public byte[] getPlainValue() {
@@ -52,7 +44,6 @@ public class Pkcs1Vector implements Vector {
     }
 
     /**
-     *
      * @param plainValue
      */
     public void setPlainValue(byte[] plainValue) {
@@ -60,7 +51,6 @@ public class Pkcs1Vector implements Vector {
     }
 
     /**
-     *
      * @return
      */
     public byte[] getEncryptedValue() {
@@ -68,7 +58,6 @@ public class Pkcs1Vector implements Vector {
     }
 
     /**
-     *
      * @param encryptedValue
      */
     public void setEncryptedValue(byte[] encryptedValue) {
@@ -111,7 +100,13 @@ public class Pkcs1Vector implements Vector {
 
     @Override
     public String toString() {
-        return "" + name + "{" + "plainValue=" + ArrayConverter.bytesToHexString(plainValue) + ", encryptedValue="
-            + ArrayConverter.bytesToHexString(encryptedValue) + '}';
+        return ""
+                + name
+                + "{"
+                + "plainValue="
+                + ArrayConverter.bytesToHexString(plainValue)
+                + ", encryptedValue="
+                + ArrayConverter.bytesToHexString(encryptedValue)
+                + '}';
     }
 }

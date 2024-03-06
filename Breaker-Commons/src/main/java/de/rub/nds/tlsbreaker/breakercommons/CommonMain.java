@@ -1,10 +1,17 @@
+/*
+ * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
+ *
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
+ *
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ */
 package de.rub.nds.tlsbreaker.breakercommons;
 
 import static de.rub.nds.tlsattacker.util.ConsoleLogger.CONSOLE;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsbreaker.breakercommons.attacker.PcapFileHandler;
 import de.rub.nds.tlsbreaker.breakercommons.config.PcapAttackConfig;
@@ -12,10 +19,10 @@ import de.rub.nds.tlsbreaker.breakercommons.util.file.FileUtils;
 
 public class CommonMain {
 
-    private CommonMain() {
-    }
+    private CommonMain() {}
 
-    public static boolean parseConfig(String[] args, JCommander jc, GeneralDelegate generalDelegate) {
+    public static boolean parseConfig(
+            String[] args, JCommander jc, GeneralDelegate generalDelegate) {
         try {
             jc.parse(args);
         } catch (ParameterException ex) {
@@ -49,7 +56,8 @@ public class CommonMain {
         return true;
     }
 
-    public static boolean optionallyHandlePcap(PcapAttackConfig attackConfig, PcapFileHandler pcapFileHandler) {
+    public static boolean optionallyHandlePcap(
+            PcapAttackConfig attackConfig, PcapFileHandler pcapFileHandler) {
         final String pcapLocation = attackConfig.getPcapFileLocation();
         if (pcapLocation == null) {
             return false;

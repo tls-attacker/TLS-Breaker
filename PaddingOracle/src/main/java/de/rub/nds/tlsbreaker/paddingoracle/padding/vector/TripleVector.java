@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.paddingoracle.padding.vector;
 
 import de.rub.nds.modifiablevariable.VariableModification;
@@ -18,17 +17,19 @@ import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
 import de.rub.nds.tlsattacker.core.record.Record;
 import java.util.Objects;
 
-/**
- *
- */
+/** */
 public class TripleVector extends PaddingVector {
 
     private final VariableModification cleanModification;
     private final VariableModification macModification;
     private final VariableModification paddingModification;
 
-    public TripleVector(String name, String identifier, VariableModification cleanModification,
-        VariableModification macModification, VariableModification paddingModification) {
+    public TripleVector(
+            String name,
+            String identifier,
+            VariableModification cleanModification,
+            VariableModification macModification,
+            VariableModification paddingModification) {
         super(name, identifier);
         this.cleanModification = cleanModification;
         this.macModification = macModification;
@@ -98,25 +99,37 @@ public class TripleVector extends PaddingVector {
 
     @Override
     public String toString() {
-        return "" + name + "{" + "cleanModification=" + cleanModification + ", macModification=" + macModification
-            + ", paddingModification=" + paddingModification + '}';
+        return ""
+                + name
+                + "{"
+                + "cleanModification="
+                + cleanModification
+                + ", macModification="
+                + macModification
+                + ", paddingModification="
+                + paddingModification
+                + '}';
     }
 
     @Override
-    public int getRecordLength(CipherSuite testedSuite, ProtocolVersion testedVersion, int appDataLength) {
+    public int getRecordLength(
+            CipherSuite testedSuite, ProtocolVersion testedVersion, int appDataLength) {
         Record r = createRecord();
         int macLength = AlgorithmResolver.getMacAlgorithm(testedVersion, testedSuite).getSize();
 
         r.setCleanProtocolMessageBytes(new byte[appDataLength]);
         r.getComputations().setMac(new byte[macLength]);
-        int paddingLength = AlgorithmResolver.getCipher(testedSuite).getBlocksize()
-            - ((r.getCleanProtocolMessageBytes().getValue().length + r.getComputations().getMac().getValue().length)
-                % AlgorithmResolver.getCipher(testedSuite).getBlocksize());
+        int paddingLength =
+                AlgorithmResolver.getCipher(testedSuite).getBlocksize()
+                        - ((r.getCleanProtocolMessageBytes().getValue().length
+                                        + r.getComputations().getMac().getValue().length)
+                                % AlgorithmResolver.getCipher(testedSuite).getBlocksize());
 
         r.getComputations().setPadding(new byte[paddingLength]);
-        return ArrayConverter.concatenate(r.getCleanProtocolMessageBytes().getValue(),
-            r.getComputations().getMac().getValue(), r.getComputations().getPadding().getValue()).length;
-
+        return ArrayConverter.concatenate(
+                        r.getCleanProtocolMessageBytes().getValue(),
+                        r.getComputations().getMac().getValue(),
+                        r.getComputations().getPadding().getValue())
+                .length;
     }
-
 }

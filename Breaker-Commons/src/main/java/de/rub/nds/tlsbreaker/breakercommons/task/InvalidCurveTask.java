@@ -1,30 +1,26 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.task;
 
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;
-import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.task.TlsTask;
 import de.rub.nds.tlsattacker.transport.socket.SocketState;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseExtractor;
+import de.rub.nds.tlsbreaker.breakercommons.util.response.ResponseFingerprint;
 import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- */
+/** */
 public class InvalidCurveTask extends TlsTask {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -52,7 +48,8 @@ public class InvalidCurveTask extends TlsTask {
     public boolean execute() {
         try {
             WorkflowExecutor executor =
-                WorkflowExecutorFactory.createWorkflowExecutor(state.getConfig().getWorkflowExecutorType(), state);
+                    WorkflowExecutorFactory.createWorkflowExecutor(
+                            state.getConfig().getWorkflowExecutorType(), state);
             executor.executeWorkflow();
 
             if (getState().getTlsContext().getServerEcPublicKey() != null) {
@@ -106,5 +103,4 @@ public class InvalidCurveTask extends TlsTask {
     public int getAppliedSecret() {
         return appliedSecret;
     }
-
 }

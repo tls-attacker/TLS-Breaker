@@ -1,25 +1,23 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1;
-
-import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
-import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.StdPlainPkcs1Oracle;
-import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.TestPkcs1Oracle;
-import org.junit.jupiter.api.Test;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.StdPlainPkcs1Oracle;
+import de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles.TestPkcs1Oracle;
+import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 public class BleichenbacherOracleTest {
 
@@ -28,7 +26,8 @@ public class BleichenbacherOracleTest {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(1024);
         KeyPair keyPair = keyPairGenerator.genKeyPair();
-        Pkcs1Oracle oracle = new StdPlainPkcs1Oracle(keyPair.getPublic(), TestPkcs1Oracle.OracleType.JSSE, 128);
+        Pkcs1Oracle oracle =
+                new StdPlainPkcs1Oracle(keyPair.getPublic(), TestPkcs1Oracle.OracleType.JSSE, 128);
 
         byte[] msg = new byte[127];
         Arrays.fill(msg, (byte) 0x01);
@@ -51,7 +50,9 @@ public class BleichenbacherOracleTest {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(1024);
         KeyPair keyPair = keyPairGenerator.genKeyPair();
-        Pkcs1Oracle oracle = new StdPlainPkcs1Oracle(keyPair.getPublic(), TestPkcs1Oracle.OracleType.XMLENC, 128);
+        Pkcs1Oracle oracle =
+                new StdPlainPkcs1Oracle(
+                        keyPair.getPublic(), TestPkcs1Oracle.OracleType.XMLENC, 128);
 
         byte[] msg = new byte[127];
         Arrays.fill(msg, (byte) 0x01);

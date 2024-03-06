@@ -1,24 +1,22 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.config.delegate;
 
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * <p>Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License, Version 2.0
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * <p>Licensed under Apache License, Version 2.0 http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-//package de.rub.nds.tlsattacker.core.config.delegate;
+// package de.rub.nds.tlsattacker.core.config.delegate;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -32,8 +30,7 @@ public class ServerDelegate extends Delegate {
     @Parameter(names = "-port", description = "ServerPort")
     private Integer port = null;
 
-    public ServerDelegate() {
-    }
+    public ServerDelegate() {}
 
     public Integer getPort() {
         return port;

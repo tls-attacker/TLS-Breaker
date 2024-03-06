@@ -1,18 +1,16 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.poodle.util;
 
+import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import com.sun.net.httpserver.*;
 
 public class MyHttpHandler implements HttpHandler {
 
@@ -40,20 +38,15 @@ public class MyHttpHandler implements HttpHandler {
         }
 
         handleResponse(httpExchange, requestParamValue);
-
     }
 
     private String handleGetRequest(HttpExchange httpExchange) {
 
-        return httpExchange.
-
-            getRequestURI()
-
-            .toString();
-
+        return httpExchange.getRequestURI().toString();
     }
 
-    private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
+    private void handleResponse(HttpExchange httpExchange, String requestParamValue)
+            throws IOException {
 
         OutputStream outputStream = httpExchange.getResponseBody();
 
@@ -88,6 +81,5 @@ public class MyHttpHandler implements HttpHandler {
         outputStream.flush();
 
         outputStream.close();
-
     }
 }

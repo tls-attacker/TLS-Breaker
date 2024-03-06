@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.cca.vector;
 
 import de.rub.nds.tlsbreaker.breakercommons.task.FingerPrintTask;
@@ -32,7 +31,11 @@ public class FingerprintTaskVectorPair<T extends Vector> {
 
     @Override
     public String toString() {
-        return "FingerprintTaskVectorPair{" + "fingerPrintTask=" + fingerPrintTask + ", vector=" + vector + '}';
+        return "FingerprintTaskVectorPair{"
+                + "fingerPrintTask="
+                + fingerPrintTask
+                + ", vector="
+                + vector
+                + '}';
     }
-
 }

@@ -1,12 +1,11 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.bleichenbacher.pkcs1.oracles;
 
 import de.rub.nds.tlsbreaker.breakercommons.cca.Pkcs1Oracle;
@@ -20,7 +19,7 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     /**
      * checks the message and its PKCS#1 conformity according to the oracle type
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     boolean checkDecryptedBytes(final byte[] msg) {
@@ -99,9 +98,10 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     }
 
     /**
-     * Returns true if and only if the message contains a 0x00 byte in the decrypted text (except of the first 8 bytes)
+     * Returns true if and only if the message contains a 0x00 byte in the decrypted text (except of
+     * the first 8 bytes)
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     private boolean checkFirst(final byte[] msg) {
@@ -116,9 +116,10 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     }
 
     /**
-     * Returns true if and only if the message contains no 0x00 byte in the first 8 bytes of the decrypted text
+     * Returns true if and only if the message contains no 0x00 byte in the first 8 bytes of the
+     * decrypted text
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     private boolean checkSecond(final byte[] msg) {
@@ -132,9 +133,10 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     }
 
     /**
-     * Returns true if and only if the message contains the 0x00 byte on the correct position in the plaintext.
+     * Returns true if and only if the message contains the 0x00 byte on the correct position in the
+     * plaintext.
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     private boolean checkThird(final byte[] msg) {
@@ -148,14 +150,16 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     /**
      * JSSE bug Plaintext oracle, for testing purposes:
      *
-     * Example for 256/512 byte long RSA key: The oracle returns true if:
+     * <p>Example for 256/512 byte long RSA key: The oracle returns true if:
+     *
      * <ul>
-     * <li>first two bytes are equal to 0x00 0x02</li>
-     * <li>the following 8 bytes do not contain 0x00</li>
-     * <li>the following (l-48-80) bytes contain at least one 0x00 byte, where l is the message/key length</li>
+     *   <li>first two bytes are equal to 0x00 0x02
+     *   <li>the following 8 bytes do not contain 0x00
+     *   <li>the following (l-48-80) bytes contain at least one 0x00 byte, where l is the
+     *       message/key length
      * </ul>
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     private boolean checkJSSE(final byte[] msg) {
@@ -188,10 +192,10 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     }
 
     /**
-     * Presents an XML Encryption oracle. This oracle checks, if the wrapped key has a correct size. It must be either
-     * 16, 24, or 32 bytes long.
+     * Presents an XML Encryption oracle. This oracle checks, if the wrapped key has a correct size.
+     * It must be either 16, 24, or 32 bytes long.
      *
-     * @param  msg
+     * @param msg
      * @return
      */
     private boolean checkXMLENC(final byte[] msg) {
@@ -201,16 +205,18 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
             return false;
         }
 
-        return hasCorrectKeySize(16, msg) || hasCorrectKeySize(24, msg) || hasCorrectKeySize(32, msg);
+        return hasCorrectKeySize(16, msg)
+                || hasCorrectKeySize(24, msg)
+                || hasCorrectKeySize(32, msg);
     }
 
     /**
      * checks if the message contains byte b in the area between <from,to>
      *
-     * @param  b
-     * @param  msg
-     * @param  from
-     * @param  to
+     * @param b
+     * @param msg
+     * @param from
+     * @param to
      * @return
      */
     private boolean containsByte(final byte b, final byte[] msg, final int from, final int to) {
@@ -227,10 +233,8 @@ public abstract class TestPkcs1Oracle extends Pkcs1Oracle {
     /**
      * Checks, if 0x00 is defined on a good position and if before this 0x00 byte is no other 0x00
      *
-     * @param  keySize
-     *                 the length of the key included in the PKCS1 message
-     * @param  msg
-     *                 message
+     * @param keySize the length of the key included in the PKCS1 message
+     * @param msg message
      * @return
      */
     private boolean hasCorrectKeySize(final int keySize, final byte[] msg) {

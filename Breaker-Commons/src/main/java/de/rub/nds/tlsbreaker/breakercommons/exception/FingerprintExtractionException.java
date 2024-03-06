@@ -1,18 +1,16 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.breakercommons.exception;
 
 public class FingerprintExtractionException extends RuntimeException {
 
-    public FingerprintExtractionException() {
-    }
+    public FingerprintExtractionException() {}
 
     public FingerprintExtractionException(String string) {
         super(string);
@@ -26,8 +24,8 @@ public class FingerprintExtractionException extends RuntimeException {
         super(throwable);
     }
 
-    public FingerprintExtractionException(String string, Throwable throwable, boolean bln, boolean bln1) {
+    public FingerprintExtractionException(
+            String string, Throwable throwable, boolean bln, boolean bln1) {
         super(string, throwable, bln, bln1);
     }
-
 }

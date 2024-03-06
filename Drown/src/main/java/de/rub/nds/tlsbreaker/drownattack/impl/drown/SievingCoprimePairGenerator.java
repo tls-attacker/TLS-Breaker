@@ -1,18 +1,18 @@
-/**
+/*
  * TLS-Breaker - A tool collection of various attacks on TLS based on TLS-Attacker
  *
- * Copyright 2021-2022 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
+ * Copyright 2021-2024 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlsbreaker.drownattack.impl.drown;
 
 import java.math.BigInteger;
 
 /**
- * Coprime pair generator which generates a lot of fractions and sieves out those that qualify as "Trimmers".
+ * Coprime pair generator which generates a lot of fractions and sieves out those that qualify as
+ * "Trimmers".
  */
 class SievingCoprimePairGenerator extends CoprimePairGenerator {
 
@@ -37,7 +37,7 @@ class SievingCoprimePairGenerator extends CoprimePairGenerator {
             ensureRange();
         }
 
-        BigInteger[] pair = { ucandidate, tcandidate };
+        BigInteger[] pair = {ucandidate, tcandidate};
         ucandidate = ucandidate.add(BigInteger.ONE);
         numberOfQueries++;
 
@@ -45,8 +45,8 @@ class SievingCoprimePairGenerator extends CoprimePairGenerator {
     }
 
     /**
-     * Makes sure that the pair's fraction is within the range given by Bardou et al. 2012, by adjusting the values of u
-     * and t.
+     * Makes sure that the pair's fraction is within the range given by Bardou et al. 2012, by
+     * adjusting the values of u and t.
      */
     private void ensureRange() {
         float quotient = ucandidate.floatValue() / tcandidate.floatValue();
@@ -66,5 +66,4 @@ class SievingCoprimePairGenerator extends CoprimePairGenerator {
     public boolean hasNext() {
         return numberOfQueries < maxQueryCount;
     }
-
 }
