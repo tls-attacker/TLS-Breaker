@@ -63,6 +63,7 @@ public class PskBruteForcerAttackServer
 
         String clientIdentity = config.getPskIdentity();
         LOGGER.debug("Client Identity: {}", clientIdentity);
+        tlsConfig.setDefaultPSKIdentity(clientIdentity.getBytes());
         WorkflowTrace trace =
                 new WorkflowConfigurationFactory(tlsConfig)
                         .createWorkflowTrace(WorkflowTraceType.HELLO, RunningModeType.CLIENT);
@@ -92,6 +93,7 @@ public class PskBruteForcerAttackServer
         tlsConfig.setDefaultClientSupportedCipherSuites(suite);
         tlsConfig.setDefaultSelectedCipherSuite(suite);
         tlsConfig.setDefaultPSKKey(pskGuess);
+        tlsConfig.setDefaultPSKIdentity(config.getPskIdentity().getBytes());
         WorkflowTrace trace =
                 new WorkflowConfigurationFactory(tlsConfig)
                         .createWorkflowTrace(WorkflowTraceType.HANDSHAKE, RunningModeType.CLIENT);
