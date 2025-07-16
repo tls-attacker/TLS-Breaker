@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>de.rub.nds.tls.breaker</groupId>
                 <artifactId>breaker-commons</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>de.rub.nds.tls.breaker</groupId>
